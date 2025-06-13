@@ -68,8 +68,8 @@ const Register = () => {
       phone: "",
     },
     validationSchema,
-    onSubmit: (values) => {
-      dispatch(
+    onSubmit: async (values) => {
+      const result = await dispatch(
         createUser({
           firstName: values.firstName,
           lastName: values.lastName,
@@ -77,9 +77,13 @@ const Register = () => {
           email: values.email,
           phone: values.phone,
         })
-      );
-      formik.resetForm();
-      navigate("/login");
+      ).unwrap();
+      if(createUser.fulfilled.match(result)){
+        navigate('/login')
+      }
+      else{
+        formik.resetForm();
+      }
     },
   });
 

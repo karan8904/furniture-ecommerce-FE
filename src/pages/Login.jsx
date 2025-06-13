@@ -16,10 +16,13 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useFormik } from "formik";
 import { Link, useNavigate } from "react-router";
 import * as Yup from "yup";
+import { useDispatch } from "react-redux";
+import { loginUser } from "../slices/userSlice";
 
 const Login = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
+  const dispatch = useDispatch()
   const navigate = useNavigate();
 
   const textFieldStyling = {
@@ -39,9 +42,15 @@ const Login = () => {
       password: "",
     },
     validationSchema,
-    onSubmit: (values) => {
-      alert("Logged in successful.");
-      navigate("/");
+    onSubmit: async(values) => {
+      try {
+        dispatch(loginUser({email: values.email, password: values.password}))
+        navigate("/");
+      } catch (error) {
+        alert("Cannot login.. try again...")
+        formik.resetForm()
+        console.log(error)
+      }
     },
   });
 
