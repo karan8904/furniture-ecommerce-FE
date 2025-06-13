@@ -1,17 +1,17 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx' 
-import { store } from './app/store'
+import { store } from './app/store.js'
 import { Provider } from 'react-redux'
 import { createBrowserRouter, RouterProvider } from 'react-router'
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import Home from "./pages/Home";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import Shop from "./pages/Shop";
-import Register from "./pages/Register";
-import Login from "./pages/Login";
-import ForgotPassword from './pages/ForgotPassword'
+import Home from "./pages/Home.jsx";
+import About from "./pages/About.jsx";
+import Contact from "./pages/Contact.jsx";
+import Shop from "./pages/Shop.jsx";
+import Register from "./pages/Register.jsx";
+import Login from "./pages/Login.jsx";
+import ForgotPassword from './pages/ForgotPassword.jsx'
 import SingleProduct from './pages/SingleProduct.jsx'
 import Cart from './pages/Cart.jsx'
 import Checkout from './pages/Checkout.jsx'
