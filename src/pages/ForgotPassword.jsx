@@ -12,8 +12,11 @@ import {
 import { Link } from "react-router";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useDispatch } from "react-redux";
+import { forgotPassword } from "../slices/userSlice";
 
 const ForgotPassword = () => {
+  const dispatch = useDispatch()
   const validationSchema = Yup.object().shape({
     email: Yup.string()
       .email("Please enter valid email")
@@ -26,7 +29,7 @@ const ForgotPassword = () => {
     },
     validationSchema,
     onSubmit: (values) => {
-      
+      dispatch(forgotPassword(values))
     },
   });
 

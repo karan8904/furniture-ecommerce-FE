@@ -15,6 +15,7 @@ import ForgotPassword from './pages/ForgotPassword.jsx'
 import SingleProduct from './pages/SingleProduct.jsx'
 import Cart from './pages/Cart.jsx'
 import Checkout from './pages/Checkout.jsx'
+import ResetPassword from './pages/ResetPassword.jsx'
 import "@fontsource/poppins";
 
 const theme = createTheme({
@@ -46,7 +47,8 @@ const router = createBrowserRouter([
       { path: "/forgot-password", Component: ForgotPassword },
       { path: "/single-product", Component: SingleProduct},
       { path: "/cart", Component: Cart},
-      { path: "/checkout", Component: Checkout}
+      { path: "/checkout", Component: Checkout},
+      { path: "/password-reset/:userId/:token", Component: ResetPassword }
     ],
   },
 ]);

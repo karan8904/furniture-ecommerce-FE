@@ -44,13 +44,17 @@ const Login = () => {
     validationSchema,
     onSubmit: async(values) => {
       try {
-        dispatch(loginUser({email: values.email, password: values.password}))
-        navigate("/");
+        const result = await dispatch(loginUser({email: values.email, password: values.password})).unwrap()
+        console.log("result",result)
       } catch (error) {
-        alert("Cannot login.. try again...")
-        formik.resetForm()
-        console.log(error)
+          console.log(error)
       }
+      // if(loginUser.fulfilled.match(result)){
+      //   formik.resetForm()
+      //   navigate("/")
+      // }else{
+      //   formik.resetForm()
+      // }
     },
   });
 
