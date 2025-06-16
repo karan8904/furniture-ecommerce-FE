@@ -16,6 +16,7 @@ import SingleProduct from './pages/SingleProduct.jsx'
 import Cart from './pages/Cart.jsx'
 import Checkout from './pages/Checkout.jsx'
 import ResetPassword from './pages/ResetPassword.jsx'
+import SnackBarTrigger from './components/SnackBarTrigger.jsx'
 import "@fontsource/poppins";
 
 const theme = createTheme({
@@ -57,7 +58,9 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
       <Provider store={store}>
         <ThemeProvider theme={theme}>
-          <RouterProvider router={router} />
+          <SnackBarTrigger>
+            <RouterProvider router={router} />
+          </SnackBarTrigger>
         </ThemeProvider>
       </Provider>
   </StrictMode>,

@@ -19,6 +19,7 @@ import { createUser } from "../slices/userSlice";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Link, useNavigate } from "react-router";
+import { showSnackbar } from "../slices/snackbarSlice";
 
 const Register = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -58,6 +59,29 @@ const Register = () => {
       .required("This field is required."),
   });
 
+  const handleOnSubmit = async (values) => {
+    try {
+      await dispatch(
+        createUser({
+          firstName: values.firstName,
+          lastName: values.lastName,
+          password: values.password,
+          email: values.email,
+          phone: values.phone,
+        })
+      ).unwrap();
+      dispatch(
+        showSnackbar({
+          message: "Registration Successful...Please Login...",
+        })
+      );
+      formik.resetForm();
+      navigate("/login");
+    }catch (error) {
+      dispatch(showSnackbar({ severity: "error", message: error }));
+    }
+  };
+
   const formik = useFormik({
     initialValues: {
       firstName: "",
@@ -68,16 +92,8 @@ const Register = () => {
       phone: "",
     },
     validationSchema,
-    onSubmit: async (values) => {
-      const result = await dispatch(
-        createUser({
-          firstName: values.firstName,
-          lastName: values.lastName,
-          password: values.password,
-          email: values.email,
-          phone: values.phone,
-        })
-      ).unwrap()
+    onSubmit: (values) => {
+      handleOnSubmit(values);
     },
   });
 

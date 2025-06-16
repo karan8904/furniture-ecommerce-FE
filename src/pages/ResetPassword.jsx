@@ -14,10 +14,11 @@ import {
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useFormik } from "formik";
-import { Link, useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import * as Yup from "yup";
 import { useDispatch } from "react-redux";
 import { resetPassword } from "../slices/userSlice";
+import { showSnackbar } from "../slices/snackbarSlice";
 
 const ResetPassword = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -38,16 +39,33 @@ const ResetPassword = () => {
       .required("This field is required"),
   });
 
+  const handleOnSubmit = async (values) => {
+    let userId = params.userId;
+    let token = params.token;
+    try {
+      await dispatch(
+        resetPassword({
+          newPassword: values.password,
+          userId: userId,
+          token: token,
+        })
+      ).unwrap();
+      dispatch(showSnackbar({ message: "Password changed successfully."}))
+      formik.resetForm();
+      navigate("/login");
+    } catch (error) {
+      dispatch(showSnackbar({ severity: "error", message: error }));
+    }
+  };
+
   const formik = useFormik({
     initialValues: {
       password: "",
       confirmPassword: "",
     },
     validationSchema,
-    onSubmit: async (values) => {
-        let userId = params.userId
-        let token = params.token   
-        dispatch(resetPassword({newPassword: values.password, userId: userId, token: token}))
+    onSubmit: (values) => {
+      handleOnSubmit(values);
     },
   });
 

@@ -2,7 +2,13 @@ import { createSlice, current, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "../api/axios";
 
 const initialState = {
-    users: []
+    users: [],
+    error: null,
+    loading: false,
+    login : {
+        isLoading : false,
+        data : []
+    }
 }
 
 export const createUser = createAsyncThunk(
@@ -13,7 +19,6 @@ export const createUser = createAsyncThunk(
             return response.data
         } catch (error) {
             const message = error.response.data.message
-            alert(message)
             return thunkApi.rejectWithValue(message)
         }
     }
@@ -27,7 +32,6 @@ export const loginUser = createAsyncThunk(
             return response.data
         } catch (error) {
             const message = error.response.data.message
-            // alert(message)
             return thunkApi.rejectWithValue(message)
         }
     }
@@ -41,7 +45,6 @@ export const forgotPassword = createAsyncThunk(
             return response.data
         } catch (error) {
             const message = error.response.data.message
-            alert(message)
             return thunkApi.rejectWithValue(message)
         }
     }
@@ -56,7 +59,6 @@ export const resetPassword = createAsyncThunk(
             return response.data
         } catch (error) {
             const message = error.response.data.message
-            alert(message)
             return thunkApi.rejectWithValue(message)
         }
     }
@@ -68,20 +70,55 @@ export const userSlice = createSlice({
     reducers: {},
     extraReducers: (buidler) => {
         buidler
+        //USER REGISTRATION
+        .addCase(createUser.pending, (state, action) => {
+            state.loading = true
+        })
         .addCase(createUser.fulfilled, (state, action) => {
-            alert("User Registration Successful.")
+            state.loading = false
             state.users.push(action.payload)
         })
+        .addCase(createUser.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload
+        })
+
+        //USER LOGIN
+        .addCase(loginUser.pending, (state, action) => {
+            state.loading = true
+        })
         .addCase(loginUser.fulfilled, (state, action) => {
+            state.loading = false
             const data = action.payload
             // localStorage.setItem("token", data.token)
-            alert("Logged in successfully.")
         } )
+        .addCase(loginUser.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload
+        })
+
+        //FORGOT PASSWORD
+        .addCase(forgotPassword.pending, (state, action) => {
+            state.loading = true
+        })
         .addCase(forgotPassword.fulfilled, (state, action) => {
-            alert("Email sent for password reseting...Check it out!")
+            state.loading = false
+        })
+        .addCase(forgotPassword.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload
+        })
+
+        //RESET PASSWORD
+        .addCase(resetPassword.pending, (state, action) => {
+            state.loading = true
         })
         .addCase(resetPassword.fulfilled, (state, action) => {
-            alert("Password Updated Successfully")
+            state.loading = false
+        })
+        .addCase(resetPassword.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload
         })
     }
 })

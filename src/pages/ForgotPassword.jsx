@@ -9,14 +9,17 @@ import {
   Button,
   Stack,
 } from "@mui/material";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useDispatch } from "react-redux";
 import { forgotPassword } from "../slices/userSlice";
+import { showSnackbar } from "../slices/snackbarSlice";
 
 const ForgotPassword = () => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const validationSchema = Yup.object().shape({
     email: Yup.string()
       .email("Please enter valid email")
@@ -28,8 +31,20 @@ const ForgotPassword = () => {
       email: "",
     },
     validationSchema,
-    onSubmit: (values) => {
-      dispatch(forgotPassword(values))
+    onSubmit: async (values) => {
+      try {
+        await dispatch(forgotPassword(values)).unwrap();
+        dispatch(
+          showSnackbar({
+            message:
+              "Link has sent to the given email. Reset password from it. The Link will expire in 15 mins.",
+          })
+        );
+        formik.resetForm();
+        navigate("/");
+      } catch (error) {
+        dispatch(showSnackbar({ severity: "error", message: error }))
+      }
     },
   });
 

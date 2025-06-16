@@ -18,11 +18,12 @@ import { Link, useNavigate } from "react-router";
 import * as Yup from "yup";
 import { useDispatch } from "react-redux";
 import { loginUser } from "../slices/userSlice";
+import { showSnackbar } from "../slices/snackbarSlice";
 
 const Login = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const textFieldStyling = {
@@ -36,25 +37,29 @@ const Login = () => {
     password: Yup.string().required("This field is required."),
   });
 
+  const handleOnSubmit = async (values) => {
+    try {
+      await dispatch(
+        loginUser({ email: values.email, password: values.password })
+      ).unwrap();
+      dispatch(
+        showSnackbar({ message: "Loggin Successful..." })
+      );
+      formik.resetForm();
+      navigate("/");
+    } catch (error) {
+      dispatch(showSnackbar({ severity: "error", message: error }));
+    }
+  };
+
   const formik = useFormik({
     initialValues: {
       email: "",
       password: "",
     },
     validationSchema,
-    onSubmit: async(values) => {
-      try {
-        const result = await dispatch(loginUser({email: values.email, password: values.password})).unwrap()
-        console.log("result",result)
-      } catch (error) {
-          console.log(error)
-      }
-      // if(loginUser.fulfilled.match(result)){
-      //   formik.resetForm()
-      //   navigate("/")
-      // }else{
-      //   formik.resetForm()
-      // }
+    onSubmit: (values) => {
+      handleOnSubmit(values);
     },
   });
 
