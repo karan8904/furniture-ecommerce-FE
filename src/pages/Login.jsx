@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import bgimg from "../assets/bgimg.jpg";
 import {
   Box,
@@ -16,12 +16,13 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useFormik } from "formik";
 import { Link, useNavigate } from "react-router";
 import * as Yup from "yup";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../slices/userSlice";
 import { showSnackbar } from "../slices/snackbarSlice";
 
 const Login = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [loading, setLoading] = useState(useSelector((state) => state.user.loading))
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -39,14 +40,15 @@ const Login = () => {
 
   const handleOnSubmit = async (values) => {
     try {
-      await dispatch(
+      const data = await dispatch(
         loginUser({ email: values.email, password: values.password })
       ).unwrap();
+      
       dispatch(
         showSnackbar({ message: "Loggin Successful..." })
       );
+      data.user.isAdmin ? navigate("/admin") : navigate("/")
       formik.resetForm();
-      navigate("/");
     } catch (error) {
       dispatch(showSnackbar({ severity: "error", message: error }));
     }
@@ -169,6 +171,7 @@ const Login = () => {
                   </Box>
 
                   <Button
+                    loading = {loading}
                     type="submit"
                     variant="contained"
                     color="primary"

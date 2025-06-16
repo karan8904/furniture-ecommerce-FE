@@ -5,10 +5,7 @@ const initialState = {
     users: [],
     error: null,
     loading: false,
-    login : {
-        isLoading : false,
-        data : []
-    }
+    loggedInUser: {}
 }
 
 export const createUser = createAsyncThunk(
@@ -90,7 +87,9 @@ export const userSlice = createSlice({
         .addCase(loginUser.fulfilled, (state, action) => {
             state.loading = false
             const data = action.payload
-            // localStorage.setItem("token", data.token)
+            localStorage.setItem("token", data.token)
+            state.loggedInUser = data.user
+            console.log(state.loggedInUser)
         } )
         .addCase(loginUser.rejected, (state, action) => {
             state.loading = false
