@@ -21,6 +21,7 @@ const initialState = {
   }
 };
 
+
 export const addCategory = createAsyncThunk(
   "categories/addCategory",
   async (categoryData, thunkApi) => {
@@ -78,6 +79,7 @@ export const editCatgory = createAsyncThunk(
     }
   }
 );
+
 
 export const categorySlice = createSlice({
   name: "categories",

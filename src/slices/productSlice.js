@@ -6,13 +6,22 @@ const initialState = {
     error: null,
     loading: false,
   },
+  getProducts: {
+    products: [],
+    error: null,
+    loading: false
+  },
+  deleteProduct: {
+    error: null,
+    loading: false
+  }
 };
 
 export const addProduct = createAsyncThunk(
   "products/addProduct",
   async (formData, thunkApi) => {
     try {
-      const response = await axios.post("/product/add", formData, {
+      const response = await axios.post("/products/add", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -25,6 +34,32 @@ export const addProduct = createAsyncThunk(
     }
   }
 );
+
+export const getProducts = createAsyncThunk(
+  "products/getProducts",
+  async (_, thunkApi) => {
+    try {
+      const response = await axios.get("/products/")
+      return response.data
+    } catch (error) {
+      const message = error.response.data.message;
+      return thunkApi.rejectWithValue(message);
+    }
+  }
+)
+
+export const deleteProduct = createAsyncThunk(
+  "products/deleteProduct",
+  async(id, thunkApi) => {
+    try {
+      const response = await axios.delete(`/products/delete/${id}`)
+      return response.data
+    } catch (error) {
+      const message = error.response.data.message;
+      return thunkApi.rejectWithValue(message);
+    }
+  }
+)
 
 const productSlice = createSlice({
   name: "products",
@@ -42,7 +77,32 @@ const productSlice = createSlice({
       .addCase(addProduct.rejected, (state, action) => {
         state.addProduct.loading = false;
         state.addProduct.error = action.payload;
-      });
+      })
+
+      //GET PRODUCTS
+      .addCase(getProducts.pending, (state) => {
+        state.getProducts.loading = true;
+      })
+      .addCase(getProducts.fulfilled, (state, action) => {
+        state.getProducts.loading = false;
+        state.getProducts.products = action.payload.products
+      })
+      .addCase(getProducts.rejected, (state, action) => {
+        state.getProducts.loading = false;
+        state.getProducts.error = action.payload
+      })
+
+      //DELETE PRODUCTS
+      .addCase(deleteProduct.pending, (state) => {
+        state.deleteProduct.loading = true;
+      })
+      .addCase(deleteProduct.fulfilled, (state) => {
+        state.deleteProduct.loading = false;
+      })
+      .addCase(deleteProduct.rejected, (state, action) => {
+        state.deleteProduct.loading = false;
+        state.deleteProduct.error = action.payload;
+      })
   },
 });
 
