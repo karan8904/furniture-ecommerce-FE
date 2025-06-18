@@ -21,6 +21,7 @@ import "@fontsource/poppins";
 import Admin from './pages/AdminPages/Admin.jsx'
 import AddCategory from './pages/AdminPages/AddCategory.jsx'
 import AddProduct from './pages/AdminPages/AddProduct.jsx'
+import EditCatgory from './pages/AdminPages/EditCatgory.jsx'
 
 const theme = createTheme({
   palette: {
@@ -56,6 +57,7 @@ const router = createBrowserRouter([
       { path: "/admin", Component: Admin},
       { path: "/admin/add-category", Component: AddCategory},
       { path: "/admin/add-product", Component: AddProduct},
+      { path: "/adming/edit-category/:id", Component: EditCatgory },
     ],
   },
 ]);

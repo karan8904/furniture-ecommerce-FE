@@ -121,7 +121,7 @@ const CategoriesGrid = () => {
                       </TableCell>
                       <TableCell align="center">
                         <IconButton aria-label="delete">
-                          <EditIcon color="primary" />
+                          <EditIcon color="primary" onClick={() => navigate(`/adming/edit-category/${category._id}`)} />
                         </IconButton>
                       </TableCell>
                       <TableCell align="center">
