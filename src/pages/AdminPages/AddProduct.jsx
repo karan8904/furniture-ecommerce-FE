@@ -9,6 +9,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  ListItemText,
+  Chip,
 } from "@mui/material";
 import FormLabel from "@mui/material/FormLabel";
 import FormControl from "@mui/material/FormControl";
@@ -25,16 +27,20 @@ import { getCategories } from "../../slices/categorySlice";
 import { useNavigate } from "react-router";
 import { addProduct } from "../../slices/productSlice";
 import { showSnackbar } from "../../slices/snackbarSlice";
+import CircleIcon from "@mui/icons-material/Circle";
 
 const AddProduct = () => {
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(getCategories());
   }, []);
-  const categories = useSelector((state) => state.category.getCategories.categories);
+  const categories = useSelector(
+    (state) => state.category.getCategories.categories
+  );
+
+  const loading = useSelector((state) => state.product.addProduct.loading);
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Name is required."),
@@ -42,32 +48,41 @@ const AddProduct = () => {
     price: Yup.number().required("Price is required."),
     category: Yup.string().required("Category is required."),
     sizes: Yup.object()
-    .test(
-      'at-least-one-true',
-      'Select at least one size',
-      (value) => Object.values(value).some((v) => v === true)
-    )
-    .required('Required'),
+      .test("at-least-one-true", "Select at least one size", (value) =>
+        Object.values(value).some((v) => v === true)
+      )
+      .required("Required"),
+    colors: Yup.array().min(1, "Atleast one color should be selected."),
     images: Yup.array()
-    .min(1, "At least one image is required")
-    .max(5, "You can upload up to 5 images only")
-    .test("fileType", "Only image files allowed", (value) =>
-      value ? value.every((file) => file.type.startsWith("image/")) : false
-    )
-  })
+      .min(1, "At least one image is required")
+      .max(5, "You can upload up to 5 images only")
+      .test("fileType", "Only image files allowed", (value) =>
+        value ? value.every((file) => file.type.startsWith("image/")) : false
+      ),
+  });
 
-  const handleOnSubmit = async() => {
+  const handleOnSubmit = async (productData) => {
     try {
-      await dispatch(
-        addProduct(formik.values)
-      ).unwrap()
-      dispatch(showSnackbar({ message: "Product Added Successfully." }))
-      formik.resetForm()
-      navigate("/admin")
+      const formData = new FormData();
+      formData.append("name", productData.name)
+      formData.append("description", productData.description)
+      formData.append("price", productData.price)
+      formData.append("category", productData.category)
+      
+      productData.images.map((image) => formData.append("images", image))
+      Object.entries(productData.sizes).forEach(([key, value]) => {
+        if (value) formData.append("sizes", key);
+      });
+      productData.colors.map((color) => formData.append("colors", color))
+
+      await dispatch(addProduct(formData)).unwrap();
+      dispatch(showSnackbar({ message: "Product Added Successfully." }));
+      formik.resetForm();
+      navigate("/admin");
     } catch (error) {
-      dispatch(showSnackbar({ severity: "error", message: error }))
+      dispatch(showSnackbar({ severity: "error", message: error }));
     }
-  }
+  };
 
   const formik = useFormik({
     initialValues: {
@@ -76,12 +91,13 @@ const AddProduct = () => {
       price: "",
       category: "",
       sizes: { S: false, M: true, L: false, XL: false },
+      colors: [],
       images: [],
     },
     validationSchema,
-    onSubmit: () => {
-      handleOnSubmit()
-    }
+    onSubmit: (values) => {
+      handleOnSubmit(values);
+    },
   });
 
   const VisuallyHiddenInput = styled("input")({
@@ -95,6 +111,33 @@ const AddProduct = () => {
     whiteSpace: "nowrap",
     width: 1,
   });
+
+  const allSizes = ["S", "M", "L", "XL"];
+  const allColors = ["#ff0000", "#000", "#6f6f6f", "#4f23ab"];
+
+  const selectedSizes = Object.entries(formik.values.sizes)
+    .filter(([key, value]) => value)
+    .map(([key]) => key);
+
+  const handleSizeChange = (size) => {
+    formik.setFieldValue("sizes", {
+      ...formik.values.sizes,
+      [size]: !formik.values.sizes[size],
+    });
+  };
+
+  const handleColorsChange = (color) => {
+    const current = formik.values.colors;
+    if (current.includes(color)) {
+      formik.setFieldValue(
+        "colors",
+        current.filter((c) => c !== color)
+      );
+    } else {
+      formik.setFieldValue("colors", [...current, color]);
+    }
+  };
+
   return (
     <>
       <Grid container marginTop="20px">
@@ -120,9 +163,7 @@ const AddProduct = () => {
                 value={formik.values.name}
                 onChange={formik.handleChange}
                 fullWidth
-                error={
-                  formik.touched.name && formik.errors.name
-                }
+                error={formik.touched.name && formik.errors.name}
                 helperText={
                   formik.touched.name && formik.errors.name
                     ? formik.errors.name
@@ -140,9 +181,7 @@ const AddProduct = () => {
                 multiline
                 rows={3}
                 fullWidth
-                error={
-                  formik.touched.description && formik.errors.description
-                }
+                error={formik.touched.description && formik.errors.description}
                 helperText={
                   formik.touched.description && formik.errors.description
                     ? formik.errors.description
@@ -151,7 +190,10 @@ const AddProduct = () => {
               />
             </Grid>
             <Grid size={6} margin="10px auto">
-              <FormControl fullWidth error={formik.touched.category && formik.errors.category}>
+              <FormControl
+                fullWidth
+                error={formik.touched.category && formik.errors.category}
+              >
                 <InputLabel id="category-label">Category</InputLabel>
                 <Select
                   labelId="category-label"
@@ -167,9 +209,9 @@ const AddProduct = () => {
                     </MenuItem>
                   ))}
                 </Select>
-                {formik.touched.category && formik.errors.category
-                    ? (<FormHelperText>{formik.errors.category}</FormHelperText>)
-                    : (<></>)}
+                {formik.touched.category && formik.errors.category && (
+                  <FormHelperText>{formik.errors.category}</FormHelperText>
+                )}
               </FormControl>
             </Grid>
             <Grid size={6} margin="10px auto">
@@ -190,9 +232,7 @@ const AddProduct = () => {
                   },
                 }}
                 fullWidth
-                error={
-                  formik.touched.price && formik.errors.price
-                }
+                error={formik.touched.price && formik.errors.price}
                 helperText={
                   formik.touched.price && formik.errors.price
                     ? formik.errors.price
@@ -201,53 +241,86 @@ const AddProduct = () => {
               />
             </Grid>
             <Grid size={6} margin="10px auto">
-              <FormControl component="fieldset" variant="standard" error={formik.touched.sizes && formik.errors.sizes}>
-                <FormLabel component="legend">Available Sizes</FormLabel>
-                <FormGroup>
-                  <FormControlLabel
-                    control={
+              <FormControl
+                fullWidth
+                error={formik.touched.sizes && formik.errors.sizes}
+              >
+                <InputLabel id="sizes-label">Available Sizes</InputLabel>
+                <Select
+                  labelId="sizes-label"
+                  id="sizes"
+                  name="sizes"
+                  multiple
+                  value={selectedSizes}
+                  label="Available Sizes"
+                  renderValue={(selected) => selected.join(", ")}
+                >
+                  {allSizes.map((size) => (
+                    <MenuItem
+                      key={size}
+                      value={size}
+                      onClick={() => handleSizeChange(size)}
+                    >
+                      <Checkbox checked={formik.values.sizes[size]} />
+                      <ListItemText primary={size} />
+                    </MenuItem>
+                  ))}
+                </Select>
+                {formik.touched.sizes && formik.errors.sizes && (
+                  <FormHelperText>{formik.errors.sizes}</FormHelperText>
+                )}
+              </FormControl>
+            </Grid>
+            <Grid size={6} margin="10px auto">
+              <FormControl
+                fullWidth
+                error={formik.touched.colors && formik.errors.colors}
+              >
+                <InputLabel id="sizes-label">Available Colors</InputLabel>
+                <Select
+                  labelId="colors-label"
+                  id="colors"
+                  name="colors"
+                  multiple
+                  value={formik.values.colors}
+                  label="Available Colors"
+                  renderValue={(selected) => (
+                    <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                      {selected.map((color) => (
+                        <Chip
+                          key={color}
+                          icon={
+                            <CircleIcon sx={{ color: color, fill: color }} />
+                          }
+                          label={color}
+                          size="small"
+                        />
+                      ))}
+                    </Box>
+                  )}
+                >
+                  {allColors.map((color) => (
+                    <MenuItem
+                      key={color}
+                      value={color}
+                      onClick={() => handleColorsChange(color)}
+                    >
                       <Checkbox
-                        name="sizes.S"
-                        checked={formik.values.sizes.S}
-                        onChange={formik.handleChange}
+                        checked={formik.values.colors.includes(color)}
                       />
-                    }
-                    label="S Size"
-                  />
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        name="sizes.M"
-                        checked={formik.values.sizes.M}
-                        onChange={formik.handleChange}
+                      <CircleIcon
+                        sx={{
+                          color: color,
+                          border: "1.5px solid black",
+                          borderRadius: "50%",
+                        }}
                       />
-                    }
-                    label="M Size"
-                  />
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        name="sizes.L"
-                        checked={formik.values.sizes.L}
-                        onChange={formik.handleChange}
-                      />
-                    }
-                    label="L Size"
-                  />
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        name="sizes.XL"
-                        checked={formik.values.sizes.XL}
-                        onChange={formik.handleChange}
-                      />
-                    }
-                    label="XL Size"
-                  />
-                </FormGroup>
-                {formik.touched.sizes && formik.errors.sizes
-                    ? (<FormHelperText>{formik.errors.sizes}</FormHelperText>)
-                    : (<></>)}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {formik.touched.colors && formik.errors.colors && (
+                  <FormHelperText>{formik.errors.colors}</FormHelperText>
+                )}
               </FormControl>
             </Grid>
             <Grid size={6} margin="10px auto">
@@ -269,13 +342,19 @@ const AddProduct = () => {
                   }
                 />
               </Button>
-                {formik.touched.images && formik.errors.images
-                    ? (<FormHelperText error>{formik.errors.images}</FormHelperText>)
-                    : (<FormHelperText>Atleast 1 image is required and Maximum 5 images</FormHelperText>)}
+              {formik.touched.images && formik.errors.images ? (
+                <FormHelperText error>{formik.errors.images}</FormHelperText>
+              ) : (
+                <FormHelperText>
+                  Atleast 1 image is required and Maximum 5 images
+                </FormHelperText>
+              )}
             </Grid>
             <Grid container size={6} margin="30px auto">
               <Grid container size={12} columnSpacing={2}>
-                <Button variant="contained" type="submit">Add</Button>
+                <Button variant="contained" type="submit" loading={loading}>
+                  Add
+                </Button>
                 <Button variant="outlined" onClick={() => navigate("/admin")}>
                   Cancel
                 </Button>
