@@ -16,13 +16,15 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useFormik } from "formik";
 import { useNavigate, useParams } from "react-router";
 import * as Yup from "yup";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { resetPassword } from "../slices/userSlice";
 import { showSnackbar } from "../slices/snackbarSlice";
 
 const ResetPassword = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfPasswordVisible, setIsConfPasswordVisible] = useState(false);
+
+  const loading = useSelector((state) => state.user.loading)
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -186,6 +188,7 @@ const ResetPassword = () => {
 
                   <Button
                     type="submit"
+                    loading={loading}
                     variant="contained"
                     color="primary"
                     fullWidth

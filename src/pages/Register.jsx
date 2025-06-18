@@ -14,7 +14,7 @@ import {
 
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { createUser } from "../slices/userSlice";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -24,6 +24,8 @@ import { showSnackbar } from "../slices/snackbarSlice";
 const Register = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfPasswordVisible, setIsConfPasswordVisible] = useState(false);
+
+  const loading = useSelector((state) => state.user.loading)
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -269,6 +271,7 @@ const Register = () => {
 
                   <Button
                     variant="contained"
+                    loading={loading}
                     type="submit"
                     fullWidth
                     sx={{ marginTop: "15px" }}

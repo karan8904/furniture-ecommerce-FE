@@ -22,7 +22,7 @@ import { showSnackbar } from "../slices/snackbarSlice";
 
 const Login = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [loading, setLoading] = useState(useSelector((state) => state.user.loading))
+  const loading = useSelector((state) => state.user.loading)
 
   const dispatch = useDispatch();
   const navigate = useNavigate();

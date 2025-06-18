@@ -12,11 +12,13 @@ import {
 import { Link, useNavigate } from "react-router";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { forgotPassword } from "../slices/userSlice";
 import { showSnackbar } from "../slices/snackbarSlice";
 
 const ForgotPassword = () => {
+  const loading = useSelector((state) => state.user.loading)
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -106,6 +108,7 @@ const ForgotPassword = () => {
 
                   <Button
                     type="submit"
+                    loading={loading}
                     variant="contained"
                     color="primary"
                     sx={{

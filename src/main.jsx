@@ -18,7 +18,9 @@ import Checkout from './pages/Checkout.jsx'
 import ResetPassword from './pages/ResetPassword.jsx'
 import SnackBarTrigger from './components/SnackBarTrigger.jsx'
 import "@fontsource/poppins";
-import AdminPanel from './pages/Admin.jsx'
+import Admin from './pages/AdminPages/Admin.jsx'
+import AddCategory from './pages/AdminPages/AddCategory.jsx'
+import AddProduct from './pages/AdminPages/AddProduct.jsx'
 
 const theme = createTheme({
   palette: {
@@ -51,7 +53,9 @@ const router = createBrowserRouter([
       { path: "/cart", Component: Cart},
       { path: "/checkout", Component: Checkout},
       { path: "/password-reset/:userId/:token", Component: ResetPassword },
-      { path: "/admin", Component: AdminPanel}
+      { path: "/admin", Component: Admin},
+      { path: "/admin/add-category", Component: AddCategory},
+      { path: "/admin/add-product", Component: AddProduct},
     ],
   },
 ]);
