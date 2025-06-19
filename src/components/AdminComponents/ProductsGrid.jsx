@@ -114,7 +114,7 @@ const ProductsGrid = () => {
                     <TableCell align="left">₹{product.price}</TableCell>
                     <TableCell align="left">
                         <IconButton aria-label="delete">
-                          <EditIcon color="primary" onClick={() => navigate(`/adming/edit-product/${product._id}`)} />
+                          <EditIcon color="primary" onClick={() => navigate(`/admin/edit-product/${product._id}`)} />
                         </IconButton>
                       </TableCell>
                       <TableCell align="left">

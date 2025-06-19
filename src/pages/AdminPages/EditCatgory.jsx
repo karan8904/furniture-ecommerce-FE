@@ -23,6 +23,8 @@ const EditCatgory = () => {
   const navigate = useNavigate();
   const catId = params.id;
 
+  const editButtonLoading = useSelector((state) => state.category.editCategory.loading)
+
   useEffect(() => {
     const get = async () => {
       const result = await dispatch(getCategories()).unwrap();
@@ -113,7 +115,7 @@ const EditCatgory = () => {
                 variant="outlined"
                 value={formik.values.name}
                 onChange={formik.handleChange}
-                focused
+                
                 fullWidth
                 error={
                   formik.touched.name && formik.errors.name
@@ -130,7 +132,7 @@ const EditCatgory = () => {
                 id="description"
                 label="Description"
                 variant="outlined"
-                focused
+                
                 multiline
                 rows={3}
                 value={formik.values.description}
@@ -192,7 +194,7 @@ const EditCatgory = () => {
             <Grid container size={6} margin="30px auto">
               <Grid container size={12} columnSpacing={2}>
                 <Button variant="contained" type="submit">
-                  Add
+                  Edit
                 </Button>
                 <Button variant="outlined" onClick={() => navigate("/admin")}>
                   Cancel

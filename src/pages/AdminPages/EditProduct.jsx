@@ -6,93 +6,111 @@ import {
   Button,
   Divider,
   TextField,
+  FormControl,
   InputLabel,
   Select,
   MenuItem,
-  ListItemText,
+  Checkbox,
   Chip,
+  ListItemText,
+  FormHelperText,
 } from "@mui/material";
-import FormLabel from "@mui/material/FormLabel";
-import FormControl from "@mui/material/FormControl";
-import FormGroup from "@mui/material/FormGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormHelperText from "@mui/material/FormHelperText";
-import Checkbox from "@mui/material/Checkbox";
 import { styled } from "@mui/material/styles";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useFormik } from "formik";
+import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
-import { useSelector, useDispatch } from "react-redux";
-import { getCategories } from "../../slices/categorySlice";
-import { useNavigate } from "react-router";
-import { addProduct } from "../../slices/productSlice";
 import { showSnackbar } from "../../slices/snackbarSlice";
+import { useNavigate, useParams } from "react-router";
+import { getCategories } from "../../slices/categorySlice";
+import { editProduct, getProducts } from "../../slices/productSlice";
 import CircleIcon from "@mui/icons-material/Circle";
 
-const AddProduct = () => {
+const EditProduct = () => {
+  const [product, setProduct] = useState({});
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const editButtonLoading = useSelector((state) => state.product.editProduct.loading )
+
+  const params = useParams();
+  const id = params.id;
+
+  const allSizes = ["S", "M", "L", "XL"];
+  const allColors = ["#ff0000", "#000", "#4f23ab", "#6f6f6f"];
+
   useEffect(() => {
+    const fetchProductDetails = async () => {
+      const result = await dispatch(getProducts()).unwrap();
+      result.products.map((p) => {
+        if (p._id === id) {
+          console.log(p);
+          setProduct(p);
+        }
+      });
+    };
+    fetchProductDetails();
     dispatch(getCategories());
   }, []);
   const categories = useSelector(
     (state) => state.category.getCategories.categories
   );
 
-  const loading = useSelector((state) => state.product.addProduct.loading);
-
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Name is required."),
     description: Yup.string().required("Description is required."),
     price: Yup.number().required("Price is required."),
     category: Yup.string().required("Category is required."),
-    sizes: Yup.object()
-      .test("at-least-one-true", "Select at least one size", (value) =>
-        Object.values(value).some((v) => v === true)
-      )
-      .required("Required"),
+    sizes: Yup.array().required("Required"),
     colors: Yup.array().min(1, "Atleast one color should be selected."),
     images: Yup.array()
       .min(1, "At least one image is required")
       .max(5, "You can upload up to 5 images only")
-      .test("fileType", "Only image files allowed", (value) =>
-        value ? value.every((file) => file.type.startsWith("image/")) : false
-      ),
+      .test("fileType", "Only image files are allowed", (value) => {
+        if (!value) return false;
+
+        return value.every((item) => {
+          if (typeof item === "string") return true;
+          if (item instanceof File)
+            return ["image/jpg", "image/jpeg", "image/png"].includes(item.type);
+          return false;
+        });
+      }),
   });
 
   const handleOnSubmit = async (productData) => {
     try {
       const formData = new FormData();
-      formData.append("name", productData.name)
-      formData.append("description", productData.description)
-      formData.append("price", productData.price)
-      formData.append("category", productData.category)
-      
-      productData.images.map((image) => formData.append("images", image))
-      Object.entries(productData.sizes).forEach(([key, value]) => {
-        if (value) formData.append("sizes", key);
-      });
-      productData.colors.map((color) => formData.append("colors", color))
-
-      await dispatch(addProduct(formData)).unwrap();
-      dispatch(showSnackbar({ message: "Product Added Successfully." }));
-      formik.resetForm();
-      navigate("/admin");
+      for (let key in productData) {
+        if (key === "sizes") {
+          productData[key].forEach((size) => formData.append("sizes", size));
+        } else if (key === "colors") {
+          productData[key].forEach((color) => formData.append("colors", color));
+        } else if (key === "images") {
+          productData[key].forEach((image) => formData.append("images", image));
+        } else {
+          formData.append(key, productData[key]);
+        }
+      }
+      await dispatch(editProduct({formData: formData, id: product._id})).unwrap()
+      dispatch(showSnackbar({ message: "Product Updated Successfully." }))
+      navigate("/admin")
     } catch (error) {
       dispatch(showSnackbar({ severity: "error", message: error }));
     }
   };
 
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      name: "",
-      description: "",
-      price: "",
-      category: "",
-      sizes: { S: false, M: true, L: false, XL: false },
-      colors: [],
-      images: [],
+      name: product?.name || "",
+      description: product?.name || "",
+      price: product?.price || "",
+      category: product?.category?._id || "",
+      sizes: product?.sizes || [],
+      colors: product?.colors || [],
+      images: product?.images || [],
     },
     validationSchema,
     onSubmit: (values) => {
@@ -112,18 +130,16 @@ const AddProduct = () => {
     width: 1,
   });
 
-  const allSizes = ["S", "M", "L", "XL"];
-  const allColors = ["#ff0000", "#000", "#6f6f6f", "#4f23ab"];
-
-  const selectedSizes = Object.entries(formik.values.sizes)
-    .filter(([key, value]) => value)
-    .map(([key]) => key);
-
   const handleSizeChange = (size) => {
-    formik.setFieldValue("sizes", {
-      ...formik.values.sizes,
-      [size]: !formik.values.sizes[size],
-    });
+    const current = formik.values.sizes;
+    if (current.includes(size)) {
+      formik.setFieldValue(
+        "sizes",
+        current.filter((s) => s !== size)
+      );
+    } else {
+      formik.setFieldValue("sizes", [...current, size]);
+    }
   };
 
   const handleColorsChange = (color) => {
@@ -137,7 +153,6 @@ const AddProduct = () => {
       formik.setFieldValue("colors", [...current, color]);
     }
   };
-
   return (
     <>
       <Grid container marginTop="20px">
@@ -251,7 +266,7 @@ const AddProduct = () => {
                   id="sizes"
                   name="sizes"
                   multiple
-                  value={selectedSizes}
+                  value={formik.values.sizes}
                   label="Available Sizes"
                   renderValue={(selected) => selected.join(", ")}
                 >
@@ -261,7 +276,7 @@ const AddProduct = () => {
                       value={size}
                       onClick={() => handleSizeChange(size)}
                     >
-                      <Checkbox checked={formik.values.sizes[size]} />
+                      <Checkbox checked={formik.values.sizes.includes(size)} />
                       <ListItemText primary={size} />
                     </MenuItem>
                   ))}
@@ -323,24 +338,52 @@ const AddProduct = () => {
               </FormControl>
             </Grid>
             <Grid size={6} margin="10px auto">
-              <Button
-                component="label"
-                role={undefined}
-                variant="contained"
-                tabIndex={-1}
-                startIcon={<CloudUploadIcon />}
-              >
-                Upload Images
-                <VisuallyHiddenInput
-                  id="images"
-                  name="images"
-                  type="file"
-                  multiple
-                  onChange={(e) =>
-                    formik.setFieldValue("images", Array.from(e.target.files))
-                  }
-                />
-              </Button>
+              <Box display="flex" gap="10px" flexWrap="wrap">
+                {formik.values.images &&
+                  formik.values.images.map((img, index) => (
+                    <img
+                      key={index}
+                      src={
+                        typeof img === "string"
+                          ? `http://localhost:5000/${img}`
+                          : URL.createObjectURL(img)
+                      }
+                      alt="image not found"
+                      height={150}
+                      width={180}
+                    />
+                  ))}
+              </Box>
+            </Grid>
+            <Grid size={6} margin="10px auto">
+              <Box display="flex" justifyContent="space-between">
+                <Button
+                  component="label"
+                  role={undefined}
+                  variant="contained"
+                  tabIndex={-1}
+                  startIcon={<CloudUploadIcon />}
+                >
+                  Upload Images
+                  <VisuallyHiddenInput
+                    id="images"
+                    name="images"
+                    type="file"
+                    multiple
+                    onChange={(e) =>
+                      formik.setFieldValue(
+                        "images",
+                        formik.values.images.concat(Array.from(e.target.files))
+                      )
+                    }
+                  />
+                </Button>
+                {formik.values.images.length > 0 && (
+                  <Button onClick={(e) => formik.setFieldValue("images", [])}>
+                    Remove all images
+                  </Button>
+                )}
+              </Box>
               {formik.touched.images && formik.errors.images ? (
                 <FormHelperText error>{formik.errors.images}</FormHelperText>
               ) : (
@@ -351,8 +394,8 @@ const AddProduct = () => {
             </Grid>
             <Grid container size={6} margin="30px auto">
               <Grid container size={12} columnSpacing={2}>
-                <Button variant="contained" type="submit" loading={loading}>
-                  Add
+                <Button variant="contained" type="submit" loading={editButtonLoading}>
+                  Edit
                 </Button>
                 <Button variant="outlined" onClick={() => navigate("/admin")}>
                   Cancel
@@ -366,4 +409,4 @@ const AddProduct = () => {
   );
 };
 
-export default AddProduct;
+export default EditProduct;
