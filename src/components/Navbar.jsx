@@ -12,6 +12,9 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  IconButton,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import logo from "../assets/logo.png";
 import SearchIcon from "@mui/icons-material/Search";
@@ -19,15 +22,24 @@ import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import MenuIcon from "@mui/icons-material/Menu";
-import HomeIcon from '@mui/icons-material/Home';
-import InfoIcon from '@mui/icons-material/Info';
-import ShopIcon from '@mui/icons-material/Shop';
-import { Link } from "react-router";
+import HomeIcon from "@mui/icons-material/Home";
+import InfoIcon from "@mui/icons-material/Info";
+import ShopIcon from "@mui/icons-material/Shop";
+import { Link, useNavigate } from "react-router";
 
 const Navbar = () => {
   const [state, setState] = useState({ right: false });
+  const [userMenu, setuserMenu] = React.useState(null);
+  const openUserMenu = Boolean(userMenu);
+  const handleUserMenuClick = (event) => {
+    setuserMenu(event.currentTarget);
+  };
+  const handleUserMenuClose = () => {
+    setuserMenu(null);
+  };
+  const navigate = useNavigate();
 
-  const linkStyle = { color: "#000", textDecoration: "none" }
+  const linkStyle = { color: "#000", textDecoration: "none" };
 
   const toggleDrawer = (open) => (event) => {
     if (
@@ -39,7 +51,15 @@ const Navbar = () => {
     setState({ right: open });
   };
   return (
-    <Box sx={{ margin: { xs: "15px 0px 15px 20px", sm: "15px 5px 15px 35px", md: "15px 60px 15px 50px" } }}>
+    <Box
+      sx={{
+        margin: {
+          xs: "15px 0px 15px 20px",
+          sm: "15px 5px 15px 35px",
+          md: "15px 60px 15px 50px",
+        },
+      }}
+    >
       <Grid
         container
         spacing={{ xs: 1, sm: 30, md: 20 }}
@@ -63,16 +83,24 @@ const Navbar = () => {
         >
           <Stack direction="row" gap="57px" sx={{ margin: "5px auto" }}>
             <Typography variant="h6" sx={{ fontWeight: "500" }}>
-              <Link to='/' style={linkStyle}>Home</Link>
+              <Link to="/" style={linkStyle}>
+                Home
+              </Link>
             </Typography>
             <Typography variant="h6" sx={{ fontWeight: "500" }}>
-              <Link to='/shop' style={linkStyle}>Shop</Link>
+              <Link to="/shop" style={linkStyle}>
+                Shop
+              </Link>
             </Typography>
             <Typography variant="h6" sx={{ fontWeight: "500" }}>
-              <Link to='/about' style={linkStyle}>About</Link>
+              <Link to="/about" style={linkStyle}>
+                About
+              </Link>
             </Typography>
             <Typography variant="h6" sx={{ fontWeight: "500" }}>
-              <Link to='/contact' style={linkStyle}>Contact</Link>
+              <Link to="/contact" style={linkStyle}>
+                Contact
+              </Link>
             </Typography>
           </Stack>
         </Grid>
@@ -83,23 +111,41 @@ const Navbar = () => {
         >
           <Stack
             direction="row"
-            
-            sx={{ fontWeight: "500", marginTop: "13px", gap: {lg: "35px", md: "18px" } }}
+            sx={{ fontWeight: "500", gap: { lg: "20px", md: "10px" } }}
           >
-            <Typography>
+            <IconButton>
               <SearchIcon />
-            </Typography>
-            <Typography>
+            </IconButton>
+            <IconButton
+              id="user-button"
+              aria-controls={openUserMenu ? "user-menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={openUserMenu ? "true" : undefined}
+              onClick={handleUserMenuClick}
+            >
               <PermIdentityIcon />
-            </Typography>
-            <Typography>
+            </IconButton>
+            <Menu
+              id="user-menu"
+              anchorEl={userMenu}
+              open={openUserMenu}
+              onClose={handleUserMenuClose}
+              slotProps={{
+                list: {
+                  "aria-labelledby": "user-button",
+                },
+              }}
+            >
+              <MenuItem onClick={handleUserMenuClose}>Profile</MenuItem>
+              <MenuItem onClick={handleUserMenuClose}>My account</MenuItem>
+              <MenuItem onClick={handleUserMenuClose}>Logout</MenuItem>
+            </Menu>
+            <IconButton>
               <FavoriteBorderIcon />
-            </Typography>
-            <Typography>
-              <Link to="/cart" style={linkStyle}>
-                <ShoppingCartIcon />
-              </Link>
-            </Typography>
+            </IconButton>
+            <IconButton>
+              <ShoppingCartIcon />
+            </IconButton>
           </Stack>
         </Grid>
 
@@ -117,8 +163,8 @@ const Navbar = () => {
             onOpen={toggleDrawer(true)}
           >
             <List>
-              <ListItem >
-                <ListItemButton>
+              <ListItem>
+                <ListItemButton onClick={() => navigate("/")}>
                   <ListItemIcon>
                     <HomeIcon />
                   </ListItemIcon>
@@ -126,8 +172,8 @@ const Navbar = () => {
                 </ListItemButton>
               </ListItem>
               <Divider />
-              <ListItem >
-                <ListItemButton>
+              <ListItem>
+                <ListItemButton onClick={() => navigate("/about")}>
                   <ListItemIcon>
                     <InfoIcon />
                   </ListItemIcon>
@@ -135,8 +181,8 @@ const Navbar = () => {
                 </ListItemButton>
               </ListItem>
               <Divider />
-              <ListItem >
-                <ListItemButton>
+              <ListItem>
+                <ListItemButton onClick={() => navigate("/shop")}>
                   <ListItemIcon>
                     <ShopIcon />
                   </ListItemIcon>
@@ -144,12 +190,12 @@ const Navbar = () => {
                 </ListItemButton>
               </ListItem>
               <Divider />
-              <ListItem >
-                <ListItemButton>
-                    <ListItemIcon>
-                      <ShoppingCartIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Cart" />
+              <ListItem>
+                <ListItemButton onClick={() => navigate("/cart")}>
+                  <ListItemIcon>
+                    <ShoppingCartIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Cart" />
                 </ListItemButton>
               </ListItem>
               <Divider />

@@ -23,6 +23,8 @@ const EditCatgory = () => {
   const navigate = useNavigate();
   const catId = params.id;
 
+  const baseURL = import.meta.env.VITE_BASEURL
+
   const editButtonLoading = useSelector((state) => state.category.editCategory.loading)
 
   useEffect(() => {
@@ -151,7 +153,7 @@ const EditCatgory = () => {
                 <img
                   src={
                     typeof formik.values.image === "string"
-                      ? `http://localhost:5000/${formik.values.image}`
+                      ? `${baseURL}/${formik.values.image}`
                       : URL.createObjectURL(formik.values.image)
                   }
                   alt="image not found"

@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import App from './App.jsx' 
 import { store } from './app/store.js'
 import { Provider } from 'react-redux'
-import { createBrowserRouter, RouterProvider } from 'react-router'
+import { createBrowserRouter, RouterProvider, useLocation } from 'react-router'
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Home from "./pages/Home.jsx";
 import About from "./pages/About.jsx";

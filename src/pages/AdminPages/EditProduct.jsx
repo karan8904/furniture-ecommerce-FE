@@ -38,6 +38,7 @@ const EditProduct = () => {
     (state) => state.product.getSingleProduct.loading
   );
 
+  const baseURL = import.meta.env.VITE_BASEURL
   const params = useParams();
   const id = params.id;
 
@@ -422,7 +423,7 @@ const EditProduct = () => {
                       key={index}
                       src={
                         typeof img === "string"
-                          ? `http://localhost:5000/${img}`
+                          ? `${baseURL}/${img}`
                           : URL.createObjectURL(img)
                       }
                       alt="image not found"

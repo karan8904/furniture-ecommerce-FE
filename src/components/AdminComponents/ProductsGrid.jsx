@@ -20,7 +20,7 @@ const ProductsGrid = () => {
 
   const navigate = useNavigate()
   const dispatch = useDispatch()
-
+  const baseURL = import.meta.env.VITE_BASEURL
   const products = useSelector((state) => state.product.getProducts.products)
   const deleteLoading = useSelector((state) => state.product.deleteProduct.loading)
 
@@ -92,7 +92,7 @@ const ProductsGrid = () => {
                   <TableRow key={index}>
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>
-                        <img src={`http://localhost:5000/${product.images[0]}`} alt="" height="100px" width="85px" />
+                        <img src={`${baseURL}/${product.images[0]}`} alt="" height="100px" width="85px" />
                     </TableCell>
                     <TableCell>{product.name}</TableCell>
                     <TableCell>{product.category.name}</TableCell>

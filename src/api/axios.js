@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const axiosInstance = axios.create({
-    baseURL: "http://192.168.2.193:5000",
+    baseURL: import.meta.env.VITE_BASEURL,
 })
 
 export default axiosInstance

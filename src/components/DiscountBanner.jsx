@@ -74,14 +74,6 @@ const DiscountBanner = () => {
                     loading="lazy"
                     style={{ maxHeight: "530px", maxWidth: "400px" }}
                   />
-                  {/* <Box sx={{ position: "absolute", }}>
-                <Typography>
-                  01 -- Bed Room
-                </Typography>
-                <Typography>
-                  Inner Peace
-                </Typography>
-              </Box> */}
                 </ImageListItem>
                 <Stack>
                   <ImageListItem>

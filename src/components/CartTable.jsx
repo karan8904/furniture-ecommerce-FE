@@ -116,11 +116,13 @@ const CartTable = () => {
           </TableContainer>
         </Grid>
         <Grid size={{ xs: 12, sm: 12 }} display={{ md: "none", lg: "none" }}>
-          <TableContainer component={Paper}>
-            <Table aria-label="customized table">
-              <TableHead>
+          <TableContainer>
+            <Table>
+              <TableHead sx={{
+                  backgroundColor: (theme) => theme.palette.custom.bannerColor,
+                }}>
                 <TableRow>
-                  <TableCell colSpan={2}>
+                  <TableCell colSpan={4}>
                     Product Details
                   </TableCell>
                 </TableRow>
@@ -171,7 +173,9 @@ const CartTable = () => {
                         +
                       </IconButton>
                     </Box>
-                    <Box>
+                  </TableCell>
+                  <TableCell>
+                  <Box display="flex" justifyContent="center">
                       <IconButton>
                         <DeleteIcon color="primary" />
                       </IconButton>

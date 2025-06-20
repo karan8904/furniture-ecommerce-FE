@@ -6,6 +6,7 @@ import { Link } from "react-router";
 
 const Categories = () => {
   const dispatch = useDispatch()
+  const baseURL = import.meta.env.VITE_BASEURL
   const categories = useSelector((state) => state.category.getCategories.categories)
 
   useEffect(() => {
@@ -42,7 +43,7 @@ const Categories = () => {
               <Grid size={{ md: 4, sm: 12, xs: 12 }} key={category._id}>
                 <Link style={{ textDecoration: "none"}} to={`/category/${category._id}`}>
                   <Stack>
-                    <img src={`http://localhost:5000/${category.imageURL}`} alt="" />
+                    <img src={`${baseURL}/${category.imageURL}`} alt="" />
                     <Typography
                       sx={{
                         fontWeight: 600,

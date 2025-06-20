@@ -13,6 +13,8 @@ import {
 } from "@mui/material";
 import CircleIcon from "@mui/icons-material/Circle";
 import { useNavigate } from "react-router";
+import { useFormik } from "formik";
+import * as Yup from 'yup'
 
 const ProductInfo = ({ product }) => {
   const [qty, setQty] = useState(1);
@@ -21,8 +23,8 @@ const ProductInfo = ({ product }) => {
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState("");
 
+  const baseURL = import.meta.env.VITE_BASEURL
   const navigate = useNavigate()
-
   useEffect(() => {
     if (product.images && product.images.length > 0) {
       setMainImage(product.images[0]);
@@ -87,7 +89,7 @@ const ProductInfo = ({ product }) => {
                 >
                   <ImageListItem>
                     <img
-                      srcSet={`http://localhost:5000/${img}`}
+                      srcSet={`${baseURL}/${img}`}
                       src={img}
                       alt={img}
                       style={{ height: "76px", width: "73px" }}
@@ -112,7 +114,7 @@ const ProductInfo = ({ product }) => {
             overflow="hidden"
           >
             <img
-              src={`http://localhost:5000/${mainImage}`}
+              src={`${baseURL}/${mainImage}`}
               width="100%"
               alt=""
             />
@@ -264,13 +266,20 @@ const ProductInfo = ({ product }) => {
                 }}
                 value={qty}
               ></TextField>
-              <Button
+              {product.stock > 0 ? (<Button
                 variant="outlined"
                 sx={{ margin: "0 20px", borderRadius: "15px" }}
                 onClick={handleOnAddingCart}
               >
                 Add to cart
-              </Button>
+              </Button>) : (<Button
+                variant="outlined"
+                sx={{ margin: "0 20px", borderRadius: "15px" }}
+                disabled
+              >
+                OUT OF STOCK
+              </Button>)}
+              
             </Box>
           </Box>
         </Grid>

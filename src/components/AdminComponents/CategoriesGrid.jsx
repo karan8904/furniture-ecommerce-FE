@@ -29,7 +29,7 @@ import { showSnackbar } from "../../slices/snackbarSlice";
 
 const CategoriesGrid = () => {
   const [deleteId, setDeleteId] = useState(null)
-
+  const baseURL = import.meta.env.VITE_BASEURL
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const categories = useSelector(
@@ -109,7 +109,7 @@ const CategoriesGrid = () => {
                       <TableCell>{index + 1}</TableCell>
                       <TableCell align="center">
                         <img
-                          src={`http://localhost:5000/${category.imageURL}`}
+                          src={`${baseURL}/${category.imageURL}`}
                           height="120px"
                           width="100px"
                           alt=""

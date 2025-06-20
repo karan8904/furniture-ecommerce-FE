@@ -3,6 +3,7 @@ import React from "react";
 import { Link } from "react-router";
 
 const ProductGrid = ({products}) => {
+  const baseURL = import.meta.env.VITE_BASEURL
   const productStyling = {
     maxWidth: { xs: 340, sm: 270, md: 240 },
     margin: "0 auto",
@@ -37,7 +38,7 @@ const ProductGrid = ({products}) => {
                       display: "flex",
                       justifyContent: "end",
                     }}
-                    image={`http://localhost:5000/${product.images[0].replace(/\\/g, "/")}`}
+                    image={`${baseURL}/${product.images[0].replace(/\\/g, "/")}`}
                   >
                     {product.discount_percent > 0 ? (
                       <Avatar
