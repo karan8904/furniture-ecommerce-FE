@@ -74,50 +74,52 @@ const ProductsGrid = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>#</TableCell>
-                  <TableCell align="center">Images</TableCell>
-                  <TableCell align="left">Name</TableCell>
-                  <TableCell align="left">Category</TableCell>
-                  <TableCell align="left">Sizes</TableCell>
-                  <TableCell align="left">Colors</TableCell>
-                  <TableCell align="left">Price</TableCell>
-                  <TableCell align="left">Update</TableCell>
-                  <TableCell align="left">Delete</TableCell>
+                  <TableCell>Images</TableCell>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Category</TableCell>
+                  <TableCell>Sizes</TableCell>
+                  <TableCell>Colors</TableCell>
+                  <TableCell>Price</TableCell>
+                  <TableCell>Discount(%)</TableCell>
+                  <TableCell>Stock</TableCell>
+                  <TableCell>Is Visible?</TableCell>
+                  <TableCell>Update</TableCell>
+                  <TableCell>Delete</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {products && products.map((product, index) => (
                   <TableRow key={index}>
                     <TableCell>{index + 1}</TableCell>
-                    <TableCell align="right">
-                      <Box display="flex" gap="20px" overflow="auto" maxWidth="180px">
-                        {product.images.map((image) => (
-                          <img key={image} src={`http://localhost:5000/${image}`} alt="" height="100px" width="85px" />
-                        ))}
-                      </Box>
+                    <TableCell>
+                        <img src={`http://localhost:5000/${product.images[0]}`} alt="" height="100px" width="85px" />
                     </TableCell>
-                    <TableCell align="left">{product.name}</TableCell>
-                    <TableCell align="left">{product.category.name}</TableCell>
-                    <TableCell align="left">
+                    <TableCell>{product.name}</TableCell>
+                    <TableCell>{product.category.name}</TableCell>
+                    <TableCell>
                       <Box display="flex" gap="2px">
                         {product.sizes.map((size) => (
                           <Chip key={size} label={size} />  
                         ))}
                       </Box>
                     </TableCell>
-                    <TableCell align="left">
+                    <TableCell>
                       <Box display="flex" gap="2px" maxWidth="110px" overflow="auto">
                         {product.colors.map((color) => (
                           <CircleIcon key={color} sx={{ fill: color }} />                        
                         ))}
                       </Box>
                     </TableCell>
-                    <TableCell align="left">₹{product.price}</TableCell>
-                    <TableCell align="left">
+                    <TableCell>₹{product.price}</TableCell>
+                    <TableCell>{product.discount_percent > 0 ? `${product.discount_percent}%` : "None"}</TableCell>
+                    <TableCell>{product.stock}</TableCell>
+                    <TableCell>{product.isVisible ? "Yes" : "No"}</TableCell>
+                    <TableCell>
                         <IconButton aria-label="delete">
                           <EditIcon color="primary" onClick={() => navigate(`/admin/edit-product/${product._id}`)} />
                         </IconButton>
                       </TableCell>
-                      <TableCell align="left">
+                      <TableCell>
                         <IconButton aria-label="delete">
                           <DeleteIcon color="primary" onClick={() => handleOpenDialog(product._id)} />
                         </IconButton>

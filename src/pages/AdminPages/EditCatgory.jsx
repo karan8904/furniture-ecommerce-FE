@@ -193,7 +193,7 @@ const EditCatgory = () => {
             </Grid>
             <Grid container size={6} margin="30px auto">
               <Grid container size={12} columnSpacing={2}>
-                <Button variant="contained" type="submit">
+                <Button variant="contained" type="submit" loading={editButtonLoading}>
                   Edit
                 </Button>
                 <Button variant="outlined" onClick={() => navigate("/admin")}>

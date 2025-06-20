@@ -1,9 +1,4 @@
-import React, { useState } from "react";
-import product_pv1 from "../assets/product_pv1.png";
-import product_pv2 from "../assets/product_pv2.png";
-import product_pv3 from "../assets/product_pv3.png";
-import product_pv4 from "../assets/product_pv4.png";
-import sofaImg from "../assets/sofa.png";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -17,9 +12,25 @@ import {
   TextField,
 } from "@mui/material";
 import CircleIcon from "@mui/icons-material/Circle";
+import { useNavigate } from "react-router";
 
-const ProductInfo = () => {
+const ProductInfo = ({ product }) => {
   const [qty, setQty] = useState(1);
+  const [pvImages, setPvImages] = useState([]);
+  const [mainImage, setMainImage] = useState("");
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedColor, setSelectedColor] = useState("");
+
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (product.images && product.images.length > 0) {
+      setMainImage(product.images[0]);
+      let pv_imgs = product.images.slice(1);
+      setPvImages(pv_imgs);
+    }
+  }, [product]);
+
   const numberFieldStyling = {
     "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button": {
       display: "none",
@@ -30,18 +41,37 @@ const ProductInfo = () => {
     width: "120px",
   };
 
-  const pv_images = [product_pv1, product_pv2, product_pv3, product_pv4];
+  const handleImages = (img, index) => {
+    let currentMainImg = mainImage;
+    setMainImage(img);
+    let currentPvImages = pvImages;
+    currentPvImages[index] = currentMainImg;
+    setPvImages(currentPvImages);
+  };
+
+  const calculateDiscountPrice = (price, discount) => {
+    return (price -= price * (discount / 100));
+  };
+
+  const handleOnAddingCart = () => {
+    
+  }
+
   return (
     <Box marginTop={2}>
       <Grid container columnSpacing={2} rowSpacing={1}>
         <Grid
-          size={{ sm: 12, md: 6 }}
+          size={{ xs: 12, sm: 12, md: 6 }}
           display="flex"
-          justifyContent={{ sm: "center", md: "space-evenly" }}
+          justifyContent={{
+            xs: "space-around",
+            sm: "space-around",
+            md: "space-evenly",
+          }}
         >
           <Box>
-            <ImageList sx={{ width: "76px", height: "416px" }} cols={1}>
-              {pv_images.map((img) => (
+            <ImageList sx={{ width: "76px" }} gap="20px" cols={1}>
+              {pvImages.map((img, index) => (
                 <Box
                   key={img}
                   sx={{
@@ -51,14 +81,16 @@ const ProductInfo = () => {
                     height: "76px",
                     width: "73px",
                     overflow: "hidden",
+                    cursor: "pointer",
                   }}
+                  onClick={() => handleImages(img, index)}
                 >
                   <ImageListItem>
                     <img
-                      srcSet={img}
+                      srcSet={`http://localhost:5000/${img}`}
                       src={img}
                       alt={img}
-                      style={{ height: "70px", width: "70px" }}
+                      style={{ height: "76px", width: "73px" }}
                       loading="lazy"
                     />
                   </ImageListItem>
@@ -70,8 +102,8 @@ const ProductInfo = () => {
           <Box
             sx={{
               backgroundColor: (theme) => theme.palette.custom.bannerColor,
-              width: { xs: "100%", sm: "80%", md: "390px", lg: "423px" },
-              maxHeight: { xs: "380px", sm: "390px", md: "400px" },
+              width: { xs: "230px", sm: "400px", md: "390px", lg: "423px" },
+              maxHeight: { xs: "300px", sm: "390px", md: "400px" },
             }}
             marginTop="16px"
             borderRadius="10px"
@@ -79,21 +111,51 @@ const ProductInfo = () => {
             justifyContent={{ sm: "center" }}
             overflow="hidden"
           >
-            <img src={sofaImg} width="100%" alt="" />
+            <img
+              src={`http://localhost:5000/${mainImage}`}
+              width="100%"
+              alt=""
+            />
           </Box>
         </Grid>
 
-        <Grid
-          size={{ sm: 12, md: 6 }}
-          padding="0 20px"
-          display="flex"
-          justifyContent={{ sm: "start", md: "center" }}
-        >
+        <Grid size={{ sm: 12, md: 6 }} padding="0 20px" display="flex">
           <Box marginTop="15px">
-            <Typography fontSize="38px">Asgard sofa</Typography>
-            <Typography fontSize="19px" color="secondary" fontWeight={500}>
-              Rs. 250,000.00
-            </Typography>
+            <Typography fontSize="38px">{product.name}</Typography>
+            {product.discount_percent > 0 ? (
+              <Box display="flex" gap="30px" alignContent="center">
+                <Typography
+                  variant="body2"
+                  color="#3a3a3a"
+                  fontWeight={550}
+                  fontSize="18px"
+                >
+                  ₹{" "}
+                  {calculateDiscountPrice(
+                    product.price,
+                    product.discount_percent
+                  )}
+                  .00
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="secondary"
+                  fontWeight={400}
+                  fontSize="18px"
+                >
+                  <del>₹ {product.price}.00</del>
+                </Typography>
+              </Box>
+            ) : (
+              <Typography
+                variant="body2"
+                color="#3a3a3a"
+                fontWeight={600}
+                fontSize="20px"
+              >
+                ₹{product.price}.00
+              </Typography>
+            )}
             <Box
               display="flex"
               justifyContent="space-between"
@@ -118,48 +180,31 @@ const ProductInfo = () => {
               sx={{ maxWidth: { xs: "424px", sm: "600px" } }}
               marginTop="5px"
             >
-              <Typography fontSize="14px">
-                Setting the bar as one of the loudest speakers in its class, the
-                Kilburn is a compact, stout-hearted hero with a well-balanced
-                audio which boasts a clear midrange and extended highs for a
-                sound.
-              </Typography>
+              <Typography fontSize="14px">{product.description}</Typography>
             </Box>
             <Box marginTop="14px">
               <Typography fontSize="14px" color="secondary">
                 Size
               </Typography>
               <Box marginTop="5px">
-                <Button
-                  variant="contained"
-                  sx={{ minWidth: "50px", marginRight: "10px" }}
-                >
-                  L
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{
-                    minWidth: "50px",
-                    marginRight: "10px",
-                    backgroundColor: (style) =>
-                      style.palette.custom.bannerColor,
-                    color: "#000",
-                  }}
-                >
-                  XL
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{
-                    minWidth: "50px",
-                    marginRight: "10px",
-                    backgroundColor: (style) =>
-                      style.palette.custom.bannerColor,
-                    color: "#000",
-                  }}
-                >
-                  XS
-                </Button>
+                {product.sizes?.map((size) => (
+                  <Button
+                    key={size}
+                    variant="contained"
+                    sx={{
+                      minWidth: "50px",
+                      marginRight: "10px",
+                      backgroundColor:
+                        selectedSize === size
+                          ? (theme) => theme.palette.primary.main
+                          : (theme) => theme.palette.custom.bannerColor,
+                      color: selectedSize === size ? "#fff" : "#000",
+                    }}
+                    onClick={() => setSelectedSize(size)}
+                  >
+                    {size}
+                  </Button>
+                ))}
               </Box>
             </Box>
             <Box marginTop="20px">
@@ -167,15 +212,23 @@ const ProductInfo = () => {
                 Color
               </Typography>
               <Box>
-                <IconButton size="small">
-                  <CircleIcon sx={{ color: "#816DFA", fontSize: "40px" }} />
-                </IconButton>
-                <IconButton size="small">
-                  <CircleIcon sx={{ color: "#000", fontSize: "40px" }} />
-                </IconButton>
-                <IconButton size="small">
-                  <CircleIcon color="primary" sx={{ fontSize: "40px" }} />
-                </IconButton>
+                {product.colors?.map((color) => (
+                  <IconButton
+                    size="small"
+                    key={color}
+                    onClick={() => setSelectedColor(color)}
+                  >
+                    <CircleIcon
+                      sx={{
+                        color: color,
+                        fontSize: "40px",
+                        outline:
+                          selectedColor === color ? "1px solid" : "none",
+                        borderRadius: "50%",
+                      }}
+                    />
+                  </IconButton>
+                ))}
               </Box>
             </Box>
             <Box marginTop="20px" display="flex">
@@ -214,6 +267,7 @@ const ProductInfo = () => {
               <Button
                 variant="outlined"
                 sx={{ margin: "0 20px", borderRadius: "15px" }}
+                onClick={handleOnAddingCart}
               >
                 Add to cart
               </Button>

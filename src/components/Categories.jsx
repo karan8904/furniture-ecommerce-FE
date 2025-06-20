@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Container, Box, Typography, Grid, Stack } from "@mui/material";
-import rangeBg1 from "../assets/Mask Group.png";
-import rangeBg2 from "../assets/Image-living room.png";
-import rangeBg3 from "../assets/Mask Group (1).png";
 import { getCategories } from "../slices/categorySlice";
 import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router";
 
 const Categories = () => {
   const dispatch = useDispatch()
@@ -42,20 +40,22 @@ const Categories = () => {
           >
             {categories && categories.map((category) => (
               <Grid size={{ md: 4, sm: 12, xs: 12 }} key={category._id}>
-              <Stack>
-                <img src={`http://localhost:5000/${category.imageURL}`} alt="" />
-                <Typography
-                  sx={{
-                    fontWeight: 600,
-                    textAlign: "center",
-                    fontSize: "18px",
-                    margin: "15px 0",
-                    color: "#333333",
-                  }}
-                >
-                  {category.name}
-                </Typography>
-              </Stack>
+                <Link style={{ textDecoration: "none"}} to={`/category/${category._id}`}>
+                  <Stack>
+                    <img src={`http://localhost:5000/${category.imageURL}`} alt="" />
+                    <Typography
+                      sx={{
+                        fontWeight: 600,
+                        textAlign: "center",
+                        fontSize: "18px",
+                        margin: "15px 0",
+                        color: "#333333",
+                      }}
+                    >
+                      {category.name}
+                    </Typography>
+                  </Stack>
+                </Link>
             </Grid>
             ))}
           </Grid>

@@ -23,6 +23,7 @@ import AddCategory from './pages/AdminPages/AddCategory.jsx'
 import AddProduct from './pages/AdminPages/AddProduct.jsx'
 import EditCatgory from './pages/AdminPages/EditCatgory.jsx'
 import EditProduct from './pages/AdminPages/EditProduct.jsx'
+import ProductsFromCategory from './pages/ProductsFromCategory.jsx'
 
 const theme = createTheme({
   palette: {
@@ -48,10 +49,11 @@ const router = createBrowserRouter([
       { path: "/about", Component: About },
       { path: "/contact", Component: Contact },
       { path: "/shop", Component: Shop },
+      { path: "/category/:id", Component: ProductsFromCategory},
       { path: "/register", Component: Register },
       { path: "/login", Component: Login },
       { path: "/forgot-password", Component: ForgotPassword },
-      { path: "/single-product", Component: SingleProduct},
+      { path: "/single-product/:id", Component: SingleProduct},
       { path: "/cart", Component: Cart},
       { path: "/checkout", Component: Checkout},
       { path: "/password-reset/:userId/:token", Component: ResetPassword },

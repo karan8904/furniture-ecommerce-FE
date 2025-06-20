@@ -18,6 +18,16 @@ const initialState = {
   editProduct: {
     error: null,
     loading: false
+  },
+  getSingleProduct: {
+    product: {},
+    error: null,
+    loading: false
+  },
+  getFromCategory: {
+    products: [],
+    error: null,
+    loading: false
   }
 };
 
@@ -80,6 +90,32 @@ export const editProduct = createAsyncThunk(
   }
 )
 
+export const getSingleProduct = createAsyncThunk(
+  "products/getSingleProduct",
+  async(id, thunkApi) => {
+    try {
+      const response = await axios.get(`/products/get/${id}`)
+      return response.data
+    } catch (error) {
+      const message = error.response.data.message;
+      return thunkApi.rejectWithValue(message)
+    }
+  }
+)
+
+export const getFromCategory = createAsyncThunk(
+  "products/getFromCategory",
+  async(id, thunkApi) => {
+    try {
+      const response = await axios.get(`/products/category/${id}`)
+      return response.data
+    } catch (error) {
+      const message = error.response.data.message;
+      return thunkApi.rejectWithValue(message)
+    }
+  }
+)
+
 const productSlice = createSlice({
   name: "products",
   initialState,
@@ -133,6 +169,32 @@ const productSlice = createSlice({
       .addCase(editProduct.rejected, (state, action) => {
         state.editProduct.loading - false
         state.editProduct.error = action.payload;
+      })
+
+      //GET SINGLE PRODUCT
+      .addCase(getSingleProduct.pending, (state) => {
+        state.getSingleProduct.loading = true
+      })
+      .addCase(getSingleProduct.fulfilled, (state, action) => {
+        state.getSingleProduct.loading = false;
+        state.getSingleProduct.product = action.payload.product
+      })
+      .addCase(getSingleProduct.rejected, (state, action) => {
+        state.getSingleProduct.loading = false;
+        state.getSingleProduct.error = action.payload
+      })
+
+      //GET PRODUCTS FROM CATEGORY
+      .addCase(getFromCategory.pending, (state) => {
+        state.getFromCategory.loading = true
+      })
+      .addCase(getFromCategory.fulfilled, (state, action) => {
+        state.getFromCategory.loading = false
+        state.getFromCategory.products = action.payload.products
+      })
+      .addCase(getFromCategory.rejected, (state, action) => {
+        state.getFromCategory.loading = false
+        state.getFromCategory.error = action.payload
       })
   },
 });

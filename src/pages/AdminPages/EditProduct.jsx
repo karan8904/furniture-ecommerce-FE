@@ -14,6 +14,8 @@ import {
   Chip,
   ListItemText,
   FormHelperText,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -23,16 +25,18 @@ import * as Yup from "yup";
 import { showSnackbar } from "../../slices/snackbarSlice";
 import { useNavigate, useParams } from "react-router";
 import { getCategories } from "../../slices/categorySlice";
-import { editProduct, getProducts } from "../../slices/productSlice";
+import { editProduct, getSingleProduct } from "../../slices/productSlice";
 import CircleIcon from "@mui/icons-material/Circle";
 
 const EditProduct = () => {
-  const [product, setProduct] = useState({});
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const editButtonLoading = useSelector((state) => state.product.editProduct.loading )
+  const product = useSelector((state) => state.product.getSingleProduct.product)
+
+  const editButtonLoading = useSelector(
+    (state) => state.product.getSingleProduct.loading
+  );
 
   const params = useParams();
   const id = params.id;
@@ -41,16 +45,7 @@ const EditProduct = () => {
   const allColors = ["#ff0000", "#000", "#4f23ab", "#6f6f6f"];
 
   useEffect(() => {
-    const fetchProductDetails = async () => {
-      const result = await dispatch(getProducts()).unwrap();
-      result.products.map((p) => {
-        if (p._id === id) {
-          console.log(p);
-          setProduct(p);
-        }
-      });
-    };
-    fetchProductDetails();
+    dispatch(getSingleProduct(id)).unwrap();
     dispatch(getCategories());
   }, []);
   const categories = useSelector(
@@ -77,6 +72,14 @@ const EditProduct = () => {
           return false;
         });
       }),
+    isDiscountEnabled: Yup.boolean(),
+    discount_percent: Yup.number().when("isDiscountEnabled", {
+      is: (value) => value === true,
+      then: () => Yup.number().min(10).max(80).required("This field is required."),
+      otherwise: () => Yup.number().notRequired(),
+    }),
+    stock: Yup.number().required("This field is requird."),
+    isVisible: Yup.boolean()
   });
 
   const handleOnSubmit = async (productData) => {
@@ -93,9 +96,11 @@ const EditProduct = () => {
           formData.append(key, productData[key]);
         }
       }
-      await dispatch(editProduct({formData: formData, id: product._id})).unwrap()
-      dispatch(showSnackbar({ message: "Product Updated Successfully." }))
-      navigate("/admin")
+      await dispatch(
+        editProduct({ formData: formData, id: product._id })
+      ).unwrap();
+      dispatch(showSnackbar({ message: "Product Updated Successfully." }));
+      navigate("/admin");
     } catch (error) {
       dispatch(showSnackbar({ severity: "error", message: error }));
     }
@@ -106,11 +111,15 @@ const EditProduct = () => {
     initialValues: {
       name: product?.name || "",
       description: product?.name || "",
-      price: product?.price || "",
+      price: product?.price || 0,
       category: product?.category?._id || "",
       sizes: product?.sizes || [],
       colors: product?.colors || [],
       images: product?.images || [],
+      isDiscountEnabled:product && product.discount_percent > 0 ,
+      discount_percent: product?.discount_percent || 0,
+      stock: product?.stock || 0,
+      isVisible: product?.isVisible ?? false
     },
     validationSchema,
     onSubmit: (values) => {
@@ -338,6 +347,74 @@ const EditProduct = () => {
               </FormControl>
             </Grid>
             <Grid size={6} margin="10px auto">
+              <Box display="flex" alignItems="center">
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      id="isDiscountEnabled"
+                      checked={formik.values.isDiscountEnabled}
+                      onChange={() => formik.setFieldValue("isDiscountEnabled", !formik.values.isDiscountEnabled)}
+                    />
+                  }
+                  label="Want to provide discount?"
+                />
+              </Box>
+            </Grid>
+            {formik.values.isDiscountEnabled && (
+              <Grid size={6} margin="10px auto">
+                <TextField
+                  id="discount_percent"
+                  type="number"
+                  label="Discount (%)"
+                  variant="outlined"
+                  value={formik.values.discount_percent}
+                  onChange={formik.handleChange}
+                  sx={{
+                    "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
+                      {
+                        display: "none",
+                      },
+                    "& input[type=number]": {
+                      MozAppearance: "textfield",
+                    },
+                  }}
+                  fullWidth
+                  error={formik.touched.discount_percent && formik.errors.discount_percent}
+                  helperText={
+                    formik.touched.discount_percent && formik.errors.discount_percent
+                      ? formik.errors.discount_percent
+                      : "Minimum: 10%, Maximum: 80%"
+                  }
+                />
+              </Grid>
+            )}
+            <Grid size={6} margin="10px auto">
+              <TextField
+                id="stock"
+                type="number"
+                label="Product Stock"
+                variant="outlined"
+                value={formik.values.stock}
+                onChange={formik.handleChange}
+                sx={{
+                  "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
+                    {
+                      display: "none",
+                    },
+                  "& input[type=number]": {
+                    MozAppearance: "textfield",
+                  },
+                }}
+                fullWidth
+                error={formik.touched.stock && formik.errors.stock}
+                helperText={
+                  formik.touched.stock && formik.errors.stock
+                    ? formik.errors.stock
+                    : ""
+                }
+              />
+            </Grid>
+            <Grid size={6} margin="10px auto">
               <Box display="flex" gap="10px" flexWrap="wrap">
                 {formik.values.images &&
                   formik.values.images.map((img, index) => (
@@ -384,6 +461,7 @@ const EditProduct = () => {
                   </Button>
                 )}
               </Box>
+              
               {formik.touched.images && formik.errors.images ? (
                 <FormHelperText error>{formik.errors.images}</FormHelperText>
               ) : (
@@ -391,10 +469,20 @@ const EditProduct = () => {
                   Atleast 1 image is required and Maximum 5 images
                 </FormHelperText>
               )}
+              <Box>
+                 <FormControlLabel
+                    control={<Switch checked={formik.values.isVisible} onChange={() => formik.setFieldValue("isVisible", !formik.values.isVisible)} />}
+                    label="Is Visible?"
+                  />
+              </Box>
             </Grid>
             <Grid container size={6} margin="30px auto">
               <Grid container size={12} columnSpacing={2}>
-                <Button variant="contained" type="submit" loading={editButtonLoading}>
+                <Button
+                  variant="contained"
+                  type="submit"
+                  loading={editButtonLoading}
+                >
                   Edit
                 </Button>
                 <Button variant="outlined" onClick={() => navigate("/admin")}>

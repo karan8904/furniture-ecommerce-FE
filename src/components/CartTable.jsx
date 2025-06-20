@@ -5,7 +5,6 @@ import {
   TableHead,
   TableRow,
   TableBody,
-  styled,
   TableCell,
   tableCellClasses,
   Typography,
@@ -32,38 +31,36 @@ const CartTable = () => {
     },
     width: "40px",
   };
-  const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-      backgroundColor: theme.palette.custom.bannerColor,
-      fontSize: 16,
-      fontWeight: 500,
-    },
-    [`&.${tableCellClasses.body}`]: {
-      fontSize: 14,
-    },
-  }));
   return (
     <>
       <Grid container columnSpacing={5} rowSpacing={2}>
-        <Grid size={{ sm: 12, md: 9 }} display={{ xs: "none", sm: "none", md: "flex" }}>
+        <Grid
+          size={{ sm: 12, md: 9 }}
+          display={{ xs: "none", sm: "none", md: "flex" }}
+        >
           <TableContainer
-            component={Paper}
+            
             sx={{ maxWidth: "100%", overflowX: "auto" }}
           >
-            <Table aria-label="customized table">
-              <TableHead>
+            <Table>
+              <TableHead
+                sx={{
+                  backgroundColor: (theme) => theme.palette.custom.bannerColor,
+                }}
+              >
                 <TableRow>
-                  <StyledTableCell align="center">Product</StyledTableCell>
-                  <StyledTableCell align="center">Price</StyledTableCell>
-                  <StyledTableCell align="center">Quantity</StyledTableCell>
-                  <StyledTableCell align="left" colSpan={2}>
+                  <TableCell align="center">Product</TableCell>
+                  <TableCell>Price</TableCell>
+                  <TableCell>Quantity</TableCell>
+                  <TableCell>
                     Subtotal
-                  </StyledTableCell>
+                  </TableCell>
+                  <TableCell>Remove</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 <TableRow>
-                  <StyledTableCell component="th" scope="row">
+                  <TableCell>
                     <Box display="flex" alignItems="center">
                       <Box
                         sx={{
@@ -80,12 +77,12 @@ const CartTable = () => {
                         Asgard Sofa
                       </Typography>
                     </Box>
-                  </StyledTableCell>
-                  <StyledTableCell align="center">
+                  </TableCell>
+                  <TableCell>
                     <Typography color="secondary">Rs. 250,000.00</Typography>
-                  </StyledTableCell>
-                  <StyledTableCell align="left">
-                    <Box display="flex" justifyContent="space-evenly">
+                  </TableCell>
+                  <TableCell>
+                    <Box display="flex" >
                       <IconButton
                         onClick={() => setQty(qty - 1)}
                         disabled={qty < 2}
@@ -99,38 +96,38 @@ const CartTable = () => {
                       ></TextField>
                       <IconButton
                         onClick={() => setQty(qty + 1)}
-                        disabled={qty > 4}
+                        disabled={qty > 9}
                       >
                         +
                       </IconButton>
                     </Box>
-                  </StyledTableCell>
-                  <StyledTableCell align="left">
+                  </TableCell>
+                  <TableCell>
                     <Typography>Rs. 250,000.00</Typography>
-                  </StyledTableCell>
-                  <StyledTableCell align="center">
+                  </TableCell>
+                  <TableCell>
                     <IconButton>
                       <DeleteIcon color="primary" />
                     </IconButton>
-                  </StyledTableCell>
+                  </TableCell>
                 </TableRow>
               </TableBody>
             </Table>
           </TableContainer>
         </Grid>
-        <Grid size={{ xs: 12, sm: 12 }} display={{ md: "none", lg:"none" }}>
-        <TableContainer
-            component={Paper}
-          >
+        <Grid size={{ xs: 12, sm: 12 }} display={{ md: "none", lg: "none" }}>
+          <TableContainer component={Paper}>
             <Table aria-label="customized table">
               <TableHead>
                 <TableRow>
-                  <StyledTableCell colSpan={2} align="center">Product Details</StyledTableCell>
+                  <TableCell colSpan={2}>
+                    Product Details
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 <TableRow>
-                  <StyledTableCell component="th" scope="row">
+                  <TableCell component="th" scope="row">
                     <Box display="flex" alignItems="center">
                       <Box
                         sx={{
@@ -144,14 +141,17 @@ const CartTable = () => {
                         <img src={sofa} alt="" height="100" width="105" />
                       </Box>
                     </Box>
-                  </StyledTableCell>
-                  <StyledTableCell col>
-                    <Typography color="secondary" fontSize={{ sm: "18px", md: "16px"}}>
+                  </TableCell>
+                  <TableCell>
+                    <Typography
+                      color="secondary"
+                      fontSize={{ sm: "18px", md: "16px" }}
+                    >
                       Asgard Sofa
                     </Typography>
                     <Typography color="secondary">Rs. 250,000.00</Typography>
-                  </StyledTableCell>
-                  <StyledTableCell >
+                  </TableCell>
+                  <TableCell>
                     <Box display="flex">
                       <IconButton
                         onClick={() => setQty(qty - 1)}
@@ -176,7 +176,7 @@ const CartTable = () => {
                         <DeleteIcon color="primary" />
                       </IconButton>
                     </Box>
-                  </StyledTableCell>
+                  </TableCell>
                 </TableRow>
               </TableBody>
             </Table>
@@ -219,7 +219,10 @@ const CartTable = () => {
               </Typography>
             </Box>
             <Box display="flex" justifyContent="center" paddingTop="30px">
-              <Link to="/checkout" style={{ textDecoration: "none", color: "#000" }}>
+              <Link
+                to="/checkout"
+                style={{ textDecoration: "none", color: "#000" }}
+              >
                 <Button
                   variant="outlined"
                   color="#000"

@@ -8,8 +8,10 @@ import DiscountBanner from "../components/DiscountBanner";
 import NewArrivalBanner from "../components/NewArrivalBanner";
 import { Box, Typography, Stack, Divider, Button } from "@mui/material";
 import "@fontsource/poppins";
+import { useNavigate } from "react-router";
 
 const Home = () => {
+  const navigate = useNavigate()
   return (
     <>
       <Navbar />
@@ -48,6 +50,7 @@ const Home = () => {
             fontWeight: 600,
             width: "245px",
           }}
+          onClick={() => navigate("/shop")}
         >
           Show More
         </Button>

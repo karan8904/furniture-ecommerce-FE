@@ -11,6 +11,7 @@ import {
   MenuItem,
   ListItemText,
   Chip,
+  Switch,
 } from "@mui/material";
 import FormLabel from "@mui/material/FormLabel";
 import FormControl from "@mui/material/FormControl";
@@ -59,21 +60,32 @@ const AddProduct = () => {
       .test("fileType", "Only image files allowed", (value) =>
         value ? value.every((file) => file.type.startsWith("image/")) : false
       ),
+    isDiscountEnabled: Yup.boolean(),
+    discount_percent: Yup.number().when("isDiscountEnabled", {
+      is: (value) => value === true,
+      then: () => Yup.number().min(10).max(80).required("This field is required."),
+      otherwise: () => Yup.number().notRequired()
+    }),
+    stock: Yup.number().required("This field is requird."),
+    isVisible: Yup.boolean()
   });
 
   const handleOnSubmit = async (productData) => {
     try {
       const formData = new FormData();
-      formData.append("name", productData.name)
-      formData.append("description", productData.description)
-      formData.append("price", productData.price)
-      formData.append("category", productData.category)
-      
-      productData.images.map((image) => formData.append("images", image))
-      Object.entries(productData.sizes).forEach(([key, value]) => {
-        if (value) formData.append("sizes", key);
-      });
-      productData.colors.map((color) => formData.append("colors", color))
+      for(let key in productData){
+        if(key === "sizes"){
+          Object.entries(productData.sizes).forEach(([key, value]) => {
+            if (value) formData.append("sizes", key);
+          });
+        } else if (key === "colors") {
+          productData[key].forEach((color) => formData.append("colors", color));
+        } else if (key === "images") {
+          productData[key].forEach((image) => formData.append("images", image));
+        } else {
+          formData.append(key, productData[key]);
+        }
+      }
 
       await dispatch(addProduct(formData)).unwrap();
       dispatch(showSnackbar({ message: "Product Added Successfully." }));
@@ -88,11 +100,15 @@ const AddProduct = () => {
     initialValues: {
       name: "",
       description: "",
-      price: "",
+      price: 0,
       category: "",
-      sizes: { S: false, M: true, L: false, XL: false },
+      sizes: { S: false, M: false, L: false, XL: false },
       colors: [],
       images: [],
+      isDiscountEnabled: false,
+      discount_percent: 10,
+      stock: 0,
+      isVisible: true
     },
     validationSchema,
     onSubmit: (values) => {
@@ -323,31 +339,114 @@ const AddProduct = () => {
               </FormControl>
             </Grid>
             <Grid size={6} margin="10px auto">
-              <Button
-                component="label"
-                role={undefined}
-                variant="contained"
-                tabIndex={-1}
-                startIcon={<CloudUploadIcon />}
-              >
-                Upload Images
-                <VisuallyHiddenInput
-                  id="images"
-                  name="images"
-                  type="file"
-                  multiple
-                  onChange={(e) =>
-                    formik.setFieldValue("images", Array.from(e.target.files))
+              <Box display="flex" alignItems="center">
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      id="isDiscountEnabled"
+                      checked={formik.values.isDiscountEnabled}
+                      onChange={() => formik.setFieldValue("isDiscountEnabled", !formik.values.isDiscountEnabled)}
+                    />
+                  }
+                  label="Want to provide discount?"
+                />
+              </Box>
+            </Grid>
+            {formik.values.isDiscountEnabled && (
+              <Grid size={6} margin="10px auto">
+                <TextField
+                  id="discount_percent"
+                  type="number"
+                  label="Discount (%)"
+                  variant="outlined"
+                  value={formik.values.discount_percent}
+                  onChange={formik.handleChange}
+                  sx={{
+                    "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
+                      {
+                        display: "none",
+                      },
+                    "& input[type=number]": {
+                      MozAppearance: "textfield",
+                    },
+                  }}
+                  fullWidth
+                  error={formik.touched.discount_percent && formik.errors.discount_percent}
+                  helperText={
+                    formik.touched.discount_percent && formik.errors.discount_percent
+                      ? formik.errors.discount_percent
+                      : "Minimum: 10%, Maximum: 80%"
                   }
                 />
-              </Button>
-              {formik.touched.images && formik.errors.images ? (
-                <FormHelperText error>{formik.errors.images}</FormHelperText>
-              ) : (
-                <FormHelperText>
-                  Atleast 1 image is required and Maximum 5 images
-                </FormHelperText>
-              )}
+              </Grid>
+            )}
+            <Grid size={6} margin="10px auto">
+              <TextField
+                id="stock"
+                type="number"
+                label="Product Stock"
+                variant="outlined"
+                value={formik.values.stock}
+                onChange={formik.handleChange}
+                sx={{
+                  "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
+                    {
+                      display: "none",
+                    },
+                  "& input[type=number]": {
+                    MozAppearance: "textfield",
+                  },
+                }}
+                fullWidth
+                error={formik.touched.stock && formik.errors.stock}
+                helperText={
+                  formik.touched.stock && formik.errors.stock
+                    ? formik.errors.stock
+                    : ""
+                }
+              />
+            </Grid>
+            <Grid size={6} margin="10px auto">
+              <Box display="flex" justifyContent="space-between">
+                <Box>
+                  <Button
+                    component="label"
+                    role={undefined}
+                    variant="contained"
+                    tabIndex={-1}
+                    startIcon={<CloudUploadIcon />}
+                  >
+                    Upload Images
+                    <VisuallyHiddenInput
+                      id="images"
+                      name="images"
+                      type="file"
+                      multiple
+                      onChange={(e) =>
+                        formik.setFieldValue(
+                          "images",
+                          Array.from(e.target.files)
+                        )
+                      }
+                    />
+                  </Button>
+                  {formik.touched.images && formik.errors.images ? (
+                    <FormHelperText error>
+                      {formik.errors.images}
+                    </FormHelperText>
+                  ) : (
+                    <FormHelperText>
+                      Atleast 1 image is required and Maximum 5 images
+                    </FormHelperText>
+                  )}
+                </Box>
+                <Box>
+                  <FormControlLabel
+                    control={<Switch checked={formik.values.isVisible} onChange={() => formik.setFieldValue("isVisible", !formik.values.isVisible)} />}
+                    label="Is Visible?"
+                  />
+                </Box>
+              </Box>
             </Grid>
             <Grid container size={6} margin="30px auto">
               <Grid container size={12} columnSpacing={2}>
