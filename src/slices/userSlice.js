@@ -5,7 +5,7 @@ const initialState = {
     users: [],
     error: null,
     loading: false,
-    loggedInUser: {}
+    loggedInUser: null
 }
 
 export const createUser = createAsyncThunk(

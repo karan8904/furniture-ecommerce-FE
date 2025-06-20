@@ -1,21 +1,44 @@
-import { createSlice, current } from "@reduxjs/toolkit";
+import { createSlice, current, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "../api/axios";
 
 const initialState = {
-    contacts: []
+    createContact: {
+        loading: false,
+        error: null
+    }
 }
+
+export const createContact = createAsyncThunk(
+    "contacts/createContact",
+    async(data, thunkApi) => {
+        try {
+            const response = await axios.post("/contacts/create", data)
+            return response.data
+        } catch (error) {
+            const message = error.response.data.message
+            return thunkApi.rejectWithValue(message)
+        }
+    }
+)
 
 export const contactSlice = createSlice({
     name: "contacts",
     initialState,
-    reducers: {
-        createContact: (state, action) => {
-            state.contacts.push(action.payload)
-            alert("Thank you for connecting with us. We will contact you soon.")
-            console.log(current(state))
-        }
+    reducers: {},
+    extraReducers: (builder) => {
+        builder
+        //CREATE CONTACT
+        .addCase(createContact.pending, (state) => {
+            state.createContact.loading = true
+        })
+        .addCase(createContact.fulfilled, (state) => {
+            state.createContact.loading = false
+        })
+        .addCase(createContact.rejected, (state, action) => {
+            state.createContact.loading = false
+            state.createContact.error = action.payload
+        })
     }
 })
-
-export const { createContact } = contactSlice.actions
 
 export default contactSlice.reducer

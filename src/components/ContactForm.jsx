@@ -7,11 +7,14 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useDispatch } from "react-redux";
 import { createContact } from "../slices/contactSlice";
+import { showSnackbar } from "../slices/snackbarSlice";
+import { useNavigate } from "react-router";
 
 const ContactForm = () => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const validationSchema = Yup.object().shape({
-    fullName: Yup.string().required("This field is required."),
+    name: Yup.string().required("This field is required."),
     email: Yup.string()
       .email("Please enter valid email")
       .required("This field is required."),
@@ -19,17 +22,27 @@ const ContactForm = () => {
     message: Yup.string().required("This field is required"),
   });
 
+  const handleSubmit = async() => {
+    try {
+      await dispatch(createContact(formik.values)).unwrap()
+      dispatch(showSnackbar({ message: "Thank you for reaching out to us. We will contact you soon."}))
+      formik.resetForm()
+      navigate("/")
+    } catch (error) {
+      dispatch(showSnackbar({ severity: "error", message: error }))
+    }
+  }
+
   const formik = useFormik({
     initialValues: {
-      fullName: "",
+      name: "",
       email: "",
       subject: "",
       message: "",
     },
     validationSchema,
     onSubmit: (values) => {
-      dispatch(createContact(values))
-      formik.resetForm();
+      handleSubmit()
     },
   });
 
@@ -137,15 +150,15 @@ const ContactForm = () => {
                 >
                   <Grid size={styling.formGridSize}>
                     <TextField
-                      id="fullName"
+                      id="name"
                       label="Your Name"
                       variant="outlined"
-                      value={formik.values.fullName}
+                      value={formik.values.name}
                       onChange={formik.handleChange}
-                      error={formik.touched.fullName && formik.errors.fullName}
+                      error={formik.touched.name && formik.errors.name}
                       helperText={
-                        formik.touched.fullName && formik.errors.fullName
-                          ? formik.errors.fullName
+                        formik.touched.name && formik.errors.name
+                          ? formik.errors.name
                           : ""
                       }
                       fullWidth

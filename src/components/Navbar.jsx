@@ -26,10 +26,15 @@ import HomeIcon from "@mui/icons-material/Home";
 import InfoIcon from "@mui/icons-material/Info";
 import ShopIcon from "@mui/icons-material/Shop";
 import { Link, useNavigate } from "react-router";
+import { useSelector } from "react-redux";
 
 const Navbar = () => {
   const [state, setState] = useState({ right: false });
   const [userMenu, setuserMenu] = React.useState(null);
+
+  const user = useSelector((state) => state.user.loggedInUser);
+  // console.log(user);
+
   const openUserMenu = Boolean(userMenu);
   const handleUserMenuClick = (event) => {
     setuserMenu(event.currentTarget);
@@ -136,9 +141,41 @@ const Navbar = () => {
                 },
               }}
             >
-              <MenuItem onClick={handleUserMenuClose}>Profile</MenuItem>
-              <MenuItem onClick={handleUserMenuClose}>My account</MenuItem>
-              <MenuItem onClick={handleUserMenuClose}>Logout</MenuItem>
+              {user
+                ? [
+                    <MenuItem key="greeting" disabled>
+                      Hey, {user.firstName}
+                    </MenuItem>,
+                    <MenuItem
+                      key="logout"
+                      onClick={() => {
+                        handleUserMenuClose();
+                        // logoutUser(); // call your logout logic here
+                      }}
+                    >
+                      Logout
+                    </MenuItem>,
+                  ]
+                : [
+                    <MenuItem
+                      key="register"
+                      onClick={() => {
+                        handleUserMenuClose();
+                        navigate("/register");
+                      }}
+                    >
+                      Register
+                    </MenuItem>,
+                    <MenuItem
+                      key="login"
+                      onClick={() => {
+                        handleUserMenuClose();
+                        navigate("/login");
+                      }}
+                    >
+                      Login
+                    </MenuItem>,
+                  ]}
             </Menu>
             <IconButton>
               <FavoriteBorderIcon />
