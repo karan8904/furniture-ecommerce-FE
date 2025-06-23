@@ -5,7 +5,7 @@ import CallIcon from "@mui/icons-material/Call";
 import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { createContact } from "../slices/contactSlice";
 import { showSnackbar } from "../slices/snackbarSlice";
 import { useNavigate } from "react-router";
@@ -13,6 +13,8 @@ import { useNavigate } from "react-router";
 const ContactForm = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
+
+  const loading = useSelector((state) => state.contact.createContact.loading)
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("This field is required."),
     email: Yup.string()
@@ -27,7 +29,6 @@ const ContactForm = () => {
       await dispatch(createContact(formik.values)).unwrap()
       dispatch(showSnackbar({ message: "Thank you for reaching out to us. We will contact you soon."}))
       formik.resetForm()
-      navigate("/")
     } catch (error) {
       dispatch(showSnackbar({ severity: "error", message: error }))
     }
@@ -223,7 +224,7 @@ const ContactForm = () => {
                   </Grid>
 
                   <Grid size={styling.formGridSize}>
-                    <Button type="submit" variant="contained" fullWidth>
+                    <Button loading={loading} type="submit" variant="contained" fullWidth>
                       Submit
                     </Button>
                   </Grid>

@@ -14,7 +14,7 @@ const Admin = () => {
     <>
       <Box>
         <Grid container rowSpacing={3}>
-          <Sidebar setCurrentSection={setCurrentSection} />
+          <Sidebar setCurrentSection={setCurrentSection} currentSection={currentSection} />
           <Grid
             size={10}
             display={currentSection === "Dashboard" ? "flex" : "none"}
@@ -27,7 +27,7 @@ const Admin = () => {
             display={currentSection !== "Categories" ? "none" : "block"}
             marginTop="15px"
           >
-            <CategoriesGrid />
+            <CategoriesGrid currentSection={currentSection} />
           </Grid>
           <Grid
             size={10}

@@ -22,6 +22,9 @@ const ProductsFromCategory = () => {
   const products = useSelector(
     (state) => state.product.getFromCategory.products
   );
+  const productsLoading = useSelector(
+    (state) => state.product.getProducts.loading
+  );
 
   useEffect(() => {
     dispatch(getFromCategory(id));
@@ -43,7 +46,7 @@ const ProductsFromCategory = () => {
       <Box margin="70px 0">
         <Container>
           <Container sx={{ marginTop: "40px" }}>
-            <ProductGrid products={products} />
+            <ProductGrid products={products} productsLoading={productsLoading} />
           </Container>
         </Container>
         <Box margin="70px auto" display="flex" justifyContent="center">

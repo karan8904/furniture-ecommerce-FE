@@ -63,18 +63,23 @@ const AddProduct = () => {
     isDiscountEnabled: Yup.boolean(),
     discount_percent: Yup.number().when("isDiscountEnabled", {
       is: (value) => value === true,
-      then: () => Yup.number().min(10).max(80).required("This field is required."),
-      otherwise: () => Yup.number().notRequired()
+      then: () =>
+        Yup.number()
+          .min(10, "Minimum discount is 10%")
+          .max(80, "Maximum discount is 80%")
+          .required("This field is required."),
+      otherwise: () => Yup.number().notRequired(),
     }),
     stock: Yup.number().required("This field is requird."),
-    isVisible: Yup.boolean()
+    isVisible: Yup.boolean(),
   });
 
   const handleOnSubmit = async (productData) => {
     try {
+      productData.discount_percent = productData.isDiscountEnabled === false ? 0 : productData.discount_percent;
       const formData = new FormData();
-      for(let key in productData){
-        if(key === "sizes"){
+      for (let key in productData) {
+        if (key === "sizes") {
           Object.entries(productData.sizes).forEach(([key, value]) => {
             if (value) formData.append("sizes", key);
           });
@@ -108,7 +113,7 @@ const AddProduct = () => {
       isDiscountEnabled: false,
       discount_percent: 10,
       stock: 0,
-      isVisible: true
+      isVisible: true,
     },
     validationSchema,
     onSubmit: (values) => {
@@ -153,6 +158,21 @@ const AddProduct = () => {
       formik.setFieldValue("colors", [...current, color]);
     }
   };
+
+  const handleSelectAllSizes = () => {
+    const isAllSelected = selectedSizes.length === allSizes.length;
+    const updated = {};
+    allSizes.forEach((size) => {
+      updated[size] = !isAllSelected;
+    });
+    formik.setFieldValue("sizes", updated);
+  };
+
+  const handleSelectAllColors = () => {
+    const isAllSelected = formik.values.colors.length === allColors.length;
+    const updated = isAllSelected ? [] : [...allColors];
+    formik.setFieldValue("colors", updated)
+  }
 
   return (
     <>
@@ -271,6 +291,17 @@ const AddProduct = () => {
                   label="Available Sizes"
                   renderValue={(selected) => selected.join(", ")}
                 >
+                  <MenuItem>
+                    <Checkbox
+                      onClick={handleSelectAllSizes}
+                      checked={selectedSizes.length === allSizes.length}
+                      // indeterminate={
+                      //   selectedSizes.length > 0 &&
+                      //   selectedSizes.length < allSizes.length
+                      // }
+                    />
+                    <ListItemText primary="Select All" />
+                  </MenuItem>
                   {allSizes.map((size) => (
                     <MenuItem
                       key={size}
@@ -315,6 +346,17 @@ const AddProduct = () => {
                     </Box>
                   )}
                 >
+                  <MenuItem>
+                    <Checkbox
+                      onClick={handleSelectAllColors}
+                      checked={formik.values.colors.length === allColors.length}
+                      // indeterminate={
+                      //   selectedSizes.length > 0 &&
+                      //   selectedSizes.length < allSizes.length
+                      // }
+                    />
+                    <ListItemText primary="Select All" />
+                  </MenuItem>
                   {allColors.map((color) => (
                     <MenuItem
                       key={color}
@@ -345,7 +387,12 @@ const AddProduct = () => {
                     <Checkbox
                       id="isDiscountEnabled"
                       checked={formik.values.isDiscountEnabled}
-                      onChange={() => formik.setFieldValue("isDiscountEnabled", !formik.values.isDiscountEnabled)}
+                      onChange={() =>
+                        formik.setFieldValue(
+                          "isDiscountEnabled",
+                          !formik.values.isDiscountEnabled
+                        )
+                      }
                     />
                   }
                   label="Want to provide discount?"
@@ -371,9 +418,13 @@ const AddProduct = () => {
                     },
                   }}
                   fullWidth
-                  error={formik.touched.discount_percent && formik.errors.discount_percent}
+                  error={
+                    formik.touched.discount_percent &&
+                    formik.errors.discount_percent
+                  }
                   helperText={
-                    formik.touched.discount_percent && formik.errors.discount_percent
+                    formik.touched.discount_percent &&
+                    formik.errors.discount_percent
                       ? formik.errors.discount_percent
                       : "Minimum: 10%, Maximum: 80%"
                   }
@@ -442,7 +493,17 @@ const AddProduct = () => {
                 </Box>
                 <Box>
                   <FormControlLabel
-                    control={<Switch checked={formik.values.isVisible} onChange={() => formik.setFieldValue("isVisible", !formik.values.isVisible)} />}
+                    control={
+                      <Switch
+                        checked={formik.values.isVisible}
+                        onChange={() =>
+                          formik.setFieldValue(
+                            "isVisible",
+                            !formik.values.isVisible
+                          )
+                        }
+                      />
+                    }
                     label="Is Visible?"
                   />
                 </Box>

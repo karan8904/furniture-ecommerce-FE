@@ -85,6 +85,7 @@ const EditProduct = () => {
 
   const handleOnSubmit = async (productData) => {
     try {
+      productData.discount_percent = productData.isDiscountEnabled === false ? 0 : productData.discount_percent
       const formData = new FormData();
       for (let key in productData) {
         if (key === "sizes") {
@@ -117,8 +118,8 @@ const EditProduct = () => {
       sizes: product?.sizes || [],
       colors: product?.colors || [],
       images: product?.images || [],
-      isDiscountEnabled:product && product.discount_percent > 0 ,
-      discount_percent: product?.discount_percent || 0,
+      isDiscountEnabled:product && product.discount_percent > 10 ,
+      discount_percent: product?.discount_percent || 10,
       stock: product?.stock || 0,
       isVisible: product?.isVisible ?? false
     },
@@ -163,6 +164,19 @@ const EditProduct = () => {
       formik.setFieldValue("colors", [...current, color]);
     }
   };
+
+  const handleSelectAllSizes = () => {
+    const isAllSelected = formik.values.sizes.length === allSizes.length;
+    const updated = isAllSelected ? [] : [...allSizes];
+    formik.setFieldValue("sizes", updated)
+  }
+
+  const handleSelectAllColors = () => {
+    const isAllSelected = formik.values.colors.length === allColors.length;
+    const updated = isAllSelected ? [] : [...allColors];
+    formik.setFieldValue("colors", updated)
+  }
+
   return (
     <>
       <Grid container marginTop="20px">
@@ -280,6 +294,17 @@ const EditProduct = () => {
                   label="Available Sizes"
                   renderValue={(selected) => selected.join(", ")}
                 >
+                  <MenuItem>
+                    <Checkbox
+                      onClick={handleSelectAllSizes}
+                      checked={formik.values.sizes.length === allSizes.length}
+                      // indeterminate={
+                      //   selectedSizes.length > 0 &&
+                      //   selectedSizes.length < allSizes.length
+                      // }
+                    />
+                    <ListItemText primary="Select All" />
+                  </MenuItem>
                   {allSizes.map((size) => (
                     <MenuItem
                       key={size}
@@ -324,6 +349,17 @@ const EditProduct = () => {
                     </Box>
                   )}
                 >
+                  <MenuItem>
+                    <Checkbox
+                      onClick={handleSelectAllColors}
+                      checked={formik.values.colors.length === allColors.length}
+                      // indeterminate={
+                      //   selectedSizes.length > 0 &&
+                      //   selectedSizes.length < allSizes.length
+                      // }
+                    />
+                    <ListItemText primary="Select All" />
+                  </MenuItem>
                   {allColors.map((color) => (
                     <MenuItem
                       key={color}

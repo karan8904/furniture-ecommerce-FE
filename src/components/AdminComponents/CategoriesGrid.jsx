@@ -13,11 +13,12 @@ import {
   Button,
   Divider,
   IconButton,
-  Dialog, 
+  Dialog,
   DialogTitle,
   DialogContent,
   DialogContentText,
-  DialogActions
+  DialogActions,
+  CircularProgress,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { getCategories } from "../../slices/categorySlice";
@@ -28,17 +29,20 @@ import { deleteCategory } from "../../slices/categorySlice";
 import { showSnackbar } from "../../slices/snackbarSlice";
 
 const CategoriesGrid = () => {
-  const [deleteId, setDeleteId] = useState(null)
-  const baseURL = import.meta.env.VITE_BASEURL
+  const [deleteId, setDeleteId] = useState(null);
+  const baseURL = import.meta.env.VITE_BASEURL;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const categories = useSelector(
     (state) => state.category.getCategories.categories
   );
 
-  const categoriesLoading = useSelector((state) => state.category.getCategories.loading) 
-  const deleteLoading = useSelector((state) => state.category.deleteCategory.loading)
-  
+  const categoriesLoading = useSelector(
+    (state) => state.category.getCategories.loading
+  );
+  const deleteLoading = useSelector(
+    (state) => state.category.deleteCategory.loading
+  );
 
   useEffect(() => {
     dispatch(getCategories());
@@ -47,22 +51,22 @@ const CategoriesGrid = () => {
   const handleOpenDialog = (id) => {
     setDeleteId(id);
   };
-  
+
   const handleCloseDialog = () => {
     setDeleteId(null);
   };
 
-  const handleOnDelete = async() => {
+  const handleOnDelete = async () => {
     try {
-      await dispatch(deleteCategory(deleteId)).unwrap()
-      dispatch(showSnackbar({ message: "Category Deleted Successfully." }))
-      await dispatch(getCategories()).unwrap()
-      setDeleteId(null)
+      await dispatch(deleteCategory(deleteId)).unwrap();
+      dispatch(showSnackbar({ message: "Category Deleted Successfully." }));
+      setDeleteId(null);
+      await dispatch(getCategories()).unwrap();
     } catch (error) {
-      dispatch(showSnackbar({ severity: "error", message: error }))
-      setDeleteId(null)
+      dispatch(showSnackbar({ severity: "error", message: error }));
+      setDeleteId(null);
     }
-  }
+  };
 
   return (
     <>
@@ -103,7 +107,14 @@ const CategoriesGrid = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {categories ? (
+                {categoriesLoading && (
+                  <TableRow>
+                    <TableCell align="center" colSpan={6}>
+                      <CircularProgress />
+                    </TableCell>
+                  </TableRow>
+                )}
+                {categories &&
                   categories.map((category, index) => (
                     <TableRow key={index}>
                       <TableCell>{index + 1}</TableCell>
@@ -116,17 +127,25 @@ const CategoriesGrid = () => {
                         />
                       </TableCell>
                       <TableCell align="right">{category.name}</TableCell>
-                      <TableCell align="center">
+                      <TableCell>
                         {category.description}
                       </TableCell>
                       <TableCell align="center">
                         <IconButton aria-label="delete">
-                          <EditIcon color="primary" onClick={() => navigate(`/admin/edit-category/${category._id}`)} />
+                          <EditIcon
+                            color="primary"
+                            onClick={() =>
+                              navigate(`/admin/edit-category/${category._id}`)
+                            }
+                          />
                         </IconButton>
                       </TableCell>
                       <TableCell align="center">
                         <IconButton aria-label="delete">
-                          <DeleteIcon color="primary" onClick={() => handleOpenDialog(category._id)} />
+                          <DeleteIcon
+                            color="primary"
+                            onClick={() => handleOpenDialog(category._id)}
+                          />
                         </IconButton>
                         <Dialog
                           open={deleteId === category._id}
@@ -135,7 +154,7 @@ const CategoriesGrid = () => {
                           aria-describedby="alert-dialog-description"
                         >
                           <DialogTitle id="alert-dialog-title">
-                             <strong>Delete Category</strong>
+                            <strong>Delete Category</strong>
                           </DialogTitle>
                           <DialogContent>
                             <DialogContentText id="alert-dialog-description">
@@ -143,17 +162,31 @@ const CategoriesGrid = () => {
                             </DialogContentText>
                           </DialogContent>
                           <DialogActions>
-                            <Button onClick={handleCloseDialog}>Cancel</Button>
-                            <Button loading={deleteLoading} onClick={() => handleOnDelete() } autoFocus>
+                            <Button
+                              onClick={handleCloseDialog}
+                              variant="outlined"
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              loading={deleteLoading}
+                              onClick={() => handleOnDelete()}
+                              variant="contained"
+                              autoFocus
+                            >
                               Delete
                             </Button>
                           </DialogActions>
                         </Dialog>
                       </TableCell>
                     </TableRow>
-                  ))
-                ) : (
-                  <></>
+                  ))}
+                {!categoriesLoading && categories.length === 0 && (
+                  <TableRow>
+                    <TableCell align="center" colSpan={6}>
+                      No Categories Found...
+                    </TableCell>
+                  </TableRow>
                 )}
               </TableBody>
             </Table>

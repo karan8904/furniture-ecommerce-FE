@@ -6,7 +6,20 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { Grid, Typography, Box, Button, Divider, Chip, IconButton, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import {
+  Grid,
+  Typography,
+  Box,
+  Button,
+  Divider,
+  Chip,
+  IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteProduct, getProducts } from "../../slices/productSlice";
@@ -14,43 +27,48 @@ import { showSnackbar } from "../../slices/snackbarSlice";
 import CircleIcon from "@mui/icons-material/Circle";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const ProductsGrid = () => {
-  const [deleteId, setDeleteId] = useState(null)
-
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const baseURL = import.meta.env.VITE_BASEURL
-  const products = useSelector((state) => state.product.getProducts.products)
-  const deleteLoading = useSelector((state) => state.product.deleteProduct.loading)
+  const [deleteId, setDeleteId] = useState(null);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const baseURL = import.meta.env.VITE_BASEURL;
+  const products = useSelector((state) => state.product.getProducts.products);
+  const productsLoading = useSelector(
+    (state) => state.product.getProducts.loading
+  );
+  const deleteLoading = useSelector(
+    (state) => state.product.deleteProduct.loading
+  );
 
   useEffect(() => {
-    dispatch(getProducts())
-  }, [])
+    dispatch(getProducts());
+  }, []);
 
   const handleOpenDialog = (id) => {
     setDeleteId(id);
   };
-  
+
   const handleCloseDialog = () => {
     setDeleteId(null);
   };
 
-  const handleOnDelete = async() => {
+  const handleOnDelete = async () => {
     try {
-      await dispatch(deleteProduct(deleteId)).unwrap()
-      dispatch(showSnackbar({ message: "Product Deleted Successfully." }))
-      await dispatch(getProducts()).unwrap()
-      setDeleteId(null)
+      await dispatch(deleteProduct(deleteId)).unwrap();
+      dispatch(showSnackbar({ message: "Product Deleted Successfully." }));
+      setDeleteId(null);
+      await dispatch(getProducts()).unwrap();
     } catch (error) {
-      dispatch(showSnackbar({ severity: "error", message: error }))
-      setDeleteId(null)
+      dispatch(showSnackbar({ severity: "error", message: error }));
+      setDeleteId(null);
     }
-  }
+  };
 
   return (
     <>
-    <Grid container>
+      <Grid container>
         <Grid container size={12}>
           <Grid size={8}>
             <Box display="flex" justifyContent="center">
@@ -61,7 +79,12 @@ const ProductsGrid = () => {
           </Grid>
           <Grid size={3}>
             <Box display="flex" justifyContent="flex-end">
-              <Button variant="contained" onClick={() => navigate("/admin/add-product")}>Add New Product</Button>
+              <Button
+                variant="contained"
+                onClick={() => navigate("/admin/add-product")}
+              >
+                Add New Product
+              </Button>
             </Box>
           </Grid>
         </Grid>
@@ -88,40 +111,70 @@ const ProductsGrid = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {products && products.map((product, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>
-                        <img src={`${baseURL}/${product.images[0]}`} alt="" height="100px" width="85px" />
+                {productsLoading && (
+                  <TableRow>
+                    <TableCell align="center" colSpan={12}>
+                      <CircularProgress />
                     </TableCell>
-                    <TableCell>{product.name}</TableCell>
-                    <TableCell>{product.category.name}</TableCell>
-                    <TableCell>
-                      <Box display="flex" gap="2px">
-                        {product.sizes.map((size) => (
-                          <Chip key={size} label={size} />  
-                        ))}
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Box display="flex" gap="2px" maxWidth="110px" overflow="auto">
-                        {product.colors.map((color) => (
-                          <CircleIcon key={color} sx={{ fill: color }} />                        
-                        ))}
-                      </Box>
-                    </TableCell>
-                    <TableCell>₹{product.price}</TableCell>
-                    <TableCell>{product.discount_percent > 0 ? `${product.discount_percent}%` : "None"}</TableCell>
-                    <TableCell>{product.stock}</TableCell>
-                    <TableCell>{product.isVisible ? "Yes" : "No"}</TableCell>
-                    <TableCell>
+                  </TableRow>
+                )}
+                {products &&
+                  products.map((product, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>
+                        <img
+                          src={`${baseURL}/${product.images[0]}`}
+                          alt=""
+                          height="100px"
+                          width="85px"
+                        />
+                      </TableCell>
+                      <TableCell>{product.name}</TableCell>
+                      <TableCell>{product.category.name}</TableCell>
+                      <TableCell>
+                        <Box display="flex" gap="2px">
+                          {product.sizes.map((size) => (
+                            <Chip key={size} label={size} />
+                          ))}
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Box
+                          display="flex"
+                          gap="2px"
+                          maxWidth="110px"
+                          overflow="auto"
+                        >
+                          {product.colors.map((color) => (
+                            <CircleIcon key={color} sx={{ fill: color }} />
+                          ))}
+                        </Box>
+                      </TableCell>
+                      <TableCell>₹{product.price}</TableCell>
+                      <TableCell>
+                        {product.discount_percent > 0
+                          ? `${product.discount_percent}%`
+                          : "None"}
+                      </TableCell>
+                      <TableCell>{product.stock}</TableCell>
+                      <TableCell>{product.isVisible ? "Yes" : "No"}</TableCell>
+                      <TableCell>
                         <IconButton aria-label="delete">
-                          <EditIcon color="primary" onClick={() => navigate(`/admin/edit-product/${product._id}`)} />
+                          <EditIcon
+                            color="primary"
+                            onClick={() =>
+                              navigate(`/admin/edit-product/${product._id}`)
+                            }
+                          />
                         </IconButton>
                       </TableCell>
                       <TableCell>
                         <IconButton aria-label="delete">
-                          <DeleteIcon color="primary" onClick={() => handleOpenDialog(product._id)} />
+                          <DeleteIcon
+                            color="primary"
+                            onClick={() => handleOpenDialog(product._id)}
+                          />
                         </IconButton>
                         <Dialog
                           open={deleteId === product._id}
@@ -130,7 +183,7 @@ const ProductsGrid = () => {
                           aria-describedby="alert-dialog-description"
                         >
                           <DialogTitle id="alert-dialog-title">
-                             <strong>Delete Product</strong>
+                            <strong>Delete Product</strong>
                           </DialogTitle>
                           <DialogContent>
                             <DialogContentText id="alert-dialog-description">
@@ -138,21 +191,39 @@ const ProductsGrid = () => {
                             </DialogContentText>
                           </DialogContent>
                           <DialogActions>
-                            <Button onClick={handleCloseDialog}>Cancel</Button>
-                            <Button loading={deleteLoading} onClick={() => handleOnDelete() } autoFocus>
+                            <Button
+                              onClick={handleCloseDialog}
+                              variant="outlined"
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              loading={deleteLoading}
+                              onClick={() => handleOnDelete()}
+                              variant="contained"
+                              autoFocus
+                            >
                               Delete
                             </Button>
                           </DialogActions>
                         </Dialog>
                       </TableCell>
+                    </TableRow>
+                  ))}
+                {!productsLoading && products.length === 0 && (
+                  <TableRow>
+                    <TableCell align="center" colSpan={12}>
+                      <Typography variant="h6">
+                        No Products Found...
+                      </Typography>
+                    </TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </TableContainer>
         </Grid>
       </Grid>
-      
     </>
   );
 };

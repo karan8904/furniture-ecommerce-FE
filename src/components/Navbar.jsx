@@ -117,9 +117,16 @@ const Navbar = () => {
           <Stack
             direction="row"
             sx={{ fontWeight: "500", gap: { lg: "20px", md: "10px" } }}
+            alignItems="center"
           >
             <IconButton>
               <SearchIcon />
+            </IconButton>
+            <IconButton>
+              <FavoriteBorderIcon />
+            </IconButton>
+            <IconButton onClick={() => navigate("/cart")}>
+              <ShoppingCartIcon />
             </IconButton>
             <IconButton
               id="user-button"
@@ -129,7 +136,7 @@ const Navbar = () => {
               onClick={handleUserMenuClick}
             >
               <PermIdentityIcon />
-            </IconButton>
+            </IconButton> 
             <Menu
               id="user-menu"
               anchorEl={userMenu}
@@ -143,7 +150,7 @@ const Navbar = () => {
             >
               {user
                 ? [
-                    <MenuItem key="greeting" disabled>
+                    <MenuItem key="greeting">
                       Hey, {user.firstName}
                     </MenuItem>,
                     <MenuItem
@@ -177,12 +184,6 @@ const Navbar = () => {
                     </MenuItem>,
                   ]}
             </Menu>
-            <IconButton>
-              <FavoriteBorderIcon />
-            </IconButton>
-            <IconButton>
-              <ShoppingCartIcon />
-            </IconButton>
           </Stack>
         </Grid>
 

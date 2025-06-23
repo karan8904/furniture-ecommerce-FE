@@ -1,9 +1,18 @@
-import { Avatar, Box, Card, CardContent, CardMedia, Grid, Typography } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Card,
+  CardContent,
+  CardMedia,
+  CircularProgress,
+  Grid,
+  Typography,
+} from "@mui/material";
 import React from "react";
 import { Link } from "react-router";
 
-const ProductGrid = ({products}) => {
-  const baseURL = import.meta.env.VITE_BASEURL
+const ProductGrid = ({ products, productsLoading }) => {
+  const baseURL = import.meta.env.VITE_BASEURL;
   const productStyling = {
     maxWidth: { xs: 340, sm: 270, md: 240 },
     margin: "0 auto",
@@ -21,6 +30,18 @@ const ProductGrid = ({products}) => {
       columns={{ md: 12, sm: 8, xs: 12 }}
       columnSpacing={{ xs: 1, sm: 1, md: 3 }}
     >
+      {productsLoading && (
+        <Grid size={12} display="flex" justifyContent="center">
+          <CircularProgress />
+        </Grid>
+        )}
+      {!productsLoading && products.length === 0 && (
+        <Grid size={12}>
+          <Typography variant="h5" textAlign="center">
+            No Products Found...
+          </Typography>
+        </Grid>
+      )}
       {products ? (
         products.map((product) => {
           if (!product.isVisible) return;

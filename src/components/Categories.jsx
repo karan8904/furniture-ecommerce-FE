@@ -35,27 +35,30 @@ const Categories = () => {
         <Box sx={{ marginTop: "70px" }}>
           <Grid
             container
-            rowSpacing={1}
+            rowSpacing={3}
             columnSpacing={{ xs: 1, sm: 1, md: 3 }}
             wrap="wrap"
           >
             {categories && categories.map((category) => (
-              <Grid size={{ md: 4, sm: 12, xs: 12 }} key={category._id}>
+              <Grid size={{ md: 4, sm: 6, xs: 12 }} key={category._id}>
                 <Link style={{ textDecoration: "none"}} to={`/category/${category._id}`}>
-                  <Stack>
-                    <img src={`${baseURL}/${category.imageURL}`} alt="" />
-                    <Typography
-                      sx={{
-                        fontWeight: 600,
-                        textAlign: "center",
-                        fontSize: "18px",
-                        margin: "15px 0",
-                        color: "#333333",
-                      }}
-                    >
-                      {category.name}
-                    </Typography>
-                  </Stack>
+                  <Box display="flex" flexDirection="column">
+                    <Box display="flex" justifyContent="center">
+                      <img src={`${baseURL}/${category.imageURL}`} alt="" height="350px" width="270px" style={{ borderRadius: "10px" }} />
+                    </Box>
+                    <Box display="flex" justifyContent="center">
+                      <Typography
+                        sx={{
+                          fontWeight: 600,
+                          fontSize: "18px",
+                          margin: "15px 0",
+                          color: "#333333",
+                        }}
+                      >
+                        {category.name}
+                      </Typography>
+                    </Box>
+                  </Box>
                 </Link>
             </Grid>
             ))}

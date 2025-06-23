@@ -152,6 +152,7 @@ const productSlice = createSlice({
         state.deleteProduct.loading = true;
       })
       .addCase(deleteProduct.fulfilled, (state) => {
+        state.getProducts.products = []
         state.deleteProduct.loading = false;
       })
       .addCase(deleteProduct.rejected, (state, action) => {
