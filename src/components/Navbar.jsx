@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Typography,
   Stack,
@@ -15,6 +15,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Badge
 } from "@mui/material";
 import logo from "../assets/logo.png";
 import SearchIcon from "@mui/icons-material/Search";
@@ -26,14 +27,23 @@ import HomeIcon from "@mui/icons-material/Home";
 import InfoIcon from "@mui/icons-material/Info";
 import ShopIcon from "@mui/icons-material/Shop";
 import { Link, useNavigate } from "react-router";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { showSnackbar } from "../slices/snackbarSlice";
+import { logoutUser } from "../slices/userSlice";
+import { getCartProducts, resetCart } from "../slices/cartSlice";
 
 const Navbar = () => {
   const [state, setState] = useState({ right: false });
   const [userMenu, setuserMenu] = React.useState(null);
 
-  const user = useSelector((state) => state.user.loggedInUser);
-  // console.log(user);
+  const dispatch = useDispatch()
+
+  const user = useSelector((state) => state.user.getCurrentUser.user);
+  const products = useSelector((state) => state.cart.getCartProducts.products)
+
+  useEffect(() => {
+    if(user._id) dispatch(getCartProducts(user._id))
+  }, [user])
 
   const openUserMenu = Boolean(userMenu);
   const handleUserMenuClick = (event) => {
@@ -55,6 +65,18 @@ const Navbar = () => {
     }
     setState({ right: open });
   };
+
+  const handleLogout = () => {
+    try {  
+      dispatch(logoutUser())
+      dispatch(resetCart())
+      dispatch(showSnackbar({ message: "Logout successfully." }))
+      navigate("/")
+    } catch (error) {
+      dispatch(showSnackbar({ severity: error, message: "Cannot logout. Try again..."}))
+    }
+  }
+
   return (
     <Box
       sx={{
@@ -126,7 +148,9 @@ const Navbar = () => {
               <FavoriteBorderIcon />
             </IconButton>
             <IconButton onClick={() => navigate("/cart")}>
-              <ShoppingCartIcon />
+              <Badge badgeContent={products.length} color="primary">
+                <ShoppingCartIcon />
+              </Badge>
             </IconButton>
             <IconButton
               id="user-button"
@@ -148,7 +172,7 @@ const Navbar = () => {
                 },
               }}
             >
-              {user
+              {user?.firstName
                 ? [
                     <MenuItem key="greeting">
                       Hey, {user.firstName}
@@ -157,7 +181,7 @@ const Navbar = () => {
                       key="logout"
                       onClick={() => {
                         handleUserMenuClose();
-                        // logoutUser(); // call your logout logic here
+                        handleLogout(); 
                       }}
                     >
                       Logout

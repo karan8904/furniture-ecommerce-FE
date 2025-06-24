@@ -1,11 +1,15 @@
-import { createSlice, current, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "../api/axios";
 
 const initialState = {
     users: [],
     error: null,
     loading: false,
-    loggedInUser: null
+    getCurrentUser: {
+        user: {},
+        error: null,
+        loading: false
+    }
 }
 
 export const createUser = createAsyncThunk(
@@ -61,10 +65,28 @@ export const resetPassword = createAsyncThunk(
     }
 )
 
+export const getCurrentUser = createAsyncThunk(
+    'users/getCurrentUser',
+    async(token, thunkApi) => {
+        try {
+            const response = await axios.get(`/users/get/${token}`)
+            return response.data
+        } catch (error) {
+            const message = error.response.data.message
+            return thunkApi.rejectWithValue(message)
+        }
+    }
+)
+
 export const userSlice = createSlice({
     name: "users",
     initialState,
-    reducers: {},
+    reducers: {
+        logoutUser: (state) => {
+            localStorage.removeItem("token")
+            state.getCurrentUser.user = {}
+        }
+    },
     extraReducers: (buidler) => {
         buidler
         //USER REGISTRATION
@@ -88,8 +110,7 @@ export const userSlice = createSlice({
             state.loading = false
             const data = action.payload
             localStorage.setItem("token", data.token)
-            state.loggedInUser = data.user
-            console.log(state.loggedInUser)
+            state.getCurrentUser.user = data.user
         } )
         .addCase(loginUser.rejected, (state, action) => {
             state.loading = false
@@ -119,7 +140,22 @@ export const userSlice = createSlice({
             state.loading = false
             state.error = action.payload
         })
+
+        //GET CURRENT USER
+        .addCase(getCurrentUser.pending, (state) => {
+            state.getCurrentUser.loading = true;
+        })
+        .addCase(getCurrentUser.fulfilled, (state, action) => {
+            state.getCurrentUser.loading = false
+            state.getCurrentUser.user = action.payload
+        })
+        .addCase(getCurrentUser.rejected, (state, action) => {
+            state.getCurrentUser.loading = false
+            state.getCurrentUser.error = action.payload
+        })
     }
 })
+
+export const { logoutUser } = userSlice.actions
 
 export default userSlice.reducer

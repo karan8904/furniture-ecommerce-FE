@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Typography,
   Grid,
@@ -14,15 +14,18 @@ import {
 } from "@mui/material";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { placeOrder } from "../slices/orderSlice";
 import { useNavigate } from "react-router";
 
 const CheckoutForm = () => {
   const [paymode, setPayMode] = useState("Bank");
 
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { products, totalAmount } = useSelector((state) => state.cart.checkoutData.data)
+  const user = useSelector((state) => state.user.getCurrentUser.user)
 
   const validationSchema = Yup.object().shape({
     firstName: Yup.string().required("This field is required."),
@@ -44,9 +47,10 @@ const CheckoutForm = () => {
   });
 
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      firstName: "",
-      lastName: "",
+      firstName: user?.firstName || "",
+      lastName: user?.lastName || "",
       companyName: "",
       country: "",
       streetAddress: "",
@@ -60,9 +64,9 @@ const CheckoutForm = () => {
     },
     validationSchema,
     onSubmit: (values) => {
-      dispatch(placeOrder(values))
+      dispatch(placeOrder(values));
       formik.resetForm();
-      navigate('/')
+      navigate("/");
     },
   });
 
@@ -174,9 +178,7 @@ const CheckoutForm = () => {
                         label="Country / Region"
                         variant="outlined"
                         fullWidth
-                        error={
-                          formik.touched.country && formik.errors.country
-                        }
+                        error={formik.touched.country && formik.errors.country}
                         helperText={
                           formik.touched.country && formik.errors.country
                             ? formik.errors.country
@@ -198,9 +200,13 @@ const CheckoutForm = () => {
                     variant="outlined"
                     value={formik.values.streetAddress}
                     onChange={formik.handleChange}
-                    error={formik.touched.streetAddress && formik.errors.streetAddress}
+                    error={
+                      formik.touched.streetAddress &&
+                      formik.errors.streetAddress
+                    }
                     helperText={
-                      formik.touched.streetAddress && formik.errors.streetAddress
+                      formik.touched.streetAddress &&
+                      formik.errors.streetAddress
                         ? formik.errors.streetAddress
                         : ""
                     }
@@ -246,7 +252,9 @@ const CheckoutForm = () => {
                         id="province"
                         label="Province"
                         variant="outlined"
-                        error={formik.touched.province && formik.errors.province}
+                        error={
+                          formik.touched.province && formik.errors.province
+                        }
                         helperText={
                           formik.touched.province && formik.errors.province
                             ? formik.errors.province
@@ -324,9 +332,13 @@ const CheckoutForm = () => {
                     variant="outlined"
                     value={formik.values.additionalInfo}
                     onChange={formik.handleChange}
-                    error={formik.touched.additionalInfo && formik.errors.additionalInfo}
+                    error={
+                      formik.touched.additionalInfo &&
+                      formik.errors.additionalInfo
+                    }
                     helperText={
-                      formik.touched.additionalInfo && formik.errors.additionalInfo
+                      formik.touched.additionalInfo &&
+                      formik.errors.additionalInfo
                         ? formik.errors.additionalInfo
                         : ""
                     }
@@ -339,7 +351,8 @@ const CheckoutForm = () => {
 
             <Grid size={styling.secondGridSize}>
               <Box margin="50px 40px">
-                <Box
+                {products && (<>
+                                <Box
                   display="flex"
                   justifyContent="space-between"
                   marginTop="20px"
@@ -351,28 +364,33 @@ const CheckoutForm = () => {
                     Subtotal
                   </Typography>
                 </Box>
-                <Box
-                  display="flex"
-                  justifyContent="space-between"
-                  marginTop="20px"
-                >
-                  <Box display="flex">
-                    <Typography
-                      fontSize="14px"
-                      color="secondary"
-                      fontWeight="400"
+                {products &&
+                  products.map((product) => (
+                    <Box
+                      key={product._id}
+                      display="flex"
+                      justifyContent="space-between"
+                      marginTop="20px"
                     >
-                      Asgard Sofa
-                    </Typography>
-                    <Typography fontSize="14px" marginLeft={2}>
-                      x 1
-                    </Typography>
-                  </Box>
-                  <Typography fontSize="14px" fontWeight="300">
-                    Rs. 250,000.00
-                  </Typography>
-                </Box>
-                <Box
+                      <Box display="flex">
+                        <Typography
+                          fontSize="14px"
+                          color="secondary"
+                          fontWeight="400"
+                        >
+                          {product.productID.name}
+                        </Typography>
+                        <Typography fontSize="14px" marginLeft={2}>
+                          x {product.quantity}
+                        </Typography>
+                      </Box>
+                      <Typography fontSize="14px" fontWeight="300">
+                        Rs. {product.price * product.quantity}
+                      </Typography>
+                    </Box>
+                  ))}
+
+                {/* <Box
                   display="flex"
                   justifyContent="space-between"
                   marginTop="20px"
@@ -383,17 +401,18 @@ const CheckoutForm = () => {
                   <Typography fontSize="14px" fontWeight="300">
                     Rs. 250,000.00
                   </Typography>
-                </Box>
+                </Box> */}
                 <Box
                   display="flex"
                   justifyContent="space-between"
                   marginTop="20px"
                 >
-                  <Typography fontSize="14px">Total</Typography>
+                  <Typography fontSize="16px">Total</Typography>
                   <Typography fontSize="20px" fontWeight="600" color="primary">
-                    Rs. 250,000.00
+                    Rs. {totalAmount}
                   </Typography>
                 </Box>
+                </>)}
                 <Divider sx={{ margin: "20px 0" }} />
                 <Box>
                   <FormControl>

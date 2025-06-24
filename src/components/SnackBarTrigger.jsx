@@ -11,14 +11,21 @@ const SnackBarTrigger = ({children}) => {
       dispatch(hideSnackbar())
     }, 5000)
   }
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    dispatch(hideSnackbar())
+  };
 
   return (
     <>
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}
+        onClose={handleClose}
         >
-        <Alert severity={severity} variant="filled" sx={{ width: "100%" }}>
+        <Alert severity={severity} variant="filled" sx={{ width: "100%" }} onClose={handleClose}>
           {message}
         </Alert>
       </Snackbar>

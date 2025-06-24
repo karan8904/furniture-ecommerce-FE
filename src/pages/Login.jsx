@@ -43,9 +43,8 @@ const Login = () => {
       const data = await dispatch(
         loginUser({ email: values.email, password: values.password })
       ).unwrap();
-      
       dispatch(
-        showSnackbar({ message: "Loggin Successful..." })
+        showSnackbar({ message: "Logged in Successful..." })
       );
       data.user.isAdmin ? navigate("/admin") : navigate("/")
       formik.resetForm();
