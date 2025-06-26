@@ -93,7 +93,7 @@ const ProductsGrid = () => {
         </Grid>
         <Grid size={12} margin="0 10px">
           <TableContainer component={Paper}>
-            <Table aria-label="customized table">
+            <Table>
               <TableHead>
                 <TableRow>
                   <TableCell>#</TableCell>
@@ -160,21 +160,21 @@ const ProductsGrid = () => {
                       <TableCell>{product.stock}</TableCell>
                       <TableCell>{product.isVisible ? "Yes" : "No"}</TableCell>
                       <TableCell>
-                        <IconButton aria-label="delete">
-                          <EditIcon
-                            color="primary"
-                            onClick={() =>
-                              navigate(`/admin/edit-product/${product._id}`)
-                            }
-                          />
+                        <IconButton
+                          aria-label="edit"
+                          onClick={() =>
+                            navigate(`/admin/edit-product/${product._id}`)
+                          }
+                        >
+                          <EditIcon color="primary" />
                         </IconButton>
                       </TableCell>
                       <TableCell>
-                        <IconButton aria-label="delete">
-                          <DeleteIcon
-                            color="primary"
-                            onClick={() => handleOpenDialog(product._id)}
-                          />
+                        <IconButton
+                          aria-label="delete"
+                          onClick={() => handleOpenDialog(product._id)}
+                        >
+                          <DeleteIcon color="primary" />
                         </IconButton>
                         <Dialog
                           open={deleteId === product._id}
@@ -213,9 +213,7 @@ const ProductsGrid = () => {
                 {!productsLoading && products.length === 0 && (
                   <TableRow>
                     <TableCell align="center" colSpan={12}>
-                      <Typography variant="h6">
-                        No Products Found...
-                      </Typography>
+                      <Typography variant="h6">No Products Found...</Typography>
                     </TableCell>
                   </TableRow>
                 )}

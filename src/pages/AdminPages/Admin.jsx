@@ -6,6 +6,7 @@ import {
 import Sidebar from "../../components/AdminComponents/Sidebar";
 import CategoriesGrid from "../../components/AdminComponents/CategoriesGrid";
 import ProductsGrid from "../../components/AdminComponents/ProductsGrid";
+import OrdersGrid from "../../components/AdminComponents/OrdersGrid";
 
 const Admin = () => {
   const [currentSection, setCurrentSection] = useState("Categories");
@@ -35,6 +36,13 @@ const Admin = () => {
             marginTop="15px"
           >
             <ProductsGrid />
+          </Grid>
+          <Grid
+            size={10}
+            display={currentSection !== "Orders" ? "none" : "block"}
+            marginTop="15px"
+          >
+            <OrdersGrid />
           </Grid>
         </Grid>
       </Box>

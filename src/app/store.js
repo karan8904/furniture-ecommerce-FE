@@ -6,6 +6,7 @@ import snackbarReducer from '../slices/snackbarSlice'
 import categoryReducer from '../slices/categorySlice'
 import produceReducer from '../slices/productSlice'
 import cartReducer from '../slices/cartSlice'
+import addressReducer from '../slices/addressSlice'
 
 export const store = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ export const store = configureStore({
     snackbar: snackbarReducer,
     category: categoryReducer,
     product: produceReducer,
-    cart: cartReducer
+    cart: cartReducer,
+    address: addressReducer,
   },
 })

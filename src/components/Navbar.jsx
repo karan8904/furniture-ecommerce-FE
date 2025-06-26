@@ -148,7 +148,7 @@ const Navbar = () => {
               <FavoriteBorderIcon />
             </IconButton>
             <IconButton onClick={() => navigate("/cart")}>
-              <Badge badgeContent={products.length} color="primary">
+              <Badge badgeContent={products?.length} color="primary">
                 <ShoppingCartIcon />
               </Badge>
             </IconButton>

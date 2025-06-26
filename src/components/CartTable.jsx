@@ -51,7 +51,7 @@ const CartTable = () => {
   const baseURL = import.meta.env.VITE_BASEURL;
 
   useEffect(() => {
-    if(user._id)  dispatch(getCartProducts(user._id));
+    if (user._id) dispatch(getCartProducts(user._id));
   }, [user]);
 
   useEffect(() => {
@@ -108,7 +108,7 @@ const CartTable = () => {
       await dispatch(removeFromCart(deleteId)).unwrap();
       dispatch(showSnackbar({ message: "Product Removed From Cart." }));
       setDeleteId(null);
-      await dispatch(getCartProducts(user._id)).unwrap()
+      await dispatch(getCartProducts(user._id)).unwrap();
     } catch (error) {
       dispatch(showSnackbar({ severity: "error", message: error }));
       setDeleteId(null);
@@ -148,7 +148,7 @@ const CartTable = () => {
                   </TableRow>
                 )}
                 {products &&
-                  products.map((product) => (
+                  products?.map((product) => (
                     <TableRow key={product._id}>
                       <TableCell>
                         <Box display="flex" alignItems="center">
@@ -161,12 +161,14 @@ const CartTable = () => {
                               borderRadius: "10px",
                             }}
                           >
-                            <img
-                              src={`${baseURL}/${product.productID.images[0]}`}
-                              alt=""
-                              height="100"
-                              width="105"
-                            />
+                            {product.productID?.images?.length > 0 && (
+                              <img
+                                src={`${baseURL}/${product.productID.images[0]}`}
+                                alt={product.productID.name}
+                                height="100"
+                                width="105"
+                              />
+                            )}
                           </Box>
                           <Typography color="secondary" fontSize="16px">
                             {product.productID.name}
@@ -215,8 +217,10 @@ const CartTable = () => {
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <IconButton>
-                          <DeleteIcon color="primary" onClick={() => handleOpenDialog(product._id)} />
+                        <IconButton
+                          onClick={() => handleOpenDialog(product._id)}
+                        >
+                          <DeleteIcon color="primary" />
                         </IconButton>
                         <Dialog
                           open={deleteId === product._id}
@@ -368,7 +372,7 @@ const CartTable = () => {
                     fontSize={{ md: "14px", lg: "17px" }}
                     color="secondary"
                   >
-                    Rs. {product.price }.00
+                    Rs. {product.price}.00
                   </Typography>
                 </Box>
               ))}
