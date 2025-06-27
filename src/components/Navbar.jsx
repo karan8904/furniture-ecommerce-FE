@@ -15,7 +15,8 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  Badge
+  Badge,
+  Avatar,
 } from "@mui/material";
 import logo from "../assets/logo.png";
 import SearchIcon from "@mui/icons-material/Search";
@@ -36,14 +37,15 @@ const Navbar = () => {
   const [state, setState] = useState({ right: false });
   const [userMenu, setuserMenu] = React.useState(null);
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const user = useSelector((state) => state.user.getCurrentUser.user);
-  const products = useSelector((state) => state.cart.getCartProducts.products)
+  const userLoading = useSelector((state) => state.user.getCurrentUser.loading)
+  const products = useSelector((state) => state.cart.getCartProducts.products);
 
   useEffect(() => {
-    if(user?._id) dispatch(getCartProducts(user._id))
-  }, [user])
+    if (user?._id) dispatch(getCartProducts(user._id));
+  }, [user]);
 
   const openUserMenu = Boolean(userMenu);
   const handleUserMenuClick = (event) => {
@@ -67,15 +69,20 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
-    try {  
-      dispatch(logoutUser())
-      dispatch(resetCart())
-      dispatch(showSnackbar({ message: "Logout successfully." }))
-      navigate("/")
+    try {
+      dispatch(logoutUser());
+      dispatch(resetCart());
+      dispatch(showSnackbar({ message: "Logout successfully." }));
+      navigate("/");
     } catch (error) {
-      dispatch(showSnackbar({ severity: error, message: "Cannot logout. Try again..."}))
+      dispatch(
+        showSnackbar({
+          severity: error,
+          message: "Cannot logout. Try again...",
+        })
+      );
     }
-  }
+  };
 
   return (
     <Box
@@ -92,7 +99,7 @@ const Navbar = () => {
         spacing={{ xs: 1, sm: 30, md: 20 }}
         columns={{ xs: 4, sm: 8, md: 12 }}
         display="flex"
-        justifyContent="space-around"
+        justifyContent="space-evenly"
       >
         <Grid size={{ xs: 2, sm: 4, md: 2 }}>
           <Stack direction="row" gap="5px">
@@ -136,31 +143,54 @@ const Navbar = () => {
           size={{ md: 3 }}
           sx={{ display: { xs: "none", sm: "none", md: "flex" } }}
         >
-          <Stack
-            direction="row"
-            sx={{ fontWeight: "500", gap: { lg: "20px", md: "10px" } }}
+          <Box
+            display="flex"
+            sx={{ fontWeight: "500", gap: { lg: "10px", md: "10px" } }}
             alignItems="center"
           >
             <IconButton>
               <SearchIcon />
             </IconButton>
-            <IconButton>
-              <FavoriteBorderIcon />
-            </IconButton>
-            <IconButton onClick={() => navigate("/cart")}>
-              <Badge badgeContent={products?.length} color="primary">
-                <ShoppingCartIcon />
-              </Badge>
-            </IconButton>
-            <IconButton
-              id="user-button"
-              aria-controls={openUserMenu ? "user-menu" : undefined}
-              aria-haspopup="true"
-              aria-expanded={openUserMenu ? "true" : undefined}
-              onClick={handleUserMenuClick}
-            >
-              <PermIdentityIcon />
-            </IconButton> 
+            {user && Object.keys(user).length !== 0 && (
+              <>
+                <IconButton>
+                  <FavoriteBorderIcon />
+                </IconButton>
+                <IconButton onClick={() => navigate("/cart")}>
+                  <Badge badgeContent={products?.length} color="primary">
+                    <ShoppingCartIcon />
+                  </Badge>
+                </IconButton>
+                <Box display="flex" alignItems="center">
+                  <Typography fontSize="15px">{user?.firstName}</Typography>
+                  <IconButton onClick={(e) => handleUserMenuClick(e)}>
+                    <Avatar
+                      sx={{
+                        bgcolor: (theme) => theme.palette.primary.main,
+                        height: "35px",
+                        width: "35px",
+                      }}
+                    >
+                      {user.firstName[0].toUpperCase()}
+                    </Avatar>
+                  </IconButton>
+                </Box>
+              </>
+            )}
+            {!userLoading && (!user || Object.keys(user).length === 0) && (
+              <>
+                <Typography fontSize="15px" sx={{ fontWeight: "500" }}>
+                  <Link to="/register" style={linkStyle}>
+                    Register
+                  </Link>
+                </Typography>
+                <Typography fontSize="15px" sx={{ fontWeight: "500" }}>
+                  <Link to="/login" style={linkStyle}>
+                    Login
+                  </Link>
+                </Typography>
+              </>
+            )}
             <Menu
               id="user-menu"
               anchorEl={userMenu}
@@ -174,14 +204,38 @@ const Navbar = () => {
             >
               {user?.firstName
                 ? [
-                    <MenuItem key="greeting">
-                      Hey, {user.firstName}
+                    <MenuItem
+                      key="profile"
+                      onClick={() => {
+                        handleUserMenuClose();
+                        navigate("/profile")
+                      }}
+                    >
+                      Profile
+                    </MenuItem>,
+                    <MenuItem
+                      key="orders"
+                      onClick={() => {
+                        handleUserMenuClose();
+                        navigate("/orders")
+                      }}
+                    >
+                      Orders
+                    </MenuItem>,
+                    <MenuItem
+                      key="settings"
+                      onClick={() => {
+                        handleUserMenuClose();
+                        navigate("/settings")
+                      }}
+                    >
+                      Settings
                     </MenuItem>,
                     <MenuItem
                       key="logout"
                       onClick={() => {
                         handleUserMenuClose();
-                        handleLogout(); 
+                        handleLogout();
                       }}
                     >
                       Logout
@@ -208,7 +262,7 @@ const Navbar = () => {
                     </MenuItem>,
                   ]}
             </Menu>
-          </Stack>
+          </Box>
         </Grid>
 
         <Grid

@@ -25,6 +25,11 @@ import EditCatgory from './pages/AdminPages/EditCatgory.jsx'
 import EditProduct from './pages/AdminPages/EditProduct.jsx'
 import ProductsFromCategory from './pages/ProductsFromCategory.jsx'
 import { AdminRoutes, ProtectedRoutes } from '../utils/RoutesAuth.jsx'
+import UserProfile from './pages/UserProfile.jsx'
+import Orders from './pages/Orders.jsx'
+import Settings from './pages/Settings.jsx'
+import EditAddress from './pages/EditAddress.jsx'
+import AddAddress from './pages/AddAddress.jsx'
 
 const theme = createTheme({
   palette: {
@@ -55,6 +60,11 @@ const router = createBrowserRouter([
       { path: "/login", Component: Login },
       { path: "/forgot-password", Component: ForgotPassword },
       { path: "/single-product/:id", Component: SingleProduct},
+      { path: "edit-address/:id", element: <ProtectedRoutes><EditAddress></EditAddress></ProtectedRoutes>},
+      { path: "add-address/:addressType", element: <ProtectedRoutes><AddAddress /></ProtectedRoutes>},
+      { path: "/profile", element: <ProtectedRoutes><UserProfile /></ProtectedRoutes> },
+      { path: "/orders", element: <ProtectedRoutes><Orders /></ProtectedRoutes>},
+      { path: "/settings", element: <ProtectedRoutes><Settings /></ProtectedRoutes>},
       { path: "/cart", element: <ProtectedRoutes><Cart /></ProtectedRoutes>},
       { path: "/checkout",element: <ProtectedRoutes><Checkout /></ProtectedRoutes>},
       { path: "/password-reset/:userId/:token", Component: ResetPassword },

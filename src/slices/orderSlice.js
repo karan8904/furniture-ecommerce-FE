@@ -15,6 +15,11 @@ const initialState = {
     changeStatus: {
         error: null,
         loading: false
+    },
+    getMyOrders: {
+        orders: [],
+        error: null,
+        loading: false
     }
 }
 
@@ -50,6 +55,19 @@ export const changeOrderStatus = createAsyncThunk(
     async(data, thunkApi) => {
         try {
             const response = await axios.put("/orders/changeStatus", data)
+            return response.data
+        } catch (error) {
+            const message = error.response.data.message
+            return thunkApi.rejectWithValue(message)
+        }
+    }
+)
+
+export const getMyOrders = createAsyncThunk(
+    "orders/getMyOrders",
+    async(id, thunkApi) => {
+        try {
+            const response = await axios.get("/orders/getMyOrders")
             return response.data
         } catch (error) {
             const message = error.response.data.message
@@ -103,6 +121,19 @@ export const orderSlice = createSlice({
         .addCase(changeOrderStatus.rejected, (state, action) => {
             state.changeStatus.loading = false
             state.changeStatus.error = action.payload
+        })
+
+        //GET MY ORDERS
+        .addCase(getMyOrders.pending, (state) => {
+            state.getMyOrders.loading = true
+        })
+        .addCase(getMyOrders.fulfilled, (state, action) => {
+            state.getMyOrders.loading = false
+            state.getMyOrders.orders = action.payload.orders
+        })
+        .addCase(getMyOrders.rejected, (state, action) => {
+            state.getMyOrders.loading = false
+            state.getMyOrders.error = action.payload
         })
     }
 })

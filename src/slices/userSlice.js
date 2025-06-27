@@ -9,6 +9,10 @@ const initialState = {
         user: {},
         error: null,
         loading: false
+    },
+    editUser: {
+        error: null,
+        loading: false
     }
 }
 
@@ -69,7 +73,20 @@ export const getCurrentUser = createAsyncThunk(
     'users/getCurrentUser',
     async(token, thunkApi) => {
         try {
-            const response = await axios.post("/users/getUser", {token: token})
+            const response = await axios.post("/users/getUser")
+            return response.data
+        } catch (error) {
+            const message = error.response.data.message
+            return thunkApi.rejectWithValue(message)
+        }
+    }
+)
+
+export const editUser = createAsyncThunk(
+    'users/editUser',
+    async(data, thunkApi) => {
+        try {
+            const response = await axios.put("/users/editUser", data)
             return response.data
         } catch (error) {
             const message = error.response.data.message
@@ -152,6 +169,19 @@ export const userSlice = createSlice({
         .addCase(getCurrentUser.rejected, (state, action) => {
             state.getCurrentUser.loading = false
             state.getCurrentUser.error = action.payload
+        })
+
+        //EDIT USER
+        .addCase(editUser.pending, (state) => {
+            state.editUser.loading = true
+        })
+        .addCase(editUser.fulfilled, (state, action) => {
+            state.editUser.loading = false
+            state.getCurrentUser.user = action.payload.user
+        })
+        .addCase(editUser.rejected, (state) => {
+            state.editUser.loading = false
+            state.editUser.error = action.payload
         })
     }
 })
