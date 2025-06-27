@@ -3,7 +3,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import img_grid from "../assets/img_grid.png";
 import Products from "../components/Products";
-import Categories from "../components/Categories";
+import CategoryComponent from "../components/Categories";
 import DiscountBanner from "../components/DiscountBanner";
 import NewArrivalBanner from "../components/NewArrivalBanner";
 import { Box, Typography, Stack, Divider, Button } from "@mui/material";
@@ -11,14 +11,34 @@ import "@fontsource/poppins";
 import { useNavigate } from "react-router";
 
 const Home = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   return (
     <>
       <Navbar />
 
       <NewArrivalBanner />
 
-      <Categories />
+      <CategoryComponent limit={3} />
+      <Box
+        sx={{
+          marginTop: "40px",
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        <Button
+          variant="outlined"
+          sx={{
+            borderColor: "#B88E2F",
+            color: "#B88E2F",
+            fontWeight: 600,
+            width: "245px",
+          }}
+          onClick={() => navigate("/categories")}
+        >
+          Show More
+        </Button>
+      </Box>
 
       <Box sx={{ marginTop: "60px" }}>
         <Typography

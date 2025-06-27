@@ -69,7 +69,7 @@ export const getCurrentUser = createAsyncThunk(
     'users/getCurrentUser',
     async(token, thunkApi) => {
         try {
-            const response = await axios.get(`/users/get/${token}`)
+            const response = await axios.post("/users/getUser", {token: token})
             return response.data
         } catch (error) {
             const message = error.response.data.message

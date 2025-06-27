@@ -34,7 +34,7 @@ const Footer = () => {
                   <Link to="/shop" style={linkStyle}>Shop</Link>
                 </Typography>
                 <Typography marginTop="25px">
-                  <Link to="/about" style={linkStyle}>About</Link>
+                  <Link to="/categories" style={linkStyle}>Categories</Link>
                 </Typography>
                 <Typography marginTop="25px">
                   <Link to="/contact" style={linkStyle}>Contact</Link>

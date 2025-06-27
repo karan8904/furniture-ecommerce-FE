@@ -6,7 +6,7 @@ import { Provider } from 'react-redux'
 import { createBrowserRouter, RouterProvider, useLocation } from 'react-router'
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Home from "./pages/Home.jsx";
-import About from "./pages/About.jsx";
+import Categories from "./pages/Categories.jsx";
 import Contact from "./pages/Contact.jsx";
 import Shop from "./pages/Shop.jsx";
 import Register from "./pages/Register.jsx";
@@ -24,6 +24,7 @@ import AddProduct from './pages/AdminPages/AddProduct.jsx'
 import EditCatgory from './pages/AdminPages/EditCatgory.jsx'
 import EditProduct from './pages/AdminPages/EditProduct.jsx'
 import ProductsFromCategory from './pages/ProductsFromCategory.jsx'
+import { AdminRoutes, ProtectedRoutes } from '../utils/RoutesAuth.jsx'
 
 const theme = createTheme({
   palette: {
@@ -46,7 +47,7 @@ const router = createBrowserRouter([
     Component: App,
     children: [
       { index: true, Component: Home },
-      { path: "/about", Component: About },
+      { path: "/categories", Component: Categories },
       { path: "/contact", Component: Contact },
       { path: "/shop", Component: Shop },
       { path: "/category/:id", Component: ProductsFromCategory},
@@ -54,14 +55,14 @@ const router = createBrowserRouter([
       { path: "/login", Component: Login },
       { path: "/forgot-password", Component: ForgotPassword },
       { path: "/single-product/:id", Component: SingleProduct},
-      { path: "/cart", Component: Cart},
-      { path: "/checkout", Component: Checkout},
+      { path: "/cart", element: <ProtectedRoutes><Cart /></ProtectedRoutes>},
+      { path: "/checkout",element: <ProtectedRoutes><Checkout /></ProtectedRoutes>},
       { path: "/password-reset/:userId/:token", Component: ResetPassword },
-      { path: "/admin", Component: Admin},
-      { path: "/admin/add-category", Component: AddCategory},
-      { path: "/admin/add-product", Component: AddProduct},
-      { path: "/admin/edit-category/:id", Component: EditCatgory },
-      { path: "/admin/edit-product/:id", Component: EditProduct },
+      { path: "/admin", element: <AdminRoutes><Admin /></AdminRoutes>},
+      { path: "/admin/add-category", element: <AdminRoutes><AddCategory /></AdminRoutes>},
+      { path: "/admin/add-product", element: <AdminRoutes><AddProduct /></AdminRoutes>},
+      { path: "/admin/edit-category/:id", element: <AdminRoutes><EditCatgory /></AdminRoutes> },
+      { path: "/admin/edit-product/:id", element: <AdminRoutes><EditProduct /></AdminRoutes> },
     ],
   },
 ]);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Outlet } from "react-router";
 import { getCurrentUser } from "./slices/userSlice";
 import { useDispatch } from "react-redux";

@@ -4,7 +4,7 @@ import { getCategories } from "../slices/categorySlice";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router";
 
-const Categories = () => {
+const CategoryComponent = ({limit}) => {
   const dispatch = useDispatch()
   const baseURL = import.meta.env.VITE_BASEURL
   const categories = useSelector((state) => state.category.getCategories.categories)
@@ -19,7 +19,7 @@ const Categories = () => {
           <Typography
             sx={{ fontWeight: 700, fontSize: "32px", textAlign: "center" }}
           >
-            Browse The Range
+            Browse Categories
           </Typography>
           <Typography
             sx={{
@@ -39,7 +39,7 @@ const Categories = () => {
             columnSpacing={{ xs: 1, sm: 1, md: 3 }}
             wrap="wrap"
           >
-            {categories && categories.map((category) => (
+            {categories && categories.slice(0, limit || categories.length).map((category) => (
               <Grid size={{ md: 4, sm: 6, xs: 12 }} key={category._id}>
                 <Link style={{ textDecoration: "none"}} to={`/category/${category._id}`}>
                   <Box display="flex" flexDirection="column">
@@ -69,4 +69,4 @@ const Categories = () => {
   );
 };
 
-export default Categories;
+export default CategoryComponent;

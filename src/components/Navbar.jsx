@@ -42,7 +42,7 @@ const Navbar = () => {
   const products = useSelector((state) => state.cart.getCartProducts.products)
 
   useEffect(() => {
-    if(user._id) dispatch(getCartProducts(user._id))
+    if(user?._id) dispatch(getCartProducts(user._id))
   }, [user])
 
   const openUserMenu = Boolean(userMenu);
@@ -120,8 +120,8 @@ const Navbar = () => {
               </Link>
             </Typography>
             <Typography variant="h6" sx={{ fontWeight: "500" }}>
-              <Link to="/about" style={linkStyle}>
-                About
+              <Link to="/categories" style={linkStyle}>
+                Categories
               </Link>
             </Typography>
             <Typography variant="h6" sx={{ fontWeight: "500" }}>
@@ -235,7 +235,7 @@ const Navbar = () => {
               </ListItem>
               <Divider />
               <ListItem>
-                <ListItemButton onClick={() => navigate("/about")}>
+                <ListItemButton onClick={() => navigate("/categories")}>
                   <ListItemIcon>
                     <InfoIcon />
                   </ListItemIcon>
