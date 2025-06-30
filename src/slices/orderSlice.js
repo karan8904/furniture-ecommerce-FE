@@ -20,6 +20,16 @@ const initialState = {
         orders: [],
         error: null,
         loading: false
+    },
+    dailyOrdersCount: {
+        data: [],
+        error: null,
+        loading: false
+    },
+    orderStatusCount: {
+        data: [],
+        error: null,
+        loading: false
     }
 }
 
@@ -68,6 +78,32 @@ export const getMyOrders = createAsyncThunk(
     async(id, thunkApi) => {
         try {
             const response = await axios.get("/orders/getMyOrders")
+            return response.data
+        } catch (error) {
+            const message = error.response.data.message
+            return thunkApi.rejectWithValue(message)
+        }
+    }
+)
+
+export const dailyOrdersCount = createAsyncThunk(
+    "orders/dailyOrdersCount",
+    async(_, thunkApi) => {
+        try {
+            const response = await axios.get("/orders/getDailyOrdersCount")
+            return response.data
+        } catch (error) {
+            const message = error.response.data.message
+            return thunkApi.rejectWithValue(message)
+        }
+    }
+)
+
+export const orderStatusCount = createAsyncThunk(
+    "orders/orderStatusCount",
+    async(_, thunkApi) => {
+        try {
+            const response = await axios.get("/orders/getOrderStatusCount")
             return response.data
         } catch (error) {
             const message = error.response.data.message
@@ -134,6 +170,32 @@ export const orderSlice = createSlice({
         .addCase(getMyOrders.rejected, (state, action) => {
             state.getMyOrders.loading = false
             state.getMyOrders.error = action.payload
+        })
+
+        //GET DAILY ORDERS COUNT
+        .addCase(dailyOrdersCount.pending, (state) => {
+            state.dailyOrdersCount.loading = true
+        })
+        .addCase(dailyOrdersCount.fulfilled, (state, action) => {
+            state.dailyOrdersCount.loading = false
+            state.dailyOrdersCount.data = action.payload.orders
+        })
+        .addCase(dailyOrdersCount.rejected, (state, action) => {
+            state.dailyOrdersCount.loading = false
+            state.dailyOrdersCount.error = action.payload
+        })
+
+        //GET ORDER STATUS COUNT
+        .addCase(orderStatusCount.pending, (state) => {
+            state.orderStatusCount.loading = true
+        })
+        .addCase(orderStatusCount.fulfilled, (state, action) => {
+            state.orderStatusCount.loading = false
+            state.orderStatusCount.data = action.payload.orders
+        })
+        .addCase(orderStatusCount.rejected, (state) => {
+            state.orderStatusCount.loading = false
+            state.orderStatusCount.error = action.payload
         })
     }
 })

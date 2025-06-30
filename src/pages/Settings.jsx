@@ -1,25 +1,50 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Navbar from "../components/Navbar";
 import PageTitleComponent from "../components/PageTitleComponent";
 import Footer from "../components/Footer";
 import InfoComponent from "../components/InfoComponent";
 import { Box, Breadcrumbs, Button, Checkbox, FormControlLabel, FormGroup, Grid, Typography } from '@mui/material';
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { useFormik } from 'formik';
+import { useDispatch, useSelector } from 'react-redux';
+import { saveEmailPreference } from '../slices/userSlice';
+import { showSnackbar } from '../slices/snackbarSlice';
+import { getEmailPreference } from '../slices/userSlice';
 
 const Settings = () => {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  const { orderStatus, newProducts, offers } = useSelector((state) => state.user.getEmailPreference.preference)
+  const loading = useSelector((state) => state.user.saveEmailPreference.loading)
+
+  useEffect(() => {
+    dispatch(getEmailPreference())
+  }, [])
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      orderStatus: false,
-      newProducts: false,
-      offers: false,
+      orderStatus: orderStatus,
+      newProducts: newProducts,
+      offers: offers,
     },
     onSubmit: () => {
-      console.log(formik.values)
+      handleSaveButtonClick()
     }
   })
+
+  const handleSaveButtonClick = async() => {
+    try {
+      await dispatch(saveEmailPreference(formik.values)).unwrap()
+      dispatch(showSnackbar({ message: "Email preference saved." }))
+      navigate("/")
+    } catch (error) {
+      dispatch(showSnackbar({ severity: "Error", message: "Cannot save the preference. Try again." }))
+    }
+  }
+
   return (
     <>
       <Navbar />
@@ -74,7 +99,7 @@ const Settings = () => {
                 />
               </FormGroup>
             <Box marginTop="30px">
-              <Button type='submit' variant='contained'>Save Preference</Button>
+              <Button type='submit' loading={loading} variant='contained'>Save Preference</Button>
             </Box>
             </form>
           </Grid>

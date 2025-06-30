@@ -59,7 +59,7 @@ const OrdersGrid = () => {
     <Grid container>
       <Grid container size={12}>
         <Grid size={12}>
-          <Box display="flex" justifyContent="center">
+          <Box display="flex">
             <Typography fontSize="25px" fontWeight="550">
               All Orders
             </Typography>

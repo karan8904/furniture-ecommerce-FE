@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import GridViewOutlinedIcon from '@mui/icons-material/GridViewOutlined';
+import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined';
 import logo from "../../assets/logo.png";
 
 const Sidebar = ({ setCurrentSection, currentSection }) => {
@@ -123,6 +124,20 @@ const Sidebar = ({ setCurrentSection, currentSection }) => {
               <ListItemText primary="Orders" />
             </ListItemButton>
           </ListItem>
+          <Divider />
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => setCurrentSection("Users")}
+              selected={currentSection === "Users"}
+              sx={selectedStyle}
+            >
+              <ListItemIcon>
+                <GroupOutlinedIcon />
+              </ListItemIcon>
+              <ListItemText primary="Users" />
+            </ListItemButton>
+          </ListItem>
+          <Divider />
         </List>
       </Drawer>
     </Grid>

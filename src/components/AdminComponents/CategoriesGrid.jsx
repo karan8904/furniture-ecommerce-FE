@@ -73,14 +73,14 @@ const CategoriesGrid = () => {
       <Grid container>
         <Grid container size={12}>
           <Grid size={8}>
-            <Box display="flex" justifyContent="center">
+            <Box display="flex">
               <Typography fontSize="25px" fontWeight="550">
                 All Categories
               </Typography>
             </Box>
           </Grid>
-          <Grid size={3}>
-            <Box display="flex" justifyContent="flex-end">
+          <Grid size={4}>
+            <Box display="flex" justifyContent="end">
               <Button
                 variant="contained"
                 onClick={() => navigate("/admin/add-category")}

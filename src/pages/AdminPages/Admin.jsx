@@ -7,9 +7,11 @@ import Sidebar from "../../components/AdminComponents/Sidebar";
 import CategoriesGrid from "../../components/AdminComponents/CategoriesGrid";
 import ProductsGrid from "../../components/AdminComponents/ProductsGrid";
 import OrdersGrid from "../../components/AdminComponents/OrdersGrid";
+import UsersGrid from "../../components/AdminComponents/UsersGrid";
+import Dashboard from "../../components/AdminComponents/Dashboard";
 
 const Admin = () => {
-  const [currentSection, setCurrentSection] = useState("Categories");
+  const [currentSection, setCurrentSection] = useState("Dashboard");
 
   return (
     <>
@@ -18,17 +20,17 @@ const Admin = () => {
           <Sidebar setCurrentSection={setCurrentSection} currentSection={currentSection} />
           <Grid
             size={10}
-            display={currentSection === "Dashboard" ? "flex" : "none"}
+            display={currentSection !== "Dashboard" ? "none" : "block"}
             marginTop="15px"
           >
-            <Box>This is dashboard</Box>
+            <Dashboard />
           </Grid>
           <Grid
             size={10}
             display={currentSection !== "Categories" ? "none" : "block"}
             marginTop="15px"
           >
-            <CategoriesGrid currentSection={currentSection} />
+            <CategoriesGrid />
           </Grid>
           <Grid
             size={10}
@@ -43,6 +45,13 @@ const Admin = () => {
             marginTop="15px"
           >
             <OrdersGrid />
+          </Grid>
+          <Grid
+            size={10}
+            display={currentSection !== "Users" ? "none" : "block"}
+            marginTop="15px"
+          >
+            <UsersGrid />
           </Grid>
         </Grid>
       </Box>

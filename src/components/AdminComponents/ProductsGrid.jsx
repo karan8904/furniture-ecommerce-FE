@@ -71,13 +71,13 @@ const ProductsGrid = () => {
       <Grid container>
         <Grid container size={12}>
           <Grid size={8}>
-            <Box display="flex" justifyContent="center">
+            <Box display="flex">
               <Typography fontSize="25px" fontWeight="550">
                 All Products
               </Typography>
             </Box>
           </Grid>
-          <Grid size={3}>
+          <Grid size={4}>
             <Box display="flex" justifyContent="flex-end">
               <Button
                 variant="contained"
