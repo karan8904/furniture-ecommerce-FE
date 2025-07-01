@@ -19,18 +19,30 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Pagination,
+  TextField,
+  InputAdornment,
 } from "@mui/material";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteProduct, getProducts } from "../../slices/productSlice";
+import { deleteProduct, getProducts, searchProducts } from "../../slices/productSlice";
 import { showSnackbar } from "../../slices/snackbarSlice";
 import CircleIcon from "@mui/icons-material/Circle";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import CircularProgress from "@mui/material/CircularProgress";
+import SearchIcon from "@mui/icons-material/Search";
 
 const ProductsGrid = () => {
   const [deleteId, setDeleteId] = useState(null);
+  const [paginationDetails, setPaginationDetails] = useState({
+    itemsPerPage: 5,
+    totalItems: 0,
+  });
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [currentProducts, setCurrentProducts] = useState([]);
+  const [query, setQuery] = useState("")
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const baseURL = import.meta.env.VITE_BASEURL;
@@ -45,6 +57,35 @@ const ProductsGrid = () => {
   useEffect(() => {
     dispatch(getProducts());
   }, []);
+
+  useEffect(() => {
+    if (products?.length > 0) {
+      setPaginationDetails({
+        ...paginationDetails,
+        totalItems: products.length,
+      });
+      let count = Math.ceil(
+        products.length / paginationDetails.itemsPerPage
+      );
+      setTotalPages(count);
+      const indexOfLastItem = currentPage * paginationDetails.itemsPerPage;
+      const indexOfFirstItem = indexOfLastItem - paginationDetails.itemsPerPage;
+      setCurrentProducts(products.slice(indexOfFirstItem, indexOfLastItem));
+    }
+  }, [products, currentPage]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if(query === "")
+        dispatch(getProducts())
+      if(query){
+        setCurrentPage(1)
+        dispatch(searchProducts(query))
+      }
+    }, 500)
+
+    return () => clearTimeout(timer) 
+  }, [query])
 
   const handleOpenDialog = (id) => {
     setDeleteId(id);
@@ -91,8 +132,38 @@ const ProductsGrid = () => {
         <Grid size={12} margin="17px 0">
           <Divider />
         </Grid>
+        <Grid container size={12} margin="0 10px 17px 10px">
+          <Grid size={3}>
+            <Box>
+              <TextField
+                id="search"
+                placeholder="Search Product"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                    style: {
+                      borderRadius: "15px",
+                    },
+                  },
+                }}
+                fullWidth
+              />
+            </Box>
+          </Grid>
+          <Grid size={6}></Grid>
+        </Grid>
         <Grid size={12} margin="0 10px">
-          <TableContainer component={Paper}>
+          <TableContainer
+            id="tableContainer"
+            component={Paper}
+            sx={{ maxHeight: "75vh" }}
+          >
             <Table>
               <TableHead>
                 <TableRow>
@@ -118,10 +189,13 @@ const ProductsGrid = () => {
                     </TableCell>
                   </TableRow>
                 )}
-                {products &&
-                  products.map((product, index) => (
+                {products?.length !== 0 && currentProducts?.length !== 0 &&
+                  currentProducts?.map((product, index) => (
                     <TableRow key={index}>
-                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>
+                        {(index + 1) +
+                          paginationDetails.itemsPerPage * (currentPage - 1)}
+                      </TableCell>
                       <TableCell>
                         <img
                           src={`${baseURL}/${product.images[0]}`}
@@ -210,7 +284,27 @@ const ProductsGrid = () => {
                       </TableCell>
                     </TableRow>
                   ))}
-                {!productsLoading && products.length === 0 && (
+                {products?.length > paginationDetails.itemsPerPage && (
+                  <TableRow>
+                    <TableCell align="center" colSpan={12}>
+                      <Box display="flex" justifyContent="center">
+                        <Pagination
+                          size="large"
+                          count={totalPages}
+                          page={currentPage}
+                          onChange={(e, page) => {
+                            setCurrentPage(page);
+                            window.tableContainer.scrollTo(0, 0);
+                          }}
+                          shape="rounded"
+                          color="primary"
+                        />
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                )}
+
+                {!productsLoading && products?.length === 0 && (
                   <TableRow>
                     <TableCell align="center" colSpan={12}>
                       <Typography variant="h6">No Products Found...</Typography>

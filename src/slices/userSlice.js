@@ -172,6 +172,19 @@ export const getEmailPreference = createAsyncThunk(
   }
 );
 
+export const searchUsers = createAsyncThunk(
+  "users/searchUsers",
+  async(query, thunkApi) => {
+    try {
+      const response = await axios.get(`/users/search/${query}`);
+      return response.data;
+    } catch (error) {
+      const message = error.response.data.message;
+      return thunkApi.rejectWithValue(message);
+    }
+  }
+)
+
 export const userSlice = createSlice({
   name: "users",
   initialState,
@@ -286,7 +299,7 @@ export const userSlice = createSlice({
         state.changeUserStatus.loadingIDs = state.changeUserStatus.loadingIDs.filter((i) => i._id === user._id);
       })
       .addCase(changeUserStatus.rejected, (state, action) => {
-        state.changeUserStatus.loadingIDs = state.changeUserStatus.loadingIDs.filter((i) => i._id === user._id);
+        state.changeUserStatus.loadingIDs = [];
         state.changeUserStatus.error = action.payload;
       })
 
@@ -316,7 +329,22 @@ export const userSlice = createSlice({
       .addCase(getEmailPreference.rejected, (state, action) => {
         state.getEmailPreference.loading = false;
         state.getEmailPreference.error = action.payload;
-      });
+      })
+
+      //SEARCH USERS
+      .addCase(searchUsers.pending, (state) => {
+        state.getAllUsers.loading = true
+      })
+      .addCase(searchUsers.fulfilled, (state, action) => {
+        if(action.payload.length === 0)
+          state.getAllUsers.users = []
+        state.getAllUsers.users = action.payload
+        state.getAllUsers.loading = false
+      })
+      .addCase(searchUsers.rejected, (state) => {
+        state.getAllUsers.loading = false
+        state.getAllUsers.error = action.payload
+      })
   },
 });
 

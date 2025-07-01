@@ -80,6 +80,19 @@ export const editCatgory = createAsyncThunk(
   }
 );
 
+export const searchCategories = createAsyncThunk(
+  "category/searchCategories",
+  async(query, thunkApi) => {
+    try {
+      const response = await axios.get(`/categories/search/${query}`)
+      return response.data
+    } catch (error) {
+      const message = error.response.data.message;
+      return thunkApi.rejectWithValue(message)
+    }
+  }
+)
+
 
 export const categorySlice = createSlice({
   name: "categories",
@@ -134,6 +147,21 @@ export const categorySlice = createSlice({
       .addCase(editCatgory.rejected, (state, action) => {
         state.editCategory.loading = false;
         state.editCategory.error = action.payload
+      })
+
+      //SEARCH CATEGORIES
+      .addCase(searchCategories.pending, (state) => {
+        state.getCategories.loading = true
+      })
+      .addCase(searchCategories.fulfilled, (state, action) => {
+        if(action.payload.length === 0)
+          state.getCategories.categories = []
+        state.getCategories.categories = action.payload
+        state.getCategories.loading = false
+      })
+      .addCase(searchCategories.rejected, (state, action) => {
+        state.getCategories.loading = false
+        state.getCategories.error = action.payload
       })
   },
 });

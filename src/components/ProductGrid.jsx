@@ -20,7 +20,7 @@ const ProductGrid = ({ products, productsLoading }) => {
   };
 
   const calculateDiscountPrice = (price, discount) => {
-    return (price -= price * (discount / 100));
+    return Math.round(price -= price * (discount / 100));
   };
 
   return (
@@ -87,7 +87,7 @@ const ProductGrid = ({ products, productsLoading }) => {
                       fontWeight={600}
                       color="#3a3a3a"
                     >
-                      {product.name}
+                      {product.name.length > 12 ? product.name.slice(0, 14).trim() + "..." : product.name}
                     </Typography>
                     <Typography
                       gutterBottom

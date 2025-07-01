@@ -19,17 +19,29 @@ import {
   DialogContentText,
   DialogActions,
   CircularProgress,
+  Pagination,
+  InputAdornment,
+  TextField,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { getCategories } from "../../slices/categorySlice";
+import { getCategories, searchCategories } from "../../slices/categorySlice";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { useNavigate } from "react-router";
 import { deleteCategory } from "../../slices/categorySlice";
 import { showSnackbar } from "../../slices/snackbarSlice";
+import SearchIcon from "@mui/icons-material/Search";
 
 const CategoriesGrid = () => {
   const [deleteId, setDeleteId] = useState(null);
+  const [paginationDetails, setPaginationDetails] = useState({
+    itemsPerPage: 5,
+    totalItems: 0,
+  });
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [currentCategories, setCurrentCategories] = useState([]);
+  const [query, setQuery] = useState("");
   const baseURL = import.meta.env.VITE_BASEURL;
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -47,6 +59,35 @@ const CategoriesGrid = () => {
   useEffect(() => {
     dispatch(getCategories());
   }, []);
+
+  useEffect(() => {
+    if (categories?.length > 0) {
+      setPaginationDetails({
+        ...paginationDetails,
+        totalItems: categories.length,
+      });
+      let count = Math.ceil(
+        categories.length / paginationDetails.itemsPerPage
+      );
+      setTotalPages(count);
+      const indexOfLastItem = currentPage * paginationDetails.itemsPerPage;
+      const indexOfFirstItem = indexOfLastItem - paginationDetails.itemsPerPage;
+      setCurrentCategories(categories.slice(indexOfFirstItem, indexOfLastItem));
+    }
+  }, [categories, currentPage]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if(query === "")
+        dispatch(getCategories())
+      if(query){
+        setCurrentPage(1)
+        dispatch(searchCategories(query))
+      }
+    }, 500)
+
+    return () => clearTimeout(timer) 
+  }, [query])
 
   const handleOpenDialog = (id) => {
     setDeleteId(id);
@@ -93,8 +134,38 @@ const CategoriesGrid = () => {
         <Grid size={12} margin="17px 0">
           <Divider />
         </Grid>
-        <Grid size={12} margin="20px 10px">
-          <TableContainer component={Paper}>
+        <Grid container size={12} margin="0 10px 17px 10px">
+          <Grid size={3}>
+            <Box>
+              <TextField
+                id="search"
+                placeholder="Search Category"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                    style: {
+                      borderRadius: "15px",
+                    },
+                  },
+                }}
+                fullWidth
+              />
+            </Box>
+          </Grid>
+          <Grid size={6}></Grid>
+        </Grid>
+        <Grid size={12} margin="0px 10px">
+          <TableContainer
+            id="tableContainer"
+            component={Paper}
+            sx={{ maxHeight: "75vh" }}
+          >
             <Table>
               <TableHead>
                 <TableRow>
@@ -114,10 +185,14 @@ const CategoriesGrid = () => {
                     </TableCell>
                   </TableRow>
                 )}
-                {categories &&
-                  categories.map((category, index) => (
+                {categories?.length !== 0 && currentCategories?.length !== 0 &&
+                  currentCategories.map((category, index) => (
                     <TableRow key={index}>
-                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>
+                        {index +
+                          1 +
+                          paginationDetails.itemsPerPage * (currentPage - 1)}
+                      </TableCell>
                       <TableCell align="center">
                         <img
                           src={`${baseURL}/${category.imageURL}`}
@@ -127,9 +202,7 @@ const CategoriesGrid = () => {
                         />
                       </TableCell>
                       <TableCell align="right">{category.name}</TableCell>
-                      <TableCell>
-                        {category.description}
-                      </TableCell>
+                      <TableCell>{category.description}</TableCell>
                       <TableCell align="center">
                         <IconButton aria-label="delete">
                           <EditIcon
@@ -181,10 +254,30 @@ const CategoriesGrid = () => {
                       </TableCell>
                     </TableRow>
                   ))}
+                {categories?.length > paginationDetails.itemsPerPage && (
+                  <TableRow>
+                    <TableCell colSpan={6}>
+                      <Box display="flex" justifyContent="center">
+                        <Pagination
+                          size="large"
+                          count={totalPages}
+                          page={currentPage}
+                          onChange={(e, page) => {
+                            setCurrentPage(page);
+                            window.tableContainer.scrollTo(0, 0);
+                          }}
+                          shape="rounded"
+                          color="primary"
+                        />
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                )}
+
                 {!categoriesLoading && categories.length === 0 && (
                   <TableRow>
                     <TableCell align="center" colSpan={6}>
-                      No Categories Found...
+                    <Typography variant="h6">No Categories Found...</Typography>
                     </TableCell>
                   </TableRow>
                 )}

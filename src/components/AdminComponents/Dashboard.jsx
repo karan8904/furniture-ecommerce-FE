@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Divider, Grid, Typography } from "@mui/material";
+import { Box, Divider, Grid, Typography, MenuItem, FormControl, InputLabel, Select } from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import GroupIcon from "@mui/icons-material/Group";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,6 +7,7 @@ import { getAllUsers } from "../../slices/userSlice";
 import { getProducts } from "../../slices/productSlice";
 import { getCategories } from "../../slices/categorySlice";
 import {
+  currentMonthOrdersCount,
   dailyOrdersCount,
   getOrders,
   orderStatusCount,
@@ -15,6 +16,7 @@ import OrdersLineChart from "./ordersLineChart";
 import OrdersBarChart from "./OrdersBarChart";
 
 const Dashboard = () => {
+  const [timePeriod, setTimePeriod] = useState("all")
   const [lineChartData, setLineChartData] = useState({
     labels: [],
     datasets: [],
@@ -32,25 +34,20 @@ const Dashboard = () => {
   const dailyOrderData = useSelector(
     (state) => state.order.dailyOrdersCount.data
   );
-  const totalOrders = useSelector(
-    (state) => state.order.getOrders.orders
-  ).length;
   const orderStatusData = useSelector(
     (state) => state.order.orderStatusCount.data
   );
-  const deliveredOrders = orderStatusData.map((order) => {
-    if (order._id === "Delivered") return order.totalOrders;
-  });
-  const pendingOrders = orderStatusData
-    .filter((order) => order._id !== "Delivered")
-    .reduce((total, order) => total + order.totalOrders, 0);
+  const totalOrders = useSelector((state) => state.order.currentMonthOrdersCount.data.totalOrders)
+  const deliveredOrders = useSelector((state) => state.order.currentMonthOrdersCount.data.deliveredOrders)
+  const pendingOrders = useSelector((state) => state.order.currentMonthOrdersCount.data.pendingOrders)
 
   useEffect(() => {
     dispatch(getAllUsers());
     dispatch(getProducts());
     dispatch(getCategories());
     dispatch(dailyOrdersCount());
-    dispatch(orderStatusCount());
+    dispatch(currentMonthOrdersCount())
+    dispatch(orderStatusCount("all"))
   }, []);
 
   useEffect(() => {
@@ -110,7 +107,7 @@ const Dashboard = () => {
         <Divider />
       </Grid>
       <Grid container size={12} columnGap={5} marginTop="20px">
-        <Grid size={{ xs: 12, sm: 6, md: 3.5}}>
+        <Grid size={{ xs: 12, sm: 6, md: 3.5 }}>
           <Box
             display="flex"
             justifyContent="space-between"
@@ -129,7 +126,9 @@ const Dashboard = () => {
               <Typography fontSize="17px">
                 Delivered Orders: {deliveredOrders}
               </Typography>
-              <Typography fontSize="17px">Pending Orders: {pendingOrders}</Typography>
+              <Typography fontSize="17px">
+                Pending Orders: {pendingOrders}
+              </Typography>
             </Box>
             <Box display="flex" alignItems="end">
               <ShoppingCartIcon fontSize="large" sx={{ color: "white" }} />
@@ -158,7 +157,7 @@ const Dashboard = () => {
             </Box>
           </Box>
         </Grid>
-        <Grid size={3.5}>
+        <Grid size={3.5}> 
           <Box
             display="flex"
             justifyContent="space-between"
@@ -213,10 +212,28 @@ const Dashboard = () => {
           )}
         </Grid>
         <Grid size={6}>
-          <Box>
+          <Box display="flex" justifyContent="space-between">
             <Typography fontSize="20px" fontWeight={550}>
               Orders per Status
             </Typography>
+            <FormControl sx={{ width: "30%" }}>
+              <InputLabel id="select-label">Time Period</InputLabel>
+              <Select
+                labelId="select-label"
+                id="time-select"
+                value={timePeriod}
+                label="Time Period"
+                onChange={(e) => {
+                  setTimePeriod(e.target.value)
+                  dispatch(orderStatusCount(e.target.value))
+                }}
+              > 
+                <MenuItem value="all">All Time</MenuItem>
+                <MenuItem value="15days">Last 15 Days</MenuItem>
+                <MenuItem value="1month">Last Month</MenuItem>
+                <MenuItem value="3months">Last 3 Months</MenuItem>
+              </Select>
+            </FormControl>
           </Box>
           {orderStatusCount.length > 0 && (
             <OrdersBarChart chartData={barChartData} />

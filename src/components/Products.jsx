@@ -20,7 +20,6 @@ const Products = ({ num }) => {
     <>
       <Container>
         <Container sx={{ marginTop: "40px" }}>
-          
           <ProductGrid products={products} productsLoading={productsLoading} />
         </Container>
       </Container>
