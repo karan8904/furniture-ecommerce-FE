@@ -129,6 +129,19 @@ export const searchProducts = createAsyncThunk(
   }
 )
 
+export const filterProducts = createAsyncThunk(
+  "products/filterProducts",
+  async(query, thunkApi) => {
+    try {
+      const response = await axios.get(`/products/filter/${query}`)
+      return response.data
+    } catch (error) {
+      const message = error.response.data.message;
+      return thunkApi.rejectWithValue(message)
+    }
+  }
+)
+
 const productSlice = createSlice({
   name: "products",
   initialState,
@@ -222,6 +235,21 @@ const productSlice = createSlice({
         state.getProducts.loading = false
       })
       .addCase(searchProducts.rejected, (state, action) => {
+        state.getProducts.loading = false
+        state.getProducts.error = action.payload
+      })
+
+      //FILTER PRODUCT
+      .addCase(filterProducts.pending, (state) => {
+        state.getProducts.loading = true
+      })
+      .addCase(filterProducts.fulfilled, (state, action) => {
+        if(action.payload.length === 0)
+          state.getProducts.products = []
+        state.getProducts.products = action.payload
+        state.getProducts.loading = false
+      })
+      .addCase(filterProducts.rejected, (state, action) => {
         state.getProducts.loading = false
         state.getProducts.error = action.payload
       })

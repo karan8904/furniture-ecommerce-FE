@@ -184,7 +184,7 @@ const AddAddress = () => {
                   slotProps={styling.textFieldBorderRadius}
                 />
               </Grid>
-              {addressType && addressType === "Other" && (
+              {formik.values.addressType && formik.values.addressType === "Other" && (
                 <Grid size={10}>
                   <TextField
                     id="addressName"

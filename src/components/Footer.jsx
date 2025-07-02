@@ -4,8 +4,38 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import { Divider, Box, Stack, TextField, Button } from "@mui/material";
 import { Link } from "react-router";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { useDispatch } from "react-redux";
+import { showSnackbar } from "../slices/snackbarSlice";
+import { setEmailSubscription } from "../slices/userSlice";
 
 const Footer = () => {
+  const dispatch = useDispatch()
+  const validationSchema = Yup.object().shape({
+    email: Yup.string()
+      .email("Please enter valid email")
+      .required("This field is required."),
+  });
+
+  const handleSubmit = async() => {
+    try {
+      await dispatch(setEmailSubscription(formik.values)).unwrap()
+      dispatch(showSnackbar({ message: "Thanks for subscribing." }))
+    } catch (error) {
+      dispatch(showSnackbar({ severity: "error", message: error }));
+    }
+  }
+  
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+    },
+    validationSchema,
+    onSubmit: () => {
+      handleSubmit()
+    },
+  });
   const linkStyle = { textDecoration: "none", color: "#000" };
   return (
     <>
@@ -28,16 +58,24 @@ const Footer = () => {
               <Stack>
                 <Typography color="#9F9F9F">Links</Typography>
                 <Typography marginTop="25px">
-                  <Link to="/" style={linkStyle}>Home</Link>
+                  <Link to="/" style={linkStyle}>
+                    Home
+                  </Link>
                 </Typography>
                 <Typography marginTop="25px">
-                  <Link to="/shop" style={linkStyle}>Shop</Link>
+                  <Link to="/shop" style={linkStyle}>
+                    Shop
+                  </Link>
                 </Typography>
                 <Typography marginTop="25px">
-                  <Link to="/categories" style={linkStyle}>Categories</Link>
+                  <Link to="/categories" style={linkStyle}>
+                    Categories
+                  </Link>
                 </Typography>
                 <Typography marginTop="25px">
-                  <Link to="/contact" style={linkStyle}>Contact</Link>
+                  <Link to="/contact" style={linkStyle}>
+                    Contact
+                  </Link>
                 </Typography>
               </Stack>
 
@@ -54,24 +92,36 @@ const Footer = () => {
             <Box display="flex" justifyContent="center">
               <Stack>
                 <Typography color="#9F9F9F">Newsletter</Typography>
-                <Box display="flex" marginTop="25px">
-                  <TextField
-                    id="standard-basic"
-                    label="Email"
-                    variant="standard"
-                  />
-                  <Button
-                    sx={{
-                      borderBottom: "1px solid black",
-                      borderRadius: 0,
-                      margin: "0 5px",
-                      color: "black",
-                      paddingBottom: 0,
-                    }}
-                  >
-                    SUBSCRIBE
-                  </Button>
-                </Box>
+                <form onSubmit={formik.handleSubmit}>
+                  <Box display="flex" marginTop="25px">
+                    <TextField
+                      id="email"
+                      label="Email"
+                      value={formik.values.email}
+                      onChange={formik.handleChange}
+                      variant="standard"
+                      error={formik.touched.email && formik.errors.email}
+                      helperText={
+                        formik.touched.email && formik.errors.email
+                          ? formik.errors.email
+                          : ""
+                      }
+                    />
+                    <Button
+                      type="submit"
+                      sx={{
+                        borderBottom: "1px solid black",
+                        borderRadius: 0,
+                        margin: "0 5px",
+                        maxHeight: "48px",
+                        color: "black",
+                        paddingBottom: 0,
+                      }}
+                    >
+                      SUBSCRIBE
+                    </Button>
+                  </Box>
+                </form>
               </Stack>
             </Box>
           </Grid>

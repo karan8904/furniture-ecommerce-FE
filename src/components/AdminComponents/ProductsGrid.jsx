@@ -198,7 +198,7 @@ const ProductsGrid = () => {
                       </TableCell>
                       <TableCell>
                         <img
-                          src={`${baseURL}/${product.images[0]}`}
+                          src={`${baseURL}/${product?.images[0]}`}
                           alt=""
                           height="100px"
                           width="85px"

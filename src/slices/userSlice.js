@@ -39,6 +39,10 @@ const initialState = {
     error: null,
     loading: false,
   },
+  setEmailSubscription: {
+    error: null,
+    loading: false
+  }
 };
 
 export const createUser = createAsyncThunk(
@@ -181,6 +185,19 @@ export const searchUsers = createAsyncThunk(
     } catch (error) {
       const message = error.response.data.message;
       return thunkApi.rejectWithValue(message);
+    }
+  }
+)
+
+export const setEmailSubscription = createAsyncThunk(
+  "users/setEmailSubscription",
+  async(email, thunkApi) => {
+    try {
+      const response = await axios.post("/email/setSubscription", email)
+      return response.data
+    } catch (error) {
+      const message = error.response.data.message
+      return thunkApi.rejectWithValue(message)
     }
   }
 )
@@ -341,9 +358,21 @@ export const userSlice = createSlice({
         state.getAllUsers.users = action.payload
         state.getAllUsers.loading = false
       })
-      .addCase(searchUsers.rejected, (state) => {
+      .addCase(searchUsers.rejected, (state, action) => {
         state.getAllUsers.loading = false
         state.getAllUsers.error = action.payload
+      })
+
+      //SET EMAIL SUBSCRIPTION
+      .addCase(setEmailSubscription.pending, (state) => {
+        state.setEmailSubscription.loading = true
+      })
+      .addCase(setEmailSubscription.fulfilled, (state) => {
+        state.setEmailSubscription.loading = false
+      })
+      .addCase(setEmailSubscription.rejected, (state, action) => {
+        state.setEmailSubscription.loading = false
+        state.setEmailSubscription.error = action.payload
       })
   },
 });

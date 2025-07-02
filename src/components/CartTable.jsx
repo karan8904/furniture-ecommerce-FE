@@ -91,7 +91,7 @@ const CartTable = () => {
   };
 
   const handleCheckout = () => {
-    dispatch(getCheckoutData({ products, totalAmount: totalAmount }));
+    dispatch(getCheckoutData({ products, totalAmount: Math.round(totalAmount) }));
     navigate("/checkout");
   };
 
@@ -177,7 +177,7 @@ const CartTable = () => {
                       </TableCell>
                       <TableCell>
                         <Typography color="secondary">
-                          Rs. {product.price}
+                          Rs. {Math.round(product.price)}.00
                         </Typography>
                       </TableCell>
                       <TableCell>
@@ -213,7 +213,7 @@ const CartTable = () => {
                       </TableCell>
                       <TableCell>
                         <Typography>
-                          Rs. {product.price * product.quantity}.00
+                          Rs. {Math.round(product.price) * product.quantity}.00
                         </Typography>
                       </TableCell>
                       <TableCell>
@@ -364,15 +364,15 @@ const CartTable = () => {
                   paddingTop="10px"
                 >
                   <Box display="flex" columnGap={2}>
-                    <Typography>{product.productID.name}</Typography>
-                    <Typography>x{product.quantity}</Typography>
+                    <Typography maxWidth={60}>{product.productID.name}</Typography>
+                    <Typography color="secondary">x{product.quantity}</Typography>
                   </Box>
                   <Typography
                     fontWeight="400"
                     fontSize={{ md: "14px", lg: "17px" }}
                     color="secondary"
                   >
-                    Rs. {product.price}.00
+                    Rs. {Math.round(product.price)}.00
                   </Typography>
                 </Box>
               ))}
@@ -383,7 +383,7 @@ const CartTable = () => {
                 fontSize={{ md: "15px", lg: "20px" }}
                 fontWeight="500"
               >
-                Rs. {totalAmount}.00
+                Rs. {Math.round(totalAmount)}.00
               </Typography>
             </Box>
             <Box display="flex" justifyContent="center" paddingTop="30px">

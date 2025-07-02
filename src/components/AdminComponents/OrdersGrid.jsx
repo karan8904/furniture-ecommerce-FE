@@ -29,7 +29,12 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-import { changeOrderStatus, getOrders } from "../../slices/orderSlice";
+import {
+  changeOrderStatus,
+  filterOrders,
+  getOrders,
+  searchOrders,
+} from "../../slices/orderSlice";
 import { showSnackbar } from "../../slices/snackbarSlice";
 import CircleIcon from "@mui/icons-material/Circle";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -39,6 +44,7 @@ import SearchIcon from "@mui/icons-material/Search";
 
 const OrdersGrid = () => {
   const [orderID, setOrderID] = useState(null);
+  const [orderFilterStatus, setOrderFilterStatus] = useState("All");
   const [paginationDetails, setPaginationDetails] = useState({
     itemsPerPage: 5,
     totalItems: 0,
@@ -46,7 +52,7 @@ const OrdersGrid = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [currentOrders, setCurrentOrders] = useState([]);
-  const [query, setQuery] = useState("")
+  const [query, setQuery] = useState("");
   const orders = useSelector((state) => state.order.getOrders.orders);
   const orderLoading = useSelector((state) => state.order.getOrders.loading);
   const changeStatusLoading = useSelector(
@@ -64,9 +70,7 @@ const OrdersGrid = () => {
         ...paginationDetails,
         totalItems: orders.length,
       });
-      let count = Math.ceil(
-        orders.length / paginationDetails.itemsPerPage
-      );
+      let count = Math.ceil(orders.length / paginationDetails.itemsPerPage);
       setTotalPages(count);
       const indexOfLastItem = currentPage * paginationDetails.itemsPerPage;
       const indexOfFirstItem = indexOfLastItem - paginationDetails.itemsPerPage;
@@ -76,16 +80,15 @@ const OrdersGrid = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      if(query === "")
-        dispatch(getOrders())
-      if(query){
-        setCurrentPage(1)
-        dispatch(searchOrders(query))
+      if (query === "") dispatch(getOrders());
+      if (query) {
+        setCurrentPage(1);
+        dispatch(searchOrders(query));
       }
-    }, 500)
+    }, 500);
 
-    return () => clearTimeout(timer) 
-  }, [query])
+    return () => clearTimeout(timer);
+  }, [query]);
 
   const handleCloseDialog = () => {
     setOrderID(null);
@@ -111,31 +114,51 @@ const OrdersGrid = () => {
         <Divider />
       </Grid>
       <Grid container size={12} margin="0 10px 17px 10px">
-          <Grid size={3}>
-            <Box>
-              <TextField
-                id="search"
-                placeholder="Search Order (Using OrderID)"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                slotProps={{
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon />
-                      </InputAdornment>
-                    ),
-                    style: {
-                      borderRadius: "15px",
-                    },
+        <Grid size={3}>
+          <Box>
+            <TextField
+              id="search"
+              placeholder="Search Order"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                  style: {
+                    borderRadius: "15px",
                   },
-                }}
-                fullWidth
-              />
-            </Box>
-          </Grid>
-          <Grid size={6}></Grid>
+                },
+              }}
+              fullWidth
+            />
+          </Box>
         </Grid>
+        <Grid size={9} display="flex" justifyContent="end">
+          <Box sx={{ minWidth: 130 }}>
+            <Select
+              labelId="Order Status"
+              id="Order Status"
+              value={orderFilterStatus}
+              onChange={(e) => {
+                setOrderFilterStatus(e.target.value);
+                dispatch(filterOrders(e.target.value))
+              }}
+            >
+              <MenuItem value="All">All Orders</MenuItem>
+              <MenuItem value="Placed">Placed</MenuItem>
+              <MenuItem value="Shipped">Shipped</MenuItem>
+              <MenuItem value="Out-for-Delivery">Out for Delivery</MenuItem>
+              <MenuItem value="Delivered">Delivered</MenuItem>
+              <MenuItem value="Cancelled">Cancelled</MenuItem>
+            </Select>
+          </Box>
+        </Grid>
+        <Grid size={6}></Grid>
+      </Grid>
       <Grid size={12} margin="0 10px">
         <TableContainer component={Paper} sx={{ maxHeight: "75vh" }}>
           <Table>
@@ -160,7 +183,8 @@ const OrdersGrid = () => {
                   </TableCell>
                 </TableRow>
               )}
-              {currentOrders &&
+              {orders?.length !== 0 &&
+                currentOrders?.length !== 0 &&
                 currentOrders?.map((order, index) => (
                   <TableRow key={index}>
                     <TableCell>
@@ -208,10 +232,15 @@ const OrdersGrid = () => {
                               <TableBody>
                                 {order?.products?.map((product, index) => (
                                   <TableRow key={index}>
-                                    <TableCell>{index + 1}</TableCell>
+                                    <TableCell>
+                                      {index +
+                                        1 +
+                                        paginationDetails.itemsPerPage *
+                                          (currentPage - 1)}
+                                    </TableCell>
                                     <TableCell>
                                       <img
-                                        src={`${baseURL}/${product.productID.images[0]}`}
+                                        src={`${baseURL}/${product?.productID?.images[0]}`}
                                         height="50px"
                                         width="50px"
                                       />
@@ -288,7 +317,7 @@ const OrdersGrid = () => {
               {orders?.length > paginationDetails.itemsPerPage && (
                 <TableRow>
                   <TableCell colSpan={9}>
-                  <Box display="flex" justifyContent="center">
+                    <Box display="flex" justifyContent="center">
                       <Pagination
                         size="large"
                         count={totalPages}
@@ -304,7 +333,7 @@ const OrdersGrid = () => {
                   </TableCell>
                 </TableRow>
               )}
-              {!orderLoading && orders.length === 0 && (
+              {!orderLoading && orders?.length === 0 && (
                 <TableRow>
                   <TableCell align="center" colSpan={11}>
                     <Typography variant="h6">No Orders Found...</Typography>

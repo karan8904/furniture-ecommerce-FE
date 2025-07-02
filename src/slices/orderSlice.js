@@ -129,6 +129,32 @@ export const currentMonthOrdersCount = createAsyncThunk(
     }
 )
 
+export const searchOrders = createAsyncThunk(
+    "orders/searchOrders",
+    async(query, thunkApi) => {
+        try {
+            const response = await axios.get(`/orders/search/${query}`)
+            return response.data
+        } catch (error) {
+            const message = error.response.data.message
+            return thunkApi.rejectWithValue(message)
+        }
+    }
+)
+
+export const filterOrders = createAsyncThunk(
+    "orders/filterOrders",
+    async(status, thunkApi) => {
+        try {
+            const response = await axios.get(`/orders/filter/${status}`)
+            return response.data
+        } catch (error) {
+            const message = error.response.data.message
+            return thunkApi.rejectWithValue(message)
+        }
+    }
+)
+
 export const orderSlice = createSlice({
     name: "orders",
     initialState,
@@ -227,6 +253,35 @@ export const orderSlice = createSlice({
         .addCase(currentMonthOrdersCount.rejected, (state, action) => {
             state.currentMonthOrdersCount.loading = false
             state.currentMonthOrdersCount.error = action.payload
+        })
+
+        //SEARCH ORDERS
+        .addCase(searchOrders.pending, (state) => {
+            state.getOrders.loading = true
+        })
+        .addCase(searchOrders.fulfilled, (state, action) => {
+            if(action.payload.length === 0)
+                state.getOrders.orders = []
+            console.log(action.payload)
+            state.getOrders.orders = action.payload
+            state.getOrders.loading = false
+        })
+        .addCase(searchOrders.rejected, (state, action) => {
+            state.getOrders.loading = false
+            state.getOrders.error = action.payload
+        })
+
+        //FILTER ORDERS
+        .addCase(filterOrders.pending, (state) => {
+            state.getOrders.loading = true
+        })
+        .addCase(filterOrders.fulfilled, (state, action) => {
+            state.getOrders.loading = false
+            state.getOrders.orders = action.payload
+        })
+        .addCase(filterOrders.rejected, (state, action) => {
+            state.getOrders.loading = false
+            state.getOrders.error = action.payload
         })
     }
 })

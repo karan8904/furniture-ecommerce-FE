@@ -204,7 +204,7 @@ const Dashboard = () => {
         <Grid size={6}>
           <Box>
             <Typography fontSize="20px" fontWeight={550}>
-              Daily Orders
+              Daily Orders (This Month)
             </Typography>
           </Box>
           {dailyOrderData.length > 0 && (

@@ -149,7 +149,7 @@ const ProductInfo = ({ product }) => {
   };
 
   const calculateDiscountPrice = (price, discount) => {
-    return (price -= price * (discount / 100));
+    return Math.round(price -= price * (discount / 100));
   };
 
   return (

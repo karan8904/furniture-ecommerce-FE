@@ -13,7 +13,7 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { Link, useNavigate, useParams } from "react-router";
 import Products from "../components/Products";
 import ProductInfo from "../components/ProductInfo";
-import { getSingleProduct } from "../slices/productSlice";
+import { getProducts, getSingleProduct } from "../slices/productSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 const SingleProduct = () => {
@@ -24,9 +24,11 @@ const SingleProduct = () => {
   const id = params.id
   const product = useSelector((state) => state.product.getSingleProduct.product)
   const productLoading = useSelector((state) => state.product.getSingleProduct.loading)
+  const products = useSelector((state) => state.product.getProducts.products).filter((p) => p._id !== id).slice(0,4)
 
   useEffect(() => {
     dispatch(getSingleProduct(id))
+    dispatch(getProducts())
   }, [id])
 
   return (
@@ -71,7 +73,7 @@ const SingleProduct = () => {
           Related Products
         </Typography>
         <Box>
-          <Products num={4} />
+          <Products products={products} />
         </Box>
         <Box display="flex" justifyContent="center" sx={{ marginTop: "40px" }}>
             <Button variant="outlined" size="large" onClick={() => navigate("/shop")}>Show More</Button>

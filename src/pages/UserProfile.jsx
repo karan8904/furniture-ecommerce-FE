@@ -287,7 +287,7 @@ const UserProfile = () => {
                     marginTop="15px"
                     border="1px solid #acb2b1"
                     borderRadius="10px"
-                    width="200px"
+                    minWidth="200px"
                   >
                     <Box margin="10px 15px">
                       <Typography fontSize="18px">
@@ -352,7 +352,7 @@ const UserProfile = () => {
                     marginTop="15px"
                     border="1px solid #acb2b1"
                     borderRadius="10px"
-                    width="200px"
+                    minWidth="200px"
                   >
                     <Box margin="10px 15px">
                       <Typography fontSize="18px">
@@ -410,7 +410,7 @@ const UserProfile = () => {
           >
             {showAddress === "Other" &&
               otherAddresses &&
-              Object.keys(otherAddresses).length > 0 &&
+              Object.keys(otherAddresses).length > 0 ?
               otherAddresses.map((address) => (
                 <Box key={address._id}>
                   <Box display="flex" alignItems="center" columnGap={1}>
@@ -423,7 +423,7 @@ const UserProfile = () => {
                     marginTop="15px"
                     border="1px solid #acb2b1"
                     borderRadius="10px"
-                    width="200px"
+                    minWidth="200px"
                   >
                     <Box margin="10px 15px">
                       <Typography fontSize="18px">
@@ -455,7 +455,14 @@ const UserProfile = () => {
                     </Box>
                   </Box>
                 </Box>
-              ))}
+              )):(<Box display="flex" justifyContent="center" marginTop="30px">
+                <Button
+                  variant="outlined"
+                  onClick={() => navigate("/add-address/3")}
+                >
+                  Add Other Adresss
+                </Button>
+              </Box>)}
             <Dialog
               open={deleteId}
               onClose={() => setDeleteId(null)}

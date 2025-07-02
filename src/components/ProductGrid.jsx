@@ -35,7 +35,7 @@ const ProductGrid = ({ products, productsLoading }) => {
           <CircularProgress />
         </Grid>
         )}
-      {!productsLoading && products.length === 0 && (
+      {!productsLoading && products?.length === 0 && (
         <Grid size={12}>
           <Typography variant="h5" textAlign="center">
             No Products Found...

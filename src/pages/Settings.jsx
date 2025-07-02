@@ -39,7 +39,6 @@ const Settings = () => {
     try {
       await dispatch(saveEmailPreference(formik.values)).unwrap()
       dispatch(showSnackbar({ message: "Email preference saved." }))
-      navigate("/")
     } catch (error) {
       dispatch(showSnackbar({ severity: "Error", message: "Cannot save the preference. Try again." }))
     }
