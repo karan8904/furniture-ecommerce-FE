@@ -25,7 +25,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { showSnackbar } from "../slices/snackbarSlice";
 import { addToCart } from "../slices/cartSlice";
 import * as Yup from "yup";
-import { getCurrentUser, loginUser } from "../slices/userSlice";
+import { loginUser } from "../slices/userSlice";
+import {
+  addToWishlist,
+  getFromWishlist,
+  removeFromWishlist,
+} from "../slices/wishlistSlice";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
 const ProductInfo = ({ product }) => {
   const [qty, setQty] = useState(1);
@@ -40,11 +47,11 @@ const ProductInfo = ({ product }) => {
   const baseURL = import.meta.env.VITE_BASEURL;
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const loading = useSelector((state) => state.user.loading)
   const user = useSelector((state) => state.user.getCurrentUser.user);
-  
-  
+  const wishlistProducts = useSelector(
+    (state) => state.wishlist.getFromWishlist.products
+  );
+
   useEffect(() => {
     if (product.images && product.images.length > 0) {
       setMainImage(product.images[0]);
@@ -52,12 +59,12 @@ const ProductInfo = ({ product }) => {
       setPvImages(pv_imgs);
     }
     const price =
-    product?.discount_percent > 0
-    ? calculateDiscountPrice(product.price, product.discount_percent)
-    : product.price;
+      product?.discount_percent > 0
+        ? calculateDiscountPrice(product.price, product.discount_percent)
+        : product.price;
     setFinalPrice(price);
-  }, [product, user]);
-  
+  }, [product]);
+
   const numberFieldStyling = {
     "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button": {
       display: "none",
@@ -73,7 +80,6 @@ const ProductInfo = ({ product }) => {
 
   const handleOnAddingCart = async () => {
     try {
-      console.log(formik.values);
       await dispatch(addToCart(formik.values)).unwrap();
       dispatch(showSnackbar({ message: "Product added to cart." }));
     } catch (error) {
@@ -115,19 +121,20 @@ const ProductInfo = ({ product }) => {
     password: Yup.string().required("This field is required."),
   });
 
-  const handleOnSubmit = async() => {
+  const handleOnSubmit = async () => {
     try {
       await dispatch(
-        loginUser({ email: formikLogin.values.email, password: formikLogin.values.password })
+        loginUser({
+          email: formikLogin.values.email,
+          password: formikLogin.values.password,
+        })
       ).unwrap();
-      dispatch(
-        showSnackbar({ message: "Logged in Successful..." })
-      );
-      setOpenDialog(false)
+      dispatch(showSnackbar({ message: "Logged in Successful..." }));
+      setOpenDialog(false);
     } catch (error) {
       dispatch(showSnackbar({ severity: "error", message: error }));
     }
-  }
+  };
 
   const formikLogin = useFormik({
     initialValues: {
@@ -138,7 +145,7 @@ const ProductInfo = ({ product }) => {
     onSubmit: (values) => {
       handleOnSubmit(values);
     },
-  })
+  });
 
   const handleImages = (img, index) => {
     let currentMainImg = mainImage;
@@ -149,7 +156,25 @@ const ProductInfo = ({ product }) => {
   };
 
   const calculateDiscountPrice = (price, discount) => {
-    return Math.round(price -= price * (discount / 100));
+    return Math.round((price -= price * (discount / 100)));
+  };
+
+  const handleOnAddWishlist = async (id) => {
+    try {
+      await dispatch(addToWishlist(id)).unwrap();
+      dispatch(showSnackbar({ message: "Product added to wishlist." }));
+    } catch (error) {
+      dispatch(showSnackbar({ severity: "error", message: error }));
+    }
+  };
+
+  const handleRemoveFromWishlist = async (id) => {
+    try {
+      await dispatch(removeFromWishlist(id)).unwrap();
+      dispatch(showSnackbar({ message: "Product removed from wishlist." }));
+    } catch (error) {
+      dispatch(showSnackbar({ severity: "error", message: error }));
+    }
   };
 
   return (
@@ -213,7 +238,9 @@ const ProductInfo = ({ product }) => {
         <Grid size={{ sm: 12, md: 6 }} padding="0 20px" display="flex">
           <Box marginTop="15px">
             <form onSubmit={formik.handleSubmit}>
-              <Typography fontSize="38px">{product.name}</Typography>
+              <Box display="flex" gap={3}>
+                <Typography fontSize="38px">{product.name}</Typography>
+              </Box>
               {product.discount_percent > 0 ? (
                 <Box display="flex" gap="30px" alignContent="center">
                   <Typography
@@ -373,6 +400,17 @@ const ProductInfo = ({ product }) => {
                     OUT OF STOCK
                   </Button>
                 )}
+                {wishlistProducts.find((p) => p._id === product._id) ? (
+                  <IconButton
+                    onClick={() => handleRemoveFromWishlist(product._id)}
+                  >
+                    <FavoriteIcon fontSize="large" sx={{ fill: "red" }} />
+                  </IconButton>
+                ) : (
+                  <IconButton onClick={() => handleOnAddWishlist(product._id)}>
+                    <FavoriteBorderIcon fontSize="large" />
+                  </IconButton>
+                )}
               </Box>
             </form>
           </Box>
@@ -384,13 +422,13 @@ const ProductInfo = ({ product }) => {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-      <form onSubmit={formikLogin.handleSubmit}>
-        <DialogTitle id="alert-dialog-title">
-          Login to your account
-        </DialogTitle>
-        <DialogContent>
-          <Box display="flex" justifyContent="center">
-            <Box>
+        <form onSubmit={formikLogin.handleSubmit}>
+          <DialogTitle id="alert-dialog-title">
+            Login to your account
+          </DialogTitle>
+          <DialogContent>
+            <Box display="flex" justifyContent="center">
+              <Box>
                 <Stack width={{ xs: 320, sm: 350, md: 400 }}>
                   <TextField
                     id="email"
@@ -424,9 +462,7 @@ const ProductInfo = ({ product }) => {
                           <InputAdornment position="end">
                             <IconButton
                               onClick={() =>
-                                setIsPasswordVisible(
-                                  !isPasswordVisible
-                                )
+                                setIsPasswordVisible(!isPasswordVisible)
                               }
                               edge="end"
                             >
@@ -452,11 +488,7 @@ const ProductInfo = ({ product }) => {
                     }
                   />
 
-                  <Box
-                    marginTop="10px"
-                    display="flex"
-                    justifyContent="end"
-                  >
+                  <Box marginTop="10px" display="flex" justifyContent="end">
                     <Typography fontSize="14px">
                       <Link
                         to="/forgot-password"
@@ -468,13 +500,9 @@ const ProductInfo = ({ product }) => {
                         Forgot password?
                       </Link>
                     </Typography>
-                  </Box> 
+                  </Box>
 
-                  <Box
-                    marginTop="20px"
-                    display="flex"
-                    justifyContent="center"
-                  >
+                  <Box marginTop="20px" display="flex" justifyContent="center">
                     <Typography fontSize="18px">
                       Not a user?{" "}
                       <Link
@@ -489,24 +517,17 @@ const ProductInfo = ({ product }) => {
                     </Typography>
                   </Box>
                 </Stack>
+              </Box>
             </Box>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            variant="outlined"
-            onClick={() => setOpenDialog(false)}
-            >
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            type="submit"
-            autoFocus
-            >
-            Login
-          </Button>
-        </DialogActions>
+          </DialogContent>
+          <DialogActions>
+            <Button variant="outlined" onClick={() => setOpenDialog(false)}>
+              Cancel
+            </Button>
+            <Button variant="contained" type="submit" autoFocus>
+              Login
+            </Button>
+          </DialogActions>
         </form>
       </Dialog>
     </Box>

@@ -264,7 +264,6 @@ const CategoriesGrid = () => {
                           page={currentPage}
                           onChange={(e, page) => {
                             setCurrentPage(page);
-                            window.tableContainer.scrollTo(0, 0);
                           }}
                           shape="rounded"
                           color="primary"

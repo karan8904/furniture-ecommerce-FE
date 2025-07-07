@@ -1,3 +1,4 @@
+import React, { useEffect } from "react";
 import {
   Avatar,
   Box,
@@ -7,12 +8,27 @@ import {
   CircularProgress,
   Grid,
   Typography,
+  IconButton,
 } from "@mui/material";
-import React from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import { addToWishlist, getFromWishlist, removeFromWishlist } from "../slices/wishlistSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { showSnackbar } from "../slices/snackbarSlice";
 
 const ProductGrid = ({ products, productsLoading }) => {
   const baseURL = import.meta.env.VITE_BASEURL;
+  const navigate = useNavigate()
+  const wishlistProducts = useSelector(
+    (state) => state.wishlist.getFromWishlist.products
+  );
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getFromWishlist());
+  }, []);
+
   const productStyling = {
     maxWidth: { xs: 340, sm: 270, md: 240 },
     margin: "0 auto",
@@ -20,8 +36,28 @@ const ProductGrid = ({ products, productsLoading }) => {
   };
 
   const calculateDiscountPrice = (price, discount) => {
-    return Math.round(price -= price * (discount / 100));
+    return Math.round((price -= price * (discount / 100)));
   };
+
+  const handleOnAddWishlist = async (e, id) => {
+    e.stopPropagation()
+    try {
+      await dispatch(addToWishlist(id)).unwrap();
+      dispatch(showSnackbar({ message: "Product added to wishlist." }));
+    } catch (error) {
+      dispatch(showSnackbar({ severity: "error", message: error }));
+    }
+  };
+
+  const handleRemoveFromWishlist = async(e, id) => {
+    e.stopPropagation()
+    try {
+      await dispatch(removeFromWishlist(id)).unwrap()
+      dispatch(showSnackbar({ message: "Product removed from wishlist." }));
+    } catch (error) {
+      dispatch(showSnackbar({ severity: "error", message: error }));
+    }
+  }
 
   return (
     <Grid
@@ -34,7 +70,7 @@ const ProductGrid = ({ products, productsLoading }) => {
         <Grid size={12} display="flex" justifyContent="center">
           <CircularProgress />
         </Grid>
-        )}
+      )}
       {!productsLoading && products?.length === 0 && (
         <Grid size={12}>
           <Typography variant="h5" textAlign="center">
@@ -47,11 +83,7 @@ const ProductGrid = ({ products, productsLoading }) => {
           if (!product.isVisible) return;
           return (
             <Grid key={product._id} size={{ md: 3, sm: 4, xs: 12 }}>
-              <Link
-                to={`/single-product/${product._id}`}
-                style={{ textDecoration: "none" }}
-              >
-                <Card sx={productStyling}>
+                <Card sx={productStyling} onClick={() => navigate(`/single-product/${product._id}`)}>
                   <CardMedia
                     sx={{
                       height: "301px",
@@ -80,15 +112,29 @@ const ProductGrid = ({ products, productsLoading }) => {
                     )}
                   </CardMedia>
                   <CardContent sx={{ backgroundColor: "#F4F5F7" }}>
-                    <Typography
-                      gutterBottom
-                      variant="h5"
-                      component="div"
-                      fontWeight={600}
-                      color="#3a3a3a"
-                    >
-                      {product.name.length > 12 ? product.name.slice(0, 14).trim() + "..." : product.name}
-                    </Typography>
+                    <Box display="flex" justifyContent="space-between">
+                      <Typography
+                        gutterBottom
+                        variant="h6"
+                        fontWeight={600}
+                        color="#3a3a3a"
+                      >
+                        {product.name.length > 8
+                          ? product.name.slice(0, 10).trim() + "..."
+                          : product.name}
+                      </Typography>
+                      {wishlistProducts.find((p) => p._id === product._id) ? (
+                        <IconButton onClick={(e) => handleRemoveFromWishlist(e, product._id)}>
+                          <FavoriteIcon sx={{ fill: "red" }} />
+                        </IconButton>
+                      ) : (
+                        <IconButton
+                          onClick={(e) => handleOnAddWishlist(e, product._id)}
+                        >
+                          <FavoriteBorderIcon />
+                        </IconButton>
+                      )}
+                    </Box>
                     <Typography
                       gutterBottom
                       variant="body2"
@@ -137,7 +183,6 @@ const ProductGrid = ({ products, productsLoading }) => {
                     )}
                   </CardContent>
                 </Card>
-              </Link>
             </Grid>
           );
         })

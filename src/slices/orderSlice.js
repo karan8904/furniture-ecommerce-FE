@@ -35,6 +35,15 @@ const initialState = {
         data: {},
         error: null,
         loading: false
+    },
+    makePayment: {
+        sessionID: {},
+        error: null,
+        loading: false
+    },
+    mailInvoice: {
+        loadingIDs: [],
+        error: null,
     }
 }
 
@@ -155,6 +164,45 @@ export const filterOrders = createAsyncThunk(
     }
 )
 
+export const makePayment = createAsyncThunk(
+    "payment/makePayment",
+    async(data, thunkApi) => {
+        try {
+            const response = await axios.post('/payment/checkout-session', data)
+            return response.data
+        } catch (error) {
+            const message = error.response.data.message
+            return thunkApi.rejectWithValue(message)
+        }
+    }
+)
+
+export const confirmPayment = createAsyncThunk(
+    "payment/confirmPayment",
+    async(sessionID, thunkApi) => {
+        try {
+            const response = await axios.get(`/orders/confirm/${sessionID}`)
+            return response.data
+        } catch (error) {
+            const message = error.response.data.message
+            return thunkApi.rejectWithValue(message)
+        }
+    }
+)
+
+export const mailInvoice = createAsyncThunk(
+    "orders/mailInvoice",
+    async(id, thunkApi) => {
+        try {
+            const response = await axios.get(`/orders/mailInvoice/${id}`)
+            return response.data
+        } catch (error) {
+            const message = error.response.data.message
+            return thunkApi.rejectWithValue(message)           
+        }
+    }
+)
+
 export const orderSlice = createSlice({
     name: "orders",
     initialState,
@@ -192,8 +240,10 @@ export const orderSlice = createSlice({
         })
         .addCase(changeOrderStatus.fulfilled, (state, action) => {
             state.getOrders.orders.map((order) => {
-                if(order._id === action.payload.order._id)
+                if(order._id === action.payload.order._id){
                     order.orderStatus = action.payload.order.orderStatus
+                    order.paymentStatus = action.payload.order.paymentStatus
+                }
             })
             state.changeStatus.loadingIDs = state.changeStatus.loadingIDs.filter((i) => i._id === action.payload.order._id)
         })
@@ -282,6 +332,32 @@ export const orderSlice = createSlice({
         .addCase(filterOrders.rejected, (state, action) => {
             state.getOrders.loading = false
             state.getOrders.error = action.payload
+        })
+
+        //MAKE PAYMENT
+        .addCase(makePayment.pending, (state) => {
+            state.placeOrder.loading = true
+        })
+        .addCase(makePayment.fulfilled, (state, action) => {
+            state.placeOrder.loading = false
+            state.makePayment.data = action.payload
+            state.makePayment.sessionID = action.payload.id
+        })
+        .addCase(makePayment.rejected, (state, action) => {
+            state.placeOrder.loading = false
+            state.placeOrder.error = action.payload
+        })
+
+        //MAIL INVOICE
+        .addCase(mailInvoice.pending, (state, action) => {
+            state.mailInvoice.loadingIDs.push(action.meta.arg)
+        })
+        .addCase(mailInvoice.fulfilled, (state, action) => {
+            state.mailInvoice.loadingIDs = state.mailInvoice.loadingIDs.filter((id) => { action.payload.order_id === id })
+        })
+        .addCase(mailInvoice.rejected, (state, action) => {
+            state.mailInvoice.error = action.payload
+            state.mailInvoice.loadingIDs = []
         })
     }
 })

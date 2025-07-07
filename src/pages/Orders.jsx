@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
-import PageTitleComponent from "../components/PageTitleComponent";
 import Footer from "../components/Footer";
-import InfoComponent from "../components/InfoComponent";
 import { useDispatch, useSelector } from "react-redux";
-import { getMyOrders } from "../slices/orderSlice";
+import { getMyOrders, mailInvoice } from "../slices/orderSlice";
 import {
   Paper,
   Grid,
@@ -24,18 +22,22 @@ import {
   DialogActions,
   CircularProgress,
   Box,
-  Breadcrumbs,
+  Breadcrumbs, 
+  IconButton,
 } from "@mui/material";
 import CircleIcon from "@mui/icons-material/Circle";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import { Link } from "react-router";
+import { showSnackbar } from "../slices/snackbarSlice";
 
 const Orders = () => {
   const [orderID, setOrderID] = useState(null);
+  const baseURL = import.meta.env.VITE_BASEURL;
   const user = useSelector((state) => state.user.getCurrentUser.user);
   const orders = useSelector((state) => state.order.getMyOrders.orders);
   const orderLoading = useSelector((state) => state.order.getMyOrders.loading);
-  const baseURL = import.meta.env.VITE_BASEURL;
+  const loadingIDs = useSelector((state) => state.order.mailInvoice.loadingIDs)
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -45,6 +47,15 @@ const Orders = () => {
   const handleCloseDialog = () => {
     setOrderID(null);
   };
+
+  const handleOnGetInvoice = async(id) => {
+    try {
+      await dispatch(mailInvoice(id)).unwrap()
+      dispatch(showSnackbar({ message: "Invoice is sent to your email." }))
+    } catch (error) {
+      dispatch(showSnackbar({ severity: "error", message: error }))
+    }
+  }
 
   return (
     <>
@@ -86,16 +97,17 @@ const Orders = () => {
                   <TableCell>Product Details</TableCell>
                   <TableCell>Total Amount</TableCell>
                   <TableCell>Payment Mode</TableCell>
-                  <TableCell>PaymentID</TableCell>
+                  <TableCell>Payment Status</TableCell>
                   <TableCell>Address</TableCell>
                   <TableCell>Order Status</TableCell>
                   <TableCell>Ordered On</TableCell>
+                  <TableCell>Get Invoice</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {orderLoading && (
                   <TableRow>
-                    <TableCell align="center" colSpan={11}>
+                    <TableCell align="center" colSpan={10}>
                       <CircularProgress />
                     </TableCell>
                   </TableRow>
@@ -186,7 +198,7 @@ const Orders = () => {
                       </TableCell>
                       <TableCell>₹{order.totalAmount}</TableCell>
                       <TableCell>{order.paymentMode}</TableCell>
-                      <TableCell>{order?.paymentID ?? "None"}</TableCell>
+                      <TableCell>{order.paymentStatus}</TableCell>
                       <TableCell>
                         {order.address.streetAddress}, {order.address.city}-
                         {order.address.zipCode}, {order.address.state},{" "}
@@ -194,11 +206,16 @@ const Orders = () => {
                       </TableCell>
                       <TableCell>{order.orderStatus}</TableCell>
                       <TableCell>{order.createdAt.slice(0, 10)}</TableCell>
+                      <TableCell align="center">
+                        <IconButton loading={loadingIDs.includes(order._id)} onClick={() => handleOnGetInvoice(order._id)}>
+                          {!loadingIDs.includes(order._id) ? (<CloudDownloadIcon color="primary" />) : (<></>)}
+                        </IconButton>
+                      </TableCell>
                     </TableRow>
                   ))}
                 {!orderLoading && orders?.length === 0 && (
                   <TableRow>
-                    <TableCell align="center" colSpan={11}>
+                    <TableCell align="center" colSpan={10}>
                       <Typography variant="h6">No Orders Found...</Typography>
                     </TableCell>
                   </TableRow>

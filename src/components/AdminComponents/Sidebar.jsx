@@ -23,6 +23,7 @@ import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
 import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import MenuIcon from "@mui/icons-material/Menu";
+import PriceChangeOutlinedIcon from '@mui/icons-material/PriceChangeOutlined';
 import logo from "../../assets/logo.png";
 import LogoutIcon from '@mui/icons-material/Logout';
 import { logoutUser } from "../../slices/userSlice";
@@ -195,6 +196,19 @@ const Sidebar = ({ open, setOpen, setCurrentSection, currentSection, user }) => 
                 <GroupOutlinedIcon />
               </ListItemIcon>
               {open && <ListItemText primary="Users" />}
+            </ListItemButton>
+          </ListItem>
+          <Divider />
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => setCurrentSection("Charges")}
+              selected={currentSection === "Charges"}
+              sx={selectedStyle}
+            >
+              <ListItemIcon>
+                <PriceChangeOutlinedIcon />
+              </ListItemIcon>
+              {open && <ListItemText primary="Charges" />}
             </ListItemButton>
           </ListItem>
           <Divider />

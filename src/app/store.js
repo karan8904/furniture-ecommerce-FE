@@ -7,6 +7,8 @@ import categoryReducer from '../slices/categorySlice'
 import produceReducer from '../slices/productSlice'
 import cartReducer from '../slices/cartSlice'
 import addressReducer from '../slices/addressSlice'
+import chargesReducer from '../slices/chargesSlice'
+import wishlistReducer from '../slices/wishlistSlice'
 
 export const store = configureStore({
   reducer: {
@@ -18,5 +20,7 @@ export const store = configureStore({
     product: produceReducer,
     cart: cartReducer,
     address: addressReducer,
+    charge: chargesReducer,
+    wishlist: wishlistReducer
   },
 })

@@ -7,10 +7,11 @@ import OrdersGrid from "../../components/AdminComponents/OrdersGrid";
 import UsersGrid from "../../components/AdminComponents/UsersGrid";
 import Dashboard from "../../components/AdminComponents/Dashboard";
 import { useSelector } from "react-redux";
+import ChargesGrid from "../../components/AdminComponents/ChargesGrid";
 
 const Admin = () => {
   const [currentSection, setCurrentSection] = useState("Dashboard");
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const user = useSelector((state) => state.user.getCurrentUser.user)
   return (
     <>
@@ -59,6 +60,13 @@ const Admin = () => {
             marginTop="15px"
           >
             <UsersGrid />
+          </Grid>
+          <Grid
+            size={open ? 10 : 11}
+            display={currentSection !== "Charges" ? "none" : "block"}
+            marginTop="15px"
+          >
+            <ChargesGrid />
           </Grid>
         </Grid>
       </Box>

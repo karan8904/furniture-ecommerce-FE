@@ -169,10 +169,12 @@ const OrdersGrid = () => {
                 <TableCell>Customer Name</TableCell>
                 <TableCell>Product Details</TableCell>
                 <TableCell>Total Amount</TableCell>
+                <TableCell>Total Amount(Incl. Tax)</TableCell>
                 <TableCell>Payment Mode</TableCell>
+                <TableCell>Payment Status</TableCell>
                 <TableCell>PaymentID</TableCell>
                 <TableCell>Address</TableCell>
-                <TableCell>Order Status</TableCell>
+                <TableCell align="center">Order Status</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -280,15 +282,17 @@ const OrdersGrid = () => {
                         </DialogActions>
                       </Dialog>
                     </TableCell>
-                    <TableCell>₹{order.totalAmount}</TableCell>
+                    <TableCell>₹{order.totalAmount}.00</TableCell>
+                    <TableCell>₹{Math.round(order.totalAmount + (order.totalAmount * 18 / 100))}.00</TableCell>
                     <TableCell>{order.paymentMode}</TableCell>
+                    <TableCell>{order.paymentStatus}</TableCell>
                     <TableCell>{order?.paymentID ?? "None"}</TableCell>
                     <TableCell>
                       {order.address.streetAddress}, {order.address.city}-
                       {order.address.zipCode}, {order.address.state},{" "}
                       {order.address.country}
                     </TableCell>
-                    <TableCell>
+                    <TableCell align="center">
                       <Box sx={{ minWidth: 120 }}>
                         {!changeStatusLoading.includes(order._id) ? (
                           <Select
@@ -308,7 +312,7 @@ const OrdersGrid = () => {
                             <MenuItem value="Cancelled">Cancelled</MenuItem>
                           </Select>
                         ) : (
-                          <CircularProgress />
+                          <CircularProgress size="25px" />
                         )}
                       </Box>
                     </TableCell>
@@ -316,7 +320,7 @@ const OrdersGrid = () => {
                 ))}
               {orders?.length > paginationDetails.itemsPerPage && (
                 <TableRow>
-                  <TableCell colSpan={9}>
+                  <TableCell colSpan={11}>
                     <Box display="flex" justifyContent="center">
                       <Pagination
                         size="large"
@@ -324,7 +328,7 @@ const OrdersGrid = () => {
                         page={currentPage}
                         onChange={(e, page) => {
                           setCurrentPage(page);
-                          window.tableContainer.scrollTo(0, 0);
+                          // window.tableContainer.scrollTo(0, 0);
                         }}
                         shape="rounded"
                         color="primary"

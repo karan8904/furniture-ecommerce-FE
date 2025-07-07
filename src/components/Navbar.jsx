@@ -153,7 +153,7 @@ const Navbar = () => {
             </IconButton>
             {user && Object.keys(user).length !== 0 && (
               <>
-                <IconButton>
+                <IconButton onClick={() => navigate("/wishlist")}>
                   <FavoriteBorderIcon />
                 </IconButton>
                 <IconButton onClick={() => navigate("/cart")}>
