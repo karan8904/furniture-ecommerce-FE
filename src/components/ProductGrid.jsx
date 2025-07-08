@@ -20,10 +20,12 @@ import { showSnackbar } from "../slices/snackbarSlice";
 const ProductGrid = ({ products, productsLoading }) => {
   const baseURL = import.meta.env.VITE_BASEURL;
   const navigate = useNavigate()
+  const dispatch = useDispatch();
   const wishlistProducts = useSelector(
     (state) => state.wishlist.getFromWishlist.products
   );
-  const dispatch = useDispatch();
+  const addWishlistLoadingIDs = useSelector((state) => state.wishlist.addToWishlist.loadingIDs)
+  const removeWishlistLoadingIDs = useSelector((state) => state.wishlist.removeFromWishlist.loadingIDs)
 
   useEffect(() => {
     dispatch(getFromWishlist());
@@ -43,7 +45,6 @@ const ProductGrid = ({ products, productsLoading }) => {
     e.stopPropagation()
     try {
       await dispatch(addToWishlist(id)).unwrap();
-      dispatch(showSnackbar({ message: "Product added to wishlist." }));
     } catch (error) {
       dispatch(showSnackbar({ severity: "error", message: error }));
     }
@@ -53,7 +54,6 @@ const ProductGrid = ({ products, productsLoading }) => {
     e.stopPropagation()
     try {
       await dispatch(removeFromWishlist(id)).unwrap()
-      dispatch(showSnackbar({ message: "Product removed from wishlist." }));
     } catch (error) {
       dispatch(showSnackbar({ severity: "error", message: error }));
     }
@@ -124,14 +124,15 @@ const ProductGrid = ({ products, productsLoading }) => {
                           : product.name}
                       </Typography>
                       {wishlistProducts.find((p) => p._id === product._id) ? (
-                        <IconButton onClick={(e) => handleRemoveFromWishlist(e, product._id)}>
-                          <FavoriteIcon sx={{ fill: "red" }} />
+                        <IconButton loading={removeWishlistLoadingIDs.includes(product._id)} onClick={(e) => handleRemoveFromWishlist(e, product._id)}>
+                          {!removeWishlistLoadingIDs.includes(product._id) && (<FavoriteIcon sx={{ fill: "red" }} />)}
                         </IconButton>
                       ) : (
                         <IconButton
+                          loading={addWishlistLoadingIDs.includes(product._id)}
                           onClick={(e) => handleOnAddWishlist(e, product._id)}
                         >
-                          <FavoriteBorderIcon />
+                          {!addWishlistLoadingIDs.includes(product._id) && (<FavoriteBorderIcon />)}
                         </IconButton>
                       )}
                     </Box>

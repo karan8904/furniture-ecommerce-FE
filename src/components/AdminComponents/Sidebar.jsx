@@ -33,6 +33,7 @@ import { showSnackbar } from "../../slices/snackbarSlice";
 
 const Sidebar = ({ open, setOpen, setCurrentSection, currentSection, user }) => {
   const [openDialog, setOpenDialog] = useState(false);
+  const baseURL = import.meta.env.VITE_BASEURL
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const drawerWidth = open ? 200 : 60;
@@ -218,6 +219,7 @@ const Sidebar = ({ open, setOpen, setCurrentSection, currentSection, user }) => 
           <ListItem sx={{ paddingLeft: "12px", py: "12px" }}>
               <ListItemIcon>
                 <Avatar
+                  src={user?.profilePicture && `${baseURL}/${user.profilePicture}`}
                   sx={{
                     bgcolor: (theme) => theme.palette.primary.main,
                     height: "30px",

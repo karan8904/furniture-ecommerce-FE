@@ -22,22 +22,32 @@ import {
   DialogActions,
   CircularProgress,
   Box,
-  Breadcrumbs, 
+  Breadcrumbs,
   IconButton,
+  Rating,
+  TextField,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
 import CircleIcon from "@mui/icons-material/Circle";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { Link } from "react-router";
 import { showSnackbar } from "../slices/snackbarSlice";
+import { postReview } from "../slices/reviewSlice";
+import { useFormik } from "formik";
 
 const Orders = () => {
   const [orderID, setOrderID] = useState(null);
+  const [reviewDialogId, setReviewDialogId] = useState(false);
   const baseURL = import.meta.env.VITE_BASEURL;
   const user = useSelector((state) => state.user.getCurrentUser.user);
   const orders = useSelector((state) => state.order.getMyOrders.orders);
   const orderLoading = useSelector((state) => state.order.getMyOrders.loading);
-  const loadingIDs = useSelector((state) => state.order.mailInvoice.loadingIDs)
+  const loadingIDs = useSelector((state) => state.order.mailInvoice.loadingIDs);
+  const reviewLoading = useSelector((state) => state.review.postReview.loading)
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -48,14 +58,46 @@ const Orders = () => {
     setOrderID(null);
   };
 
-  const handleOnGetInvoice = async(id) => {
+  const handleOnGetInvoice = async (id) => {
     try {
-      await dispatch(mailInvoice(id)).unwrap()
-      dispatch(showSnackbar({ message: "Invoice is sent to your email." }))
+      await dispatch(mailInvoice(id)).unwrap();
+      dispatch(showSnackbar({ message: "Invoice is sent to your email." }));
     } catch (error) {
-      dispatch(showSnackbar({ severity: "error", message: error }))
+      dispatch(showSnackbar({ severity: "error", message: error }));
     }
-  }
+  };
+
+  const handlePostReview = async() => {
+    try {
+      await dispatch(postReview(formik.values)).unwrap()
+      dispatch(showSnackbar({ message: "Thank you for the review." }))
+      formik.resetForm()
+      setReviewDialogId(null)
+    } catch (error) {
+      dispatch(
+        showSnackbar({ severity: "error", message: "Cannot post the review." })
+      );
+    }
+  };
+
+  const formik = useFormik({
+    initialValues: {
+      productID: "",
+      ratingScore: 0,
+      description: "",
+    },
+    onSubmit: (values) => {
+      if (values.productID && values.ratingScore && values.description) handlePostReview();
+      else {
+        dispatch(
+          showSnackbar({
+            severity: "error",
+            message: "All fields are mandatory.",
+          })
+        );
+      }
+    },
+  });
 
   return (
     <>
@@ -101,13 +143,14 @@ const Orders = () => {
                   <TableCell>Address</TableCell>
                   <TableCell>Order Status</TableCell>
                   <TableCell>Ordered On</TableCell>
-                  <TableCell>Get Invoice</TableCell>
+                  <TableCell align="center">Get Invoice</TableCell>
+                  <TableCell align="center">Give Review</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {orderLoading && (
                   <TableRow>
-                    <TableCell align="center" colSpan={10}>
+                    <TableCell align="center" colSpan={11}>
                       <CircularProgress />
                     </TableCell>
                   </TableRow>
@@ -207,15 +250,123 @@ const Orders = () => {
                       <TableCell>{order.orderStatus}</TableCell>
                       <TableCell>{order.createdAt.slice(0, 10)}</TableCell>
                       <TableCell align="center">
-                        <IconButton loading={loadingIDs.includes(order._id)} onClick={() => handleOnGetInvoice(order._id)}>
-                          {!loadingIDs.includes(order._id) ? (<CloudDownloadIcon color="primary" />) : (<></>)}
+                        <IconButton
+                          loading={loadingIDs.includes(order._id)}
+                          onClick={() => handleOnGetInvoice(order._id)}
+                        >
+                          {!loadingIDs.includes(order._id) ? (
+                            <CloudDownloadIcon color="primary" />
+                          ) : (
+                            <></>
+                          )}
                         </IconButton>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          disabled={order.orderStatus !== "Delivered"}
+                          sx={{ textTransform: "initial" }}
+                          onClick={() => {
+                            setReviewDialogId(order._id);
+                          }}
+                        >
+                          Review
+                        </Button>
+                        <Dialog
+                          open={order._id === reviewDialogId}
+                          onClose={() => setReviewDialogId(null)}
+                          aria-labelledby="review-dialog-title"
+                          aria-describedby="review-dialog-description"
+                          fullWidth
+                          maxWidth="xs"
+                        >
+                          <form onSubmit={formik.handleSubmit}>
+                            <DialogTitle id="review-dialog-title">
+                              <strong>Post Review</strong>
+                            </DialogTitle>
+                            <DialogContent>
+                              <Box mt={2}>
+                                <FormControl fullWidth>
+                                  <InputLabel id="product-select-label">
+                                    Select Product
+                                  </InputLabel>
+                                  <Select
+                                    labelId="product-select-label"
+                                    name="productID"
+                                    value={formik.values.productID}
+                                    label="Select Product"
+                                    onChange={(e) =>
+                                      formik.setFieldValue(
+                                        "productID",
+                                        e.target.value
+                                      )
+                                    }
+                                  >
+                                    {order.products.map((product) => (
+                                      <MenuItem value={product.productID._id}>
+                                        {product.productID.name}
+                                      </MenuItem>
+                                    ))}
+                                  </Select>
+                                </FormControl>
+                              </Box>
+                              <Box display="flex" columnGap={1} mt={2}>
+                                <Typography component="legend">
+                                  Rating:{" "}
+                                </Typography>
+                                <Rating
+                                  name="ratingScore"
+                                  value={formik.values.ratingScore}
+                                  onChange={(e, newValue) => {
+                                    formik.setFieldValue(
+                                      "ratingScore",
+                                      newValue
+                                    );
+                                  }}
+                                  precision={0.5}
+                                />
+                              </Box>
+                              <Box>
+                                <TextField
+                                  id="reviewMessage"
+                                  name="description"
+                                  label="Description"
+                                  value={formik.values.description}
+                                  onChange={formik.handleChange}
+                                  multiline
+                                  rows={4}
+                                  fullWidth
+                                  sx={{ maxWidth: "500px", mt: 2 }}
+                                />
+                              </Box>
+                            </DialogContent>
+                            <DialogActions>
+                              <Button
+                                type="submit"
+                                loading={reviewLoading}
+                                variant="contained"
+                                autoFocus
+                              >
+                                Post
+                              </Button>
+                              <Button
+                                onClick={() => {
+                                  setReviewDialogId(null);
+                                  formik.resetForm();
+                                }}
+                                variant="outlined"
+                                autoFocus
+                              >
+                                Cancel
+                              </Button>
+                            </DialogActions>
+                          </form>
+                        </Dialog>
                       </TableCell>
                     </TableRow>
                   ))}
                 {!orderLoading && orders?.length === 0 && (
                   <TableRow>
-                    <TableCell align="center" colSpan={10}>
+                    <TableCell align="center" colSpan={11}>
                       <Typography variant="h6">No Orders Found...</Typography>
                     </TableCell>
                   </TableRow>

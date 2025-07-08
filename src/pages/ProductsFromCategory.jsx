@@ -40,9 +40,6 @@ const ProductsFromCategory = () => {
     <>
       <Navbar />
       <PageTitleComponent pageTitle={category} />
-
-      <FilterComponent />
-
       <Box margin="70px 0">
         <Container>
           <Container sx={{ marginTop: "40px" }}>

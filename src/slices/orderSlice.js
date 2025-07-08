@@ -88,7 +88,7 @@ export const changeOrderStatus = createAsyncThunk(
 
 export const getMyOrders = createAsyncThunk(
     "orders/getMyOrders",
-    async(id, thunkApi) => {
+    async(_, thunkApi) => {
         try {
             const response = await axios.get("/orders/getMyOrders")
             return response.data

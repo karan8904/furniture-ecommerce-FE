@@ -38,7 +38,7 @@ const Navbar = () => {
   const [userMenu, setuserMenu] = React.useState(null);
 
   const dispatch = useDispatch();
-
+  const baseURL = import.meta.env.VITE_BASEURL
   const user = useSelector((state) => state.user.getCurrentUser.user);
   const userLoading = useSelector((state) => state.user.getCurrentUser.loading)
   const products = useSelector((state) => state.cart.getCartProducts.products);
@@ -165,6 +165,7 @@ const Navbar = () => {
                   <Typography fontSize="15px">{user?.firstName}</Typography>
                   <IconButton onClick={(e) => handleUserMenuClick(e)}>
                     <Avatar
+                      src={user?.profilePicture && `${baseURL}/${user.profilePicture}`}
                       sx={{
                         bgcolor: (theme) => theme.palette.primary.main,
                         height: "35px",

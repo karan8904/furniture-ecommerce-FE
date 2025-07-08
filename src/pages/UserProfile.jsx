@@ -4,6 +4,7 @@ import PageTitleComponent from "../components/PageTitleComponent";
 import Footer from "../components/Footer";
 import InfoComponent from "../components/InfoComponent";
 import {
+  Avatar,
   Box,
   Breadcrumbs,
   Button,
@@ -16,6 +17,7 @@ import {
   Grid,
   Radio,
   RadioGroup,
+  styled,
   TextField,
   Typography,
 } from "@mui/material";
@@ -24,19 +26,28 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { editUser } from "../slices/userSlice";
-import { createAddress, deleteAddress, getAddresses } from "../slices/addressSlice";
+import {
+  createAddress,
+  deleteAddress,
+  getAddresses,
+} from "../slices/addressSlice";
 import { Link, useNavigate } from "react-router";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import HomeIcon from "@mui/icons-material/Home";
 import BusinessIcon from "@mui/icons-material/Business";
 import OtherHousesIcon from "@mui/icons-material/OtherHouses";
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 const UserProfile = () => {
   const [showAddress, setShowAddress] = useState("Home");
-  const [deleteId, setDeleteId] = useState(null)
+  const [deleteId, setDeleteId] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const deleteAddressLoading = useSelector((state) => state.address.deleteAddress.loading)
+  const baseURL = import.meta.env.VITE_BASEURL
+  const deleteAddressLoading = useSelector(
+    (state) => state.address.deleteAddress.loading
+  );
   const user = useSelector((state) => state.user.getCurrentUser.user);
 
   const homeAddress = useSelector(
@@ -80,6 +91,7 @@ const UserProfile = () => {
     enableReinitialize: true,
     validationSchema,
     initialValues: {
+      profilePicture: user?.profilePicture || "",
       firstName: user?.firstName || "",
       lastName: user?.lastName || "",
       email: user?.email || "",
@@ -98,16 +110,28 @@ const UserProfile = () => {
     },
   };
 
-  const handleOnDelete = async() => {
+  const handleOnDelete = async () => {
     try {
-      await dispatch(deleteAddress(deleteId)).unwrap()
-      await dispatch(getAddresses(user._id)).unwrap()
-      setDeleteId(null)
-      dispatch(showSnackbar({ message: "Address Deleted Successfully." }))
+      await dispatch(deleteAddress(deleteId)).unwrap();
+      await dispatch(getAddresses(user._id)).unwrap();
+      setDeleteId(null);
+      dispatch(showSnackbar({ message: "Address Deleted Successfully." }));
     } catch (error) {
-      
+      dispatch(showSnackbar({ severiy: "error", message: "Cannot delete address. Try again." }))
     }
-  }
+  };
+
+  const VisuallyHiddenInput = styled('input')({
+    clip: 'rect(0 0 0 0)',
+    clipPath: 'inset(50%)',
+    height: 1,
+    overflow: 'hidden',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    whiteSpace: 'nowrap',
+    width: 1,
+  });
 
   return (
     <>
@@ -139,6 +163,44 @@ const UserProfile = () => {
             <Typography variant="h5" fontWeight="550" textAlign={"center"}>
               Manage Your Profile
             </Typography>
+          </Grid>
+          <Grid container size={12} display="flex" justifyContent="center" mb={1}>
+            <Grid size={8} display="flex" columnGap={5} alignItems="center">
+              <Box>
+                <Avatar 
+                  sx={{ width: 100, height: 100 }}
+                  src={
+                    typeof formik.values.profilePicture === "string"
+                      ? `${baseURL}/${formik.values.profilePicture}`
+                      : URL.createObjectURL(formik.values.profilePicture)
+                  }
+                />
+              </Box>
+              <Box display="flex" flexDirection="column" rowGap={2}>
+                <Button
+                  component="label"
+                  variant="contained"
+                  tabIndex={-1}
+                  startIcon={<CloudUploadIcon />}
+                >
+                  Upload Photo
+                  <VisuallyHiddenInput
+                    type="file"
+                    name="profilePicture"
+                    onChange={(e) => formik.setFieldValue("profilePicture", e.target.files[0])}
+                  />
+                </Button>
+                <Button
+                  component="label"
+                  variant="outlined"
+                  tabIndex={-1}
+                  onClick={() => formik.setFieldValue("profilePicture", "")}
+                  startIcon={<DeleteOutlineIcon />}
+                >
+                  Remove Photo
+                </Button>
+              </Box>
+            </Grid>
           </Grid>
           <Grid
             container
@@ -331,9 +393,7 @@ const UserProfile = () => {
                 <Box display="flex" justifyContent="center" marginTop="30px">
                   <Button
                     variant="outlined"
-                    onClick={() =>
-                      navigate("/add-address/1")
-                    }
+                    onClick={() => navigate("/add-address/1")}
                   >
                     Add Home Adresss
                   </Button>
@@ -409,8 +469,8 @@ const UserProfile = () => {
             display={showAddress === "Other" ? "flex" : "none"}
           >
             {showAddress === "Other" &&
-              otherAddresses &&
-              Object.keys(otherAddresses).length > 0 ?
+            otherAddresses &&
+            Object.keys(otherAddresses).length > 0 ? (
               otherAddresses.map((address) => (
                 <Box key={address._id}>
                   <Box display="flex" alignItems="center" columnGap={1}>
@@ -455,14 +515,17 @@ const UserProfile = () => {
                     </Box>
                   </Box>
                 </Box>
-              )):(<Box display="flex" justifyContent="center" marginTop="30px">
+              ))
+            ) : (
+              <Box display="flex" justifyContent="center" marginTop="30px">
                 <Button
                   variant="outlined"
                   onClick={() => navigate("/add-address/3")}
                 >
                   Add Other Adresss
                 </Button>
-              </Box>)}
+              </Box>
+            )}
             <Dialog
               open={deleteId}
               onClose={() => setDeleteId(null)}

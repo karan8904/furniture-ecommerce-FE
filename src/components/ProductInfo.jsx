@@ -33,14 +33,16 @@ import {
 } from "../slices/wishlistSlice";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import ShareLink from "./ShareLink";
 
-const ProductInfo = ({ product }) => {
+const ProductInfo = ({ product, reviews }) => {
   const [qty, setQty] = useState(1);
   const [pvImages, setPvImages] = useState([]);
   const [mainImage, setMainImage] = useState("");
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState("");
   const [finalPrice, setFinalPrice] = useState("");
+  const [avgRatingScore, setAvgRatingScore] = useState(0)
   const [openDialog, setOpenDialog] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -50,6 +52,12 @@ const ProductInfo = ({ product }) => {
   const user = useSelector((state) => state.user.getCurrentUser.user);
   const wishlistProducts = useSelector(
     (state) => state.wishlist.getFromWishlist.products
+  );
+  const addWishlistLoadingIDs = useSelector(
+    (state) => state.wishlist.addToWishlist.loadingIDs
+  );
+  const removeWishlistLoadingIDs = useSelector(
+    (state) => state.wishlist.removeFromWishlist.loadingIDs
   );
 
   useEffect(() => {
@@ -62,8 +70,11 @@ const ProductInfo = ({ product }) => {
       product?.discount_percent > 0
         ? calculateDiscountPrice(product.price, product.discount_percent)
         : product.price;
+    let totalRatingScore = 0
+    reviews?.map((r) => totalRatingScore += r.ratingScore)
+    setAvgRatingScore(totalRatingScore/reviews?.length)
     setFinalPrice(price);
-  }, [product]);
+  }, [product, reviews]);
 
   const numberFieldStyling = {
     "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button": {
@@ -162,7 +173,6 @@ const ProductInfo = ({ product }) => {
   const handleOnAddWishlist = async (id) => {
     try {
       await dispatch(addToWishlist(id)).unwrap();
-      dispatch(showSnackbar({ message: "Product added to wishlist." }));
     } catch (error) {
       dispatch(showSnackbar({ severity: "error", message: error }));
     }
@@ -171,7 +181,6 @@ const ProductInfo = ({ product }) => {
   const handleRemoveFromWishlist = async (id) => {
     try {
       await dispatch(removeFromWishlist(id)).unwrap();
-      dispatch(showSnackbar({ message: "Product removed from wishlist." }));
     } catch (error) {
       dispatch(showSnackbar({ severity: "error", message: error }));
     }
@@ -235,7 +244,7 @@ const ProductInfo = ({ product }) => {
           </Box>
         </Grid>
 
-        <Grid size={{ sm: 12, md: 6 }} padding="0 20px" display="flex">
+        <Grid size={{ sm: 12, md: 6 }} padding="0 20px">
           <Box marginTop="15px">
             <form onSubmit={formik.handleSubmit}>
               <Box display="flex" gap={3}>
@@ -282,17 +291,16 @@ const ProductInfo = ({ product }) => {
                 width={{ xs: "220px", sm: "230px", md: "250px" }}
               >
                 <Rating
-                  name="simple-uncontrolled"
-                  onChange={(event, newValue) => {
-                    console.log(newValue);
-                  }}
-                  defaultValue={4}
+                  name="finalRating"
                   size="small"
+                  value={avgRatingScore}
+                  precision={0.5}
+                  readOnly
                 />
                 <Box borderRight="2px solid #9F9F9F" />
 
                 <Typography fontSize="13px" color="secondary">
-                  5 Customer Reviews
+                  {reviews?.length} Customer Reviews
                 </Typography>
               </Box>
               <Box
@@ -342,7 +350,7 @@ const ProductInfo = ({ product }) => {
                           color: color,
                           fontSize: "40px",
                           outline:
-                            selectedColor === color ? "1px solid" : "none",
+                          selectedColor === color ? "1px solid" : "none",
                           borderRadius: "50%",
                         }}
                       />
@@ -402,17 +410,28 @@ const ProductInfo = ({ product }) => {
                 )}
                 {wishlistProducts.find((p) => p._id === product._id) ? (
                   <IconButton
+                    loading={removeWishlistLoadingIDs.includes(product._id)}
                     onClick={() => handleRemoveFromWishlist(product._id)}
                   >
-                    <FavoriteIcon fontSize="large" sx={{ fill: "red" }} />
+                    {!removeWishlistLoadingIDs.includes(product._id) && (
+                      <FavoriteIcon fontSize="large" sx={{ fill: "red" }} />
+                    )}
                   </IconButton>
                 ) : (
-                  <IconButton onClick={() => handleOnAddWishlist(product._id)}>
-                    <FavoriteBorderIcon fontSize="large" />
+                  <IconButton
+                    loading={addWishlistLoadingIDs.includes(product._id)}
+                    onClick={() => handleOnAddWishlist(product._id)}
+                  >
+                    {!addWishlistLoadingIDs.includes(product._id) && (
+                      <FavoriteBorderIcon fontSize="large" />
+                    )}
                   </IconButton>
                 )}
               </Box>
             </form>
+          </Box>
+          <Box mt={3}>
+            <ShareLink id={product._id} ></ShareLink>
           </Box>
         </Grid>
       </Grid>

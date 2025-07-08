@@ -3,7 +3,7 @@ import axios from "../api/axios";
 
 const initialState = { 
     addToWishlist: {
-        loading: false,
+        loadingIDs: [],
         error: null
     },
     getFromWishlist: {
@@ -12,7 +12,7 @@ const initialState = {
         error: null
     },
     removeFromWishlist: {
-        loading: false,
+        loadingIDs: [],
         error: null
     }
 }
@@ -64,16 +64,16 @@ const wishlistSlice = createSlice({
         builder
 
         //ADD TO WISHLIST
-        .addCase(addToWishlist.pending, (state) => {
-            state.addToWishlist.loading = true
+        .addCase(addToWishlist.pending, (state, action) => {
+            state.addToWishlist.loadingIDs.push(action.meta.arg)
         })
         .addCase(addToWishlist.fulfilled, (state, action) => {
-            state.addToWishlist.loading = false
             state.getFromWishlist.products.push(action.payload.product)
+            state.addToWishlist.loadingIDs = state.addToWishlist.loadingIDs.filter((i) => i !== action.payload.product._id)
         })
         .addCase(addToWishlist.rejected, (state, action) => {
-            state.addToWishlist.loading = false
             state.addToWishlist.error = action.payload
+            state.addToWishlist.loadingIDs = state.addToWishlist.loadingIDs.filter((i) => i !== action.payload.product._id)
         })
 
         //GET FROM WISHLIST
@@ -90,16 +90,16 @@ const wishlistSlice = createSlice({
         })
 
         //REMOVE FROM WISHLIST
-        .addCase(removeFromWishlist.pending, (state) => {
-            state.removeFromWishlist.loading = true
+        .addCase(removeFromWishlist.pending, (state, action) => {
+            state.removeFromWishlist.loadingIDs.push(action.meta.arg)
         })
         .addCase(removeFromWishlist.fulfilled, (state, action) => {
             state.getFromWishlist.products = state.getFromWishlist.products.filter((p) => p._id !== action.payload.id)
-            state.removeFromWishlist.loading = false
+            state.removeFromWishlist.loadingIDs = state.removeFromWishlist.loadingIDs.filter((i) => i !== action.payload.id)
         })
         .addCase(removeFromWishlist.rejected, (state, action) => {
             state.removeFromWishlist.loading = false
-            state.removeFromWishlist.error = action.payload
+            state.removeFromWishlist.loadingIDs = state.removeFromWishlist.loadingIDs.filter((i) => i !== action.meta.arg)
         })
     }
 })

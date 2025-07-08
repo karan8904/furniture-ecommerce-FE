@@ -115,7 +115,11 @@ export const editUser = createAsyncThunk(
   "users/editUser",
   async (data, thunkApi) => {
     try {
-      const response = await axios.put("/users/editUser", data);
+      const response = await axios.put("/users/editUser", data, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
       return response.data;
     } catch (error) {
       const message = error.response.data.message;
@@ -284,7 +288,7 @@ export const userSlice = createSlice({
       })
       .addCase(editUser.fulfilled, (state, action) => {
         state.editUser.loading = false;
-        state.getCurrentUser.user = action.payload.user;
+        state.getCurrentUser.user = action.payload;
       })
       .addCase(editUser.rejected, (state) => {
         state.editUser.loading = false;
