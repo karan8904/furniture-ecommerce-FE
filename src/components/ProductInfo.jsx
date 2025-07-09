@@ -33,6 +33,7 @@ import {
 } from "../slices/wishlistSlice";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import ShareIcon from '@mui/icons-material/Share';
 import ShareLink from "./ShareLink";
 
 const ProductInfo = ({ product, reviews }) => {
@@ -45,6 +46,7 @@ const ProductInfo = ({ product, reviews }) => {
   const [avgRatingScore, setAvgRatingScore] = useState(0)
   const [openDialog, setOpenDialog] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [openShareDialog, setOpenShareDialog] = useState(false)
 
   const baseURL = import.meta.env.VITE_BASEURL;
   const navigate = useNavigate();
@@ -427,12 +429,13 @@ const ProductInfo = ({ product, reviews }) => {
                     )}
                   </IconButton>
                 )}
+                <IconButton onClick={() => setOpenShareDialog(true)}>
+                  <ShareIcon fontSize="large" />
+                </IconButton>
               </Box>
             </form>
           </Box>
-          <Box mt={3}>
-            <ShareLink id={product._id} ></ShareLink>
-          </Box>
+          
         </Grid>
       </Grid>
       <Dialog
@@ -548,6 +551,26 @@ const ProductInfo = ({ product, reviews }) => {
             </Button>
           </DialogActions>
         </form>
+      </Dialog>
+      <Dialog
+        open={openShareDialog}
+        onClose={() => setOpenShareDialog(false)}
+        aria-labelledby="share-dialog-title"
+        aria-describedby="share-dialog-description"
+      >
+          <DialogTitle id="share-dialog-title" align="center">
+            Share this product
+          </DialogTitle>
+          <DialogContent>
+            <Box display="flex" justifyContent="center">
+              <ShareLink />
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button variant="contained" onClick={() => setOpenShareDialog(false)}>
+              Cancel
+            </Button>
+          </DialogActions>
       </Dialog>
     </Box>
   );

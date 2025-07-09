@@ -223,7 +223,9 @@ export const userSlice = createSlice({
       })
       .addCase(createUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.users.push(action.payload);
+        const data = action.payload;
+        localStorage.setItem("token", data.token);
+        state.getCurrentUser.user = data.user;
       })
       .addCase(createUser.rejected, (state, action) => {
         state.loading = false;

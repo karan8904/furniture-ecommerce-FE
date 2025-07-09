@@ -1,8 +1,10 @@
 import React from "react";
 import { Box, Card, CardContent, Typography, CardActions, Button } from "@mui/material";
 import homeBg from "../assets/home-bg.jpg";
+import { useNavigate } from "react-router";
 
 const NewArrivalBanner = () => {
+  const navigate = useNavigate()
   return (
       <Box
         sx={{
@@ -73,6 +75,10 @@ const NewArrivalBanner = () => {
               sx={{
                 width: { md: "222px", sm: "180px", xs: "110px" },
                 height: { md: "70px", sm: "40px", xs: "25px" },
+              }}
+              onClick={() => {
+                navigate("/shop")
+                window.scrollTo(0,0)
               }}
             >
               Buy Now

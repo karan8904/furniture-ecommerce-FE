@@ -106,7 +106,9 @@ const SingleProduct = () => {
       </Box>
 
       {productLoading ? (
-        <></>
+        <Box display="flex" justifyContent="center" alignItems="center" mt={3}>
+          <CircularProgress />
+        </Box>
       ) : (
         <ProductInfo product={product} reviews={reviews} />
       )}
@@ -282,7 +284,10 @@ const SingleProduct = () => {
           <Button
             variant="outlined"
             size="large"
-            onClick={() => navigate("/shop")}
+            onClick={() => {
+              navigate("/shop")
+              window.scrollTo(0,0)
+            }}
           >
             Show More
           </Button>

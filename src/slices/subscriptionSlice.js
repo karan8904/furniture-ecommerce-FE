@@ -6,12 +6,16 @@ const initialState = {
         error: null,
         loading: false
     },
-    confirmSubscrption: {
+    confirmSubscription: {
         error: null,
         loading: false
     },
     getSubscriptionDetails: {
         details: {},
+        error: null,
+        loading: false
+    },
+    cancelSubscription: {
         error: null,
         loading: false
     }
@@ -47,8 +51,21 @@ export const getSubscriptionDetails = createAsyncThunk(
     "subscription/getSubscriptionDetails",
     async(priceId, thunkApi) => {
         try {
-        //    const response = await axios.get(`/subscription/getDetails/${priceId}`)
+           const response = await axios.get(`/subscription/getDetails/${priceId}`)
            return response.data 
+        } catch (error) {
+            const message = error.response.data.message
+            return thunkApi.rejectWithValue(message)
+        }
+    }
+)
+
+export const cancelSubscription = createAsyncThunk(
+    "subscription/cancelSubcription",
+    async(priceID, thunkApi) => {
+        try {
+            const response = await axios.put(`/subscription/cancelSubscription/${priceID}`)
+            return response.data
         } catch (error) {
             const message = error.response.data.message
             return thunkApi.rejectWithValue(message)
@@ -77,14 +94,14 @@ export const subscriptionSlice = createSlice({
 
         //CONFIRM SUBSCRIPTION
         .addCase(confirmSubscription.pending, (state) => {
-            state.confirmSubscrption.loading = true
+            state.confirmSubscription.loading = true
         })
         .addCase(confirmSubscription.fulfilled, (state) => {
-            state.confirmSubscrption.loading = false
+            state.confirmSubscription.loading = false
         })
         .addCase(confirmSubscription.rejected, (state, action) => {
-            state.confirmSubscrption.loading = false
-            state.confirmSubscrption.error = action.payload
+            state.confirmSubscription.loading = false
+            state.confirmSubscription.error = action.payload
         })
 
         //GET SUBSCRIPTION DETAILS
@@ -100,5 +117,20 @@ export const subscriptionSlice = createSlice({
             state.getSubscriptionDetails.loading = false
             state.getSubscriptionDetails.error = action.payload
         })
+
+        //CANCEL SUBSCRIPTION
+        .addCase(cancelSubscription.pending, (state) => {
+            state.cancelSubscription.loading = true
+        }) 
+        .addCase(cancelSubscription.fulfilled, (state, action) => {
+            state.getSubscriptionDetails = action.payload.subscription
+            state.cancelSubscription.loading = false
+        }) 
+        .addCase(cancelSubscription.rejected, (state, action) => {
+            state.cancelSubscription.loading = false
+            state.cancelSubscription.error = action.payload
+        }) 
     }
 })
+
+export default subscriptionSlice.reducer

@@ -51,15 +51,7 @@ const UserProfile = () => {
   );
   const user = useSelector((state) => state.user.getCurrentUser.user);
 
-  const homeAddress = useSelector(
-    (state) => state.address.getAddresses.addresses.homeAddress
-  );
-  const officeAddress = useSelector(
-    (state) => state.address.getAddresses.addresses.officeAddress
-  );
-  const otherAddresses = useSelector(
-    (state) => state.address.getAddresses.addresses.otherAddresses
-  );
+  const { homeAddress, officeAddress, otherAddresses } = useSelector((state) => state.address.getAddresses.addresses)
 
   useEffect(() => {
     const get = async () => {
@@ -557,22 +549,6 @@ const UserProfile = () => {
             </Dialog>
           </Grid>
         </Grid>
-      </Grid>
-      <Grid container margin="60px 30px" columnSpacing={5} rowSpacing={3}>
-        <Grid size={12}>
-          <Typography variant="h5" fontWeight="550" textAlign="center">
-            Subscriptions
-          </Typography>
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }} display="flex" justifyContent="center">
-          <SubscriptionCards />
-        </Grid>
-        {/* <Grid size={{ xs: 12, sm: 6, md: 4 }} display="flex" justifyContent="center">
-          <SubscriptionCards />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }} display="flex" justifyContent="center" >
-          <SubscriptionCards />
-        </Grid> */}
       </Grid>
       <Footer />
     </>

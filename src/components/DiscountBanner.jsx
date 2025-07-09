@@ -2,10 +2,11 @@ import React from "react";
 import { Box, Grid, Stack, Typography, Button, ImageList, ImageListItem } from "@mui/material";
 import listImg1 from "../assets/listImg1.png";
 import listImg2 from "../assets/listImg2.png";
+import { useNavigate } from "react-router";
 
 const DiscountBanner = () => {
+  const navigate = useNavigate()
   return (
-
       <Box
         sx={{
           margin: "60px 0",
@@ -50,6 +51,7 @@ const DiscountBanner = () => {
                     fontWeight: 500,
                     size: "15px",
                   }}
+                  onClick={() => navigate("/shop") }
                 >
                   Explore More
                 </Button>

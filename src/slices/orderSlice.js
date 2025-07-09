@@ -41,6 +41,10 @@ const initialState = {
         error: null,
         loading: false
     },
+    confirmPayment: {
+        error: null,
+        loading: false
+    },
     mailInvoice: {
         loadingIDs: [],
         error: null,
@@ -346,6 +350,18 @@ export const orderSlice = createSlice({
         .addCase(makePayment.rejected, (state, action) => {
             state.placeOrder.loading = false
             state.placeOrder.error = action.payload
+        })
+
+        //CONFIRM PAYMENT
+        .addCase(confirmPayment.pending, (state) => {
+            state.confirmPayment.loading = true
+        })
+        .addCase(confirmPayment.fulfilled, (state) => {
+            state.confirmPayment.loading = false
+        })
+        .addCase(confirmPayment.rejected, (state, action) => {
+            state.confirmPayment.loading = false
+            state.confirmPayment.error = action.payload
         })
 
         //MAIL INVOICE

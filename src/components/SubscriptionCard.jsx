@@ -1,20 +1,15 @@
 import React, { useEffect } from "react";
 import { Box, Button, Chip, Typography } from "@mui/material";
 import DoneIcon from "@mui/icons-material/Done";
-import { useDispatch } from "react-redux";
-import { getSubscription } from "../slices/subscriptionSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { getSubscription, getSubscriptionDetails } from "../slices/subscriptionSlice";
 import { showSnackbar } from "../slices/snackbarSlice";
 import { useNavigate } from "react-router";
 
-const SubscriptionCards = () => {
+const SubscriptionCards = ({ subscriptionDetails, id }) => {
   const dispatch = useDispatch()
-  const navigate = useNavigate()
-  // useEffect(() => {
-
-  // }, [])
   const handleOnGetPlan = async() => {
     try {
-        const id = "price_1RiYwyQRKo1um7bTHcTvfFND"
         localStorage.setItem("type", "subscription")
         const response = await dispatch(getSubscription(id)).unwrap()
         window.location.href = response.url
@@ -78,11 +73,12 @@ const SubscriptionCards = () => {
           <Button
             color="primary"
             variant="contained"
+            disabled={subscriptionDetails?.status === "active"}
             onClick={handleOnGetPlan}
             sx={{ borderRadius: "20px" }}
             fullWidth
           >
-            Upgrade Plan
+            {subscriptionDetails?._id ? "Current Plan" : "Upgrade Plan"}
           </Button>
         </Box>
       </Box>

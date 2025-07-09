@@ -27,8 +27,9 @@ const ProductsFromCategory = () => {
   );
 
   useEffect(() => {
+    window.scrollTo(0,0)
     dispatch(getFromCategory(id));
-  }, [id]);
+  }, [params]);
 
   useEffect(() => {
     if (products && products.length > 0) {
@@ -46,9 +47,6 @@ const ProductsFromCategory = () => {
             <ProductGrid products={products} productsLoading={productsLoading} />
           </Container>
         </Container>
-        <Box margin="70px auto" display="flex" justifyContent="center">
-          <Pagination count={3} shape="rounded" color="primary" size="large" />
-        </Box>
       </Box>
 
       <InfoComponent />

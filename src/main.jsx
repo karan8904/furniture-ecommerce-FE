@@ -47,6 +47,22 @@ const theme = createTheme({
       dropDownBg: "#fff"
     }
   },
+  components: {
+    MuiTableHead: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "#F9F1E7"
+        }
+      }
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        head: {
+          fontSize: "15px"
+        }
+      }
+    }
+  }
 });
 
 const router = createBrowserRouter([

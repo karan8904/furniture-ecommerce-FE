@@ -7,7 +7,6 @@ import CategoryComponent from "../components/Categories";
 import DiscountBanner from "../components/DiscountBanner";
 import NewArrivalBanner from "../components/NewArrivalBanner";
 import { Box, Typography, Stack, Divider, Button } from "@mui/material";
-import "@fontsource/poppins";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { getProducts } from "../slices/productSlice";

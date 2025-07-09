@@ -74,11 +74,11 @@ const Register = () => {
       ).unwrap();
       dispatch(
         showSnackbar({
-          message: "Registration Successful...Please Login...",
+          message: "Registration Successful...",
         })
       );
       formik.resetForm();
-      navigate("/login");
+      navigate("/");
     }catch (error) {
       dispatch(showSnackbar({ severity: "error", message: error }));
     }
