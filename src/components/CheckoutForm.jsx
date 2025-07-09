@@ -65,6 +65,7 @@ const CheckoutForm = () => {
   const initiatePayment = async ({ orderID, products, platformCharges, totalAmount }) => {
     try {
       const stripe = await stripeLoading;
+      localStorage.setItem("type", "order")
       const result = await dispatch(makePayment({ orderID, platformCharges, products, totalAmount })).unwrap();
       await stripe.redirectToCheckout({
         sessionId: result.id,

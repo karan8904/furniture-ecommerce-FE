@@ -38,6 +38,7 @@ import BusinessIcon from "@mui/icons-material/Business";
 import OtherHousesIcon from "@mui/icons-material/OtherHouses";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import SubscriptionCards from "../components/SubscriptionCard";
 
 const UserProfile = () => {
   const [showAddress, setShowAddress] = useState("Home");
@@ -556,6 +557,22 @@ const UserProfile = () => {
             </Dialog>
           </Grid>
         </Grid>
+      </Grid>
+      <Grid container margin="60px 30px" columnSpacing={5} rowSpacing={3}>
+        <Grid size={12}>
+          <Typography variant="h5" fontWeight="550" textAlign="center">
+            Subscriptions
+          </Typography>
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }} display="flex" justifyContent="center">
+          <SubscriptionCards />
+        </Grid>
+        {/* <Grid size={{ xs: 12, sm: 6, md: 4 }} display="flex" justifyContent="center">
+          <SubscriptionCards />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }} display="flex" justifyContent="center" >
+          <SubscriptionCards />
+        </Grid> */}
       </Grid>
       <Footer />
     </>
