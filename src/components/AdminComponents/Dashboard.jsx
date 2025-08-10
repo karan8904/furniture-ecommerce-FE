@@ -12,7 +12,7 @@ import {
   getOrders,
   orderStatusCount,
 } from "../../slices/orderSlice";
-import OrdersLineChart from "./ordersLineChart";
+import OrdersLineChart from "./OrdersLineChart";
 import OrdersBarChart from "./OrdersBarChart";
 
 const Dashboard = () => {
