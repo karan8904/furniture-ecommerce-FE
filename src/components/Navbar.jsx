@@ -44,7 +44,9 @@ const Navbar = () => {
   const products = useSelector((state) => state.cart.getCartProducts.products);
 
   useEffect(() => {
-    if (user?._id) dispatch(getCartProducts(user._id));
+    if (user?._id){
+      dispatch(getCartProducts(user._id));
+    }
   }, [user]);
 
   const openUserMenu = Boolean(userMenu);

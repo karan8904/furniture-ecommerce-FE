@@ -34,10 +34,13 @@ const ProductGrid = ({ products, productsLoading }) => {
   const removeWishlistLoadingIDs = useSelector(
     (state) => state.wishlist.removeFromWishlist.loadingIDs
   );
+  const user = useSelector((state) => state.user.getCurrentUser.user);
 
   useEffect(() => {
-    dispatch(getFromWishlist());
-  }, []);
+    if(user?._id){
+      dispatch(getFromWishlist());
+    }
+  }, [user]);
 
   const productStyling = {
     maxWidth: { xs: 340, sm: 270, md: 240 },
@@ -52,18 +55,25 @@ const ProductGrid = ({ products, productsLoading }) => {
   const handleOnAddWishlist = async (e, id) => {
     e.stopPropagation();
     try {
+      if(!user?._id){
+        throw new Error("Login to use this feature.");
+      }
       await dispatch(addToWishlist(id)).unwrap();
     } catch (error) {
-      dispatch(showSnackbar({ severity: "error", message: error }));
+      dispatch(showSnackbar({ severity: "error", message: error?.message || error }));
     }
   };
 
   const handleRemoveFromWishlist = async (e, id) => {
     e.stopPropagation();
     try {
+      if(!user?._id){
+        console.log("here inside if")
+        throw new Error("Login to use this feature.");
+      }
       await dispatch(removeFromWishlist(id)).unwrap();
     } catch (error) {
-      dispatch(showSnackbar({ severity: "error", message: error }));
+      dispatch(showSnackbar({ severity: "error", message: error?.message || error }));
     }
   };
 

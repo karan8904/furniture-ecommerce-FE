@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Navigate, useNavigate } from 'react-router'
 
+const authRoutes = ["login", "resgister", "forgot-password", "passsword-reset"];
+
 export const ProtectedRoutes = ({children}) => {
     const token = localStorage.getItem("token")
 
@@ -27,4 +29,10 @@ export const AdminRoutes = ({children}) => {
     }, [user])
 
     if(isAdmin) return children
-}   
+}
+
+export const IfAlreadyLoggedIn = ({children}) => {
+    const token = localStorage.getItem("token");
+    if(token) return <Navigate to="/" replace />;
+    return children
+}

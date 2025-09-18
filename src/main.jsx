@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import App from './App.jsx' 
 import { store } from './app/store.js'
 import { Provider } from 'react-redux'
-import { createBrowserRouter, RouterProvider, useLocation } from 'react-router'
+import { createBrowserRouter, RouterProvider } from 'react-router'
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Home from "./pages/Home.jsx";
 import Categories from "./pages/Categories.jsx";
@@ -24,7 +24,7 @@ import AddProduct from './pages/AdminPages/AddProduct.jsx'
 import EditCatgory from './pages/AdminPages/EditCatgory.jsx'
 import EditProduct from './pages/AdminPages/EditProduct.jsx'
 import ProductsFromCategory from './pages/ProductsFromCategory.jsx'
-import { AdminRoutes, ProtectedRoutes } from '../utils/RoutesAuth.jsx'
+import { AdminRoutes, IfAlreadyLoggedIn, ProtectedRoutes } from '../utils/RoutesAuth.jsx'
 import UserProfile from './pages/UserProfile.jsx'
 import Orders from './pages/Orders.jsx'
 import Settings from './pages/Settings.jsx'
@@ -70,31 +70,40 @@ const router = createBrowserRouter([
     path: "/",
     Component: App,
     children: [
+      
+      // PUBLIC ROUTES
       { index: true, Component: Home },
       { path: "/categories", Component: Categories },
       { path: "/contact", Component: Contact },
       { path: "/shop", Component: Shop },
       { path: "/category/:id", Component: ProductsFromCategory},
-      { path: "/register", Component: Register },
-      { path: "/login", Component: Login },
-      { path: "/forgot-password", Component: ForgotPassword },
       { path: "/single-product/:id", Component: SingleProduct},
-      { path: "/wishlist", element: <ProtectedRoutes><Wishlist /></ProtectedRoutes>},
-      { path: "edit-address/:id", element: <ProtectedRoutes><EditAddress></EditAddress></ProtectedRoutes>},
-      { path: "add-address/:addressType", element: <ProtectedRoutes><AddAddress /></ProtectedRoutes>},
+
+      // AUTH ROUTES
+      { path: "/register", element: <IfAlreadyLoggedIn><Register /></IfAlreadyLoggedIn> },
+      { path: "/login", element: <IfAlreadyLoggedIn><Login /></IfAlreadyLoggedIn> },
+      { path: "/forgot-password", element: <IfAlreadyLoggedIn><ForgotPassword /></IfAlreadyLoggedIn> },
+      { path: "/password-reset/:userId/:token", element: <IfAlreadyLoggedIn><ResetPassword /></IfAlreadyLoggedIn> },
+      
+      // PROTECTED ROUTES
       { path: "/profile", element: <ProtectedRoutes><UserProfile /></ProtectedRoutes> },
       { path: "/orders", element: <ProtectedRoutes><Orders /></ProtectedRoutes>},
+      { path: "/wishlist", element: <ProtectedRoutes><Wishlist /></ProtectedRoutes>},
       { path: "/subscriptions", element: <ProtectedRoutes><Subscriptions /></ProtectedRoutes>},
-      { path: "/payment/success", element: <ProtectedRoutes><PaymentSuccess /></ProtectedRoutes>},
-      { path: "/settings", element: <ProtectedRoutes><Settings /></ProtectedRoutes>},
       { path: "/cart", element: <ProtectedRoutes><Cart /></ProtectedRoutes>},
+      { path: "/settings", element: <ProtectedRoutes><Settings /></ProtectedRoutes>},
       { path: "/checkout",element: <ProtectedRoutes><Checkout /></ProtectedRoutes>},
-      { path: "/password-reset/:userId/:token", Component: ResetPassword },
+      { path: "/payment/success", element: <ProtectedRoutes><PaymentSuccess /></ProtectedRoutes>},
+      { path: "edit-address/:id", element: <ProtectedRoutes><EditAddress></EditAddress></ProtectedRoutes>},
+      { path: "add-address/:addressType", element: <ProtectedRoutes><AddAddress /></ProtectedRoutes>},
+      
+      // ADMIN ROUTES 
       { path: "/admin", element: <AdminRoutes><Admin /></AdminRoutes>},
       { path: "/admin/add-category", element: <AdminRoutes><AddCategory /></AdminRoutes>},
       { path: "/admin/add-product", element: <AdminRoutes><AddProduct /></AdminRoutes>},
       { path: "/admin/edit-category/:id", element: <AdminRoutes><EditCatgory /></AdminRoutes> },
       { path: "/admin/edit-product/:id", element: <AdminRoutes><EditProduct /></AdminRoutes> },
+    
     ],
   },
 ]);

@@ -1,10 +1,8 @@
-import React, { useEffect } from "react";
-import { Box, CircularProgress, Container, Typography } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
-import { getProducts } from "../slices/productSlice.js";
+import { Container } from "@mui/material";
+import { useSelector } from "react-redux";
 import ProductGrid from "./ProductGrid.jsx";
 
-const Products = ({ num, products }) => {
+const Products = ({ _, products }) => {
   const productsLoading = useSelector(
     (state) => state.product.getProducts.loading
   );

@@ -9,12 +9,16 @@ import { Container } from "@mui/material";
 import ProductGrid from "../components/ProductGrid";
 
 const Wishlist = () => {
-  const {products, loading} = useSelector((state) => state.wishlist.getFromWishlist);
   const dispatch = useDispatch();
 
+  const {products, loading} = useSelector((state) => state.wishlist.getFromWishlist);
+  const user = useSelector((state) => state.user.getCurrentUser.user);
+
   useEffect(() => {
-    dispatch(getFromWishlist());
-  }, []);
+    if(user?._id){
+      dispatch(getFromWishlist());
+    }
+  }, [user]);
 
   return (
     <>
