@@ -51,7 +51,7 @@ const CartTable = () => {
   const baseURL = import.meta.env.VITE_BASEURL;
 
   useEffect(() => {
-    if (user._id) dispatch(getCartProducts(user._id));
+    if (user._id) dispatch(getCartProducts());
   }, [user]);
 
   useEffect(() => {

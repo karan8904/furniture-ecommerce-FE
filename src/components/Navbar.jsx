@@ -32,6 +32,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { showSnackbar } from "../slices/snackbarSlice";
 import { logoutUser } from "../slices/userSlice";
 import { getCartProducts, resetCart } from "../slices/cartSlice";
+import LogoutIcon from '@mui/icons-material/Logout';
 
 const Navbar = () => {
   const [state, setState] = useState({ right: false });
@@ -305,7 +306,7 @@ const Navbar = () => {
                   <ListItemIcon>
                     <InfoIcon />
                   </ListItemIcon>
-                  <ListItemText primary="About" />
+                  <ListItemText primary="Categories" />
                 </ListItemButton>
               </ListItem>
               <Divider />
@@ -326,6 +327,44 @@ const Navbar = () => {
                   <ListItemText primary="Cart" />
                 </ListItemButton>
               </ListItem>
+              <Divider />
+            </List>
+            <List sx={{ mt: "auto" }}>
+            {!userLoading && (!user || Object.keys(user).length === 0) ? (
+              <ListItem>
+                <Divider />
+                <ListItemButton onClick={() => navigate("/register")}>
+                  <ListItemText primary="Register" />
+                </ListItemButton>
+                <Divider />
+                <ListItemButton onClick={() => navigate("/login")}>
+                  <ListItemText primary="Login" />
+                </ListItemButton>
+              </ListItem>
+            ) : (
+              user?.firstName && 
+              (<ListItem>
+                <Divider />
+                <ListItemIcon>
+                  <Avatar
+                    src={user?.profilePicture && `${baseURL}/${user.profilePicture}`}
+                    sx={{
+                      bgcolor: (theme) => theme.palette.primary.main,
+                      height: "30px",
+                      width: "30px",
+                    }}
+                  >
+                    {user?.firstName[0].toUpperCase()}
+                  </Avatar>
+                </ListItemIcon>
+                <ListItemText primary={user?.firstName} />
+                <ListItemIcon>
+                  <ListItemButton onClick={handleLogout}>
+                    <LogoutIcon />
+                  </ListItemButton>
+                </ListItemIcon>
+              </ListItem>)
+            )}
               <Divider />
             </List>
           </SwipeableDrawer>
