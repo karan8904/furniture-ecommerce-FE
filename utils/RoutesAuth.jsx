@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Navigate, useNavigate } from 'react-router'
+import Cookies from 'js-cookie';
 
 const authRoutes = ["login", "resgister", "forgot-password", "passsword-reset"];
 
 export const ProtectedRoutes = ({children}) => {
-    const token = localStorage.getItem("token")
+    const token = Cookies.get("token")
 
     if (!token) return <Navigate to="/login" replace />;
     return children
@@ -16,7 +17,7 @@ export const AdminRoutes = ({children}) => {
     const user = useSelector((state) => state.user.getCurrentUser.user)
     const navigate = useNavigate()
 
-    const token = localStorage.getItem("token")
+    const token = Cookies.get("token")
     if(!token) return <Navigate to="/login" replace />;
 
     useEffect(() => {
@@ -32,7 +33,7 @@ export const AdminRoutes = ({children}) => {
 }
 
 export const IfAlreadyLoggedIn = ({children}) => {
-    const token = localStorage.getItem("token");
+    const token = Cookies.get("token");
     if(token) return <Navigate to="/" replace />;
     return children
 }

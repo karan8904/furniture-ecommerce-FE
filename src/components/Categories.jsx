@@ -3,12 +3,12 @@ import { Container, Box, Typography, Grid, Stack } from "@mui/material";
 import { getCategories } from "../slices/categorySlice";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router";
+import { CategorySkeleton } from "./SkeletonLoading/OtherSkeletons";
 
-const CategoryComponent = ({limit}) => {
+const CategoryComponent = ({limit, isCategoryPage}) => {
   const dispatch = useDispatch()
   const baseURL = import.meta.env.VITE_BASEURL
-  const categories = useSelector((state) => state.category.getCategories.categories)
-
+  const { categories, loading } = useSelector((state) => state.category.getCategories)
   useEffect(() => {
     dispatch(getCategories())
   }, [])
@@ -39,6 +39,9 @@ const CategoryComponent = ({limit}) => {
             columnSpacing={{ xs: 1, sm: 1, md: 3 }}
             wrap="wrap"
           >
+            {categories && loading && (
+              <CategorySkeleton count={isCategoryPage ? 6 : 3} />
+            )}
             {categories && categories.slice(0, limit || categories.length).map((category) => (
               <Grid size={{ md: 4, sm: 6, xs: 12 }} key={category._id}>
                 <Link style={{ textDecoration: "none"}} to={`/category/${category._id}`}>

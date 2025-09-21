@@ -1,16 +1,15 @@
-import React, { useEffect } from "react";
 import { Box, Button, Chip, Typography } from "@mui/material";
 import DoneIcon from "@mui/icons-material/Done";
-import { useDispatch, useSelector } from "react-redux";
-import { getSubscription, getSubscriptionDetails } from "../slices/subscriptionSlice";
+import { useDispatch } from "react-redux";
+import { getSubscription } from "../slices/subscriptionSlice";
 import { showSnackbar } from "../slices/snackbarSlice";
-import { useNavigate } from "react-router";
+import Cookies from 'js-cookie';
 
 const SubscriptionCards = ({ subscriptionDetails, id }) => {
   const dispatch = useDispatch()
   const handleOnGetPlan = async() => {
     try {
-        localStorage.setItem("type", "subscription")
+        Cookies.set("type", "subscription")
         const response = await dispatch(getSubscription(id)).unwrap()
         window.location.href = response.url
     } catch (error) {

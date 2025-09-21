@@ -14,7 +14,7 @@ const Categories = () => {
       <Navbar />
       <PageTitleComponent pageTitle="Categories" />
 
-      <CategoryComponent />
+      <CategoryComponent isCategoryPage={true} />
 
       <InfoComponent />
 

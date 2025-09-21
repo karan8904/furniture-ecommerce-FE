@@ -23,6 +23,7 @@ import { showSnackbar } from "../slices/snackbarSlice";
 import { resetCart } from "../slices/cartSlice";
 import { loadStripe } from "@stripe/stripe-js";
 import { getCharges } from "../slices/chargesSlice";
+import Cookies from 'js-cookie';
 
 const CheckoutForm = () => {
   const [addressType, setAddressType] = useState("Home");
@@ -65,7 +66,7 @@ const CheckoutForm = () => {
   const initiatePayment = async ({ orderID, products, platformCharges, totalAmount }) => {
     try {
       const stripe = await stripeLoading;
-      localStorage.setItem("type", "order")
+      Cookies.set("type", "order")
       const result = await dispatch(makePayment({ orderID, platformCharges, products, totalAmount })).unwrap();
       await stripe.redirectToCheckout({
         sessionId: result.id,

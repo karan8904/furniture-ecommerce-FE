@@ -32,6 +32,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import CircularProgress from "@mui/material/CircularProgress";
 import SearchIcon from "@mui/icons-material/Search";
+import SkeletonTable from "../SkeletonLoading/SkeletonTable";
 
 const ProductsGrid = () => {
   const [deleteId, setDeleteId] = useState(null);
@@ -183,11 +184,7 @@ const ProductsGrid = () => {
               </TableHead>
               <TableBody>
                 {productsLoading && (
-                  <TableRow>
-                    <TableCell align="center" colSpan={12}>
-                      <CircularProgress />
-                    </TableCell>
-                  </TableRow>
+                  <SkeletonTable row={3} column={7} />
                 )}
                 {products?.length !== 0 && currentProducts?.length !== 0 &&
                   currentProducts?.map((product, index) => (

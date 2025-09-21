@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "../api/axios";
+import Cookies from 'js-cookie';
 
 const initialState = {
   users: [],
@@ -211,7 +212,7 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     logoutUser: (state) => {
-      localStorage.removeItem("token");
+      Cookies.remove("token");
       state.getCurrentUser.user = {};
     },
   },
@@ -224,7 +225,7 @@ export const userSlice = createSlice({
       .addCase(createUser.fulfilled, (state, action) => {
         state.loading = false;
         const data = action.payload;
-        localStorage.setItem("token", data.token);
+        Cookies.set("token", data.token, { expires: 7 });
         state.getCurrentUser.user = data.user;
       })
       .addCase(createUser.rejected, (state, action) => {
@@ -239,7 +240,7 @@ export const userSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         const data = action.payload;
-        localStorage.setItem("token", data.token);
+        Cookies.set("token", data.token, { expires: 7 });
         state.getCurrentUser.user = data.user;
       })
       .addCase(loginUser.rejected, (state, action) => {

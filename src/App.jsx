@@ -2,12 +2,13 @@ import { useEffect } from "react";
 import { Outlet } from "react-router";
 import { getCurrentUser } from "./slices/userSlice";
 import { useDispatch } from "react-redux";
+import Cookies from 'js-cookie';
 
 function App() {
   const dispatch = useDispatch()
   useEffect(() => {
-    if(localStorage.getItem("token")){
-      let token = localStorage.getItem("token")
+    if(Cookies.get("token")){
+      let token = Cookies.get("token")
       dispatch(getCurrentUser(token))
     }
   },[])

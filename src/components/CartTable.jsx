@@ -32,6 +32,7 @@ import {
 import CircleIcon from "@mui/icons-material/Circle";
 import { showSnackbar } from "../slices/snackbarSlice";
 import { getCheckoutData, removeFromCart } from "../slices/cartSlice";
+import SkeletonTable from "./SkeletonLoading/SkeletonTable";
 
 const CartTable = () => {
   const [qty, setQty] = useState(1);
@@ -140,12 +141,8 @@ const CartTable = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {productsLoading && (
-                  <TableRow>
-                    <TableCell align="center" colSpan={7}>
-                      <CircularProgress />
-                    </TableCell>
-                  </TableRow>
+                {!products.length && productsLoading && (
+                  <SkeletonTable row={3} column={7} />
                 )}
                 {products &&
                   products?.map((product) => (

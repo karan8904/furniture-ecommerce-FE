@@ -20,6 +20,7 @@ import {
 } from "../slices/wishlistSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { showSnackbar } from "../slices/snackbarSlice";
+import { ProductCardSkeleton } from "./SkeletonLoading/OtherSkeletons";
 
 const ProductGrid = ({ products, productsLoading }) => {
   const baseURL = import.meta.env.VITE_BASEURL;
@@ -85,9 +86,7 @@ const ProductGrid = ({ products, productsLoading }) => {
       columnSpacing={{ xs: 1, sm: 1, md: 3 }}
     >
       {productsLoading && (
-        <Grid size={12} display="flex" justifyContent="center">
-          <CircularProgress />
-        </Grid>
+        <ProductCardSkeleton count={8}/>
       )}
       {!productsLoading && products?.length === 0 && (
         <Grid size={12}>

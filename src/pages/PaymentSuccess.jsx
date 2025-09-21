@@ -5,6 +5,7 @@ import { Typography } from '@mui/material'
 import { useNavigate, useSearchParams } from 'react-router'
 import { showSnackbar } from '../slices/snackbarSlice'
 import { confirmSubscription } from '../slices/subscriptionSlice'
+import Cookies from 'js-cookie';
 
 const PaymentSuccess = () => {
     const [params] = useSearchParams()
@@ -13,7 +14,7 @@ const PaymentSuccess = () => {
     const confirmOrderLoading = useSelector((state) => state.order.confirmPayment.loading)
     const confirmSubscriptionLoading = useSelector((state) => state.subscription.confirmSubscription.loading)
     const id = params.get("session_id")
-    const type = localStorage.getItem("type")
+    const type = Cookies.get("type")
     useEffect(() => {
         if(id){
           const update = async() => {
@@ -28,7 +29,7 @@ const PaymentSuccess = () => {
               }
               setTimeout(() => {
                navigate("/")
-               localStorage.removeItem("type")
+               Cookies.remove("type")
               }, 3000)
             } catch (error) {
               dispatch(showSnackbar({ severity: "error", message: error }))
