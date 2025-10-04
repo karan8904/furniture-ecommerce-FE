@@ -218,8 +218,7 @@ const ProductInfo = ({ product, reviews }) => {
                 >
                   <ImageListItem>
                     <img
-                      srcSet={`${baseURL}/${img}`}
-                      src={img}
+                      src={`${baseURL}/${img}`}
                       alt={img}
                       style={{ height: "76px", width: "73px" }}
                       loading="lazy"

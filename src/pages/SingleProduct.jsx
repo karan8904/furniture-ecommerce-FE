@@ -35,6 +35,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import ShareLink from "../components/ShareLink";
+import { SingleProductSkeleton } from "../components/SkeletonLoading/OtherSkeletons";
 
 const SingleProduct = () => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -106,9 +107,7 @@ const SingleProduct = () => {
       </Box>
 
       {productLoading ? (
-        <Box display="flex" justifyContent="center" alignItems="center" mt={3}>
-          <CircularProgress />
-        </Box>
+        <SingleProductSkeleton />
       ) : (
         <ProductInfo product={product} reviews={reviews} />
       )}
