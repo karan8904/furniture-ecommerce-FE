@@ -13,14 +13,12 @@ import {
   Button,
   TextField,
   Chip,
-  CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogContentText,
   DialogActions,
 } from "@mui/material";
-import sofa from "../assets/sofa.png";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
@@ -35,7 +33,6 @@ import { getCheckoutData, removeFromCart } from "../slices/cartSlice";
 import SkeletonTable from "./SkeletonLoading/SkeletonTable";
 
 const CartTable = () => {
-  const [qty, setQty] = useState(1);
   const [totalAmount, setTotalAmount] = useState(0);
   const [deleteId, setDeleteId] = useState(null);
   const dispatch = useDispatch();
@@ -48,8 +45,6 @@ const CartTable = () => {
   const deleteLoading = useSelector(
     (state) => state.cart.removeFromCart.loading
   );
-
-  const baseURL = import.meta.env.VITE_BASEURL;
 
   useEffect(() => {
     if (user._id) dispatch(getCartProducts());
@@ -160,7 +155,7 @@ const CartTable = () => {
                           >
                             {product.productID?.images?.length > 0 && (
                               <img
-                                src={`${baseURL}/${product.productID.images[0]}`}
+                                src={product.productID.images[0]}
                                 alt={product.productID.name}
                                 height="100"
                                 width="105"
@@ -277,60 +272,133 @@ const CartTable = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                <TableRow>
-                  <TableCell component="th" scope="row">
-                    <Box display="flex" alignItems="center">
-                      <Box
-                        sx={{
-                          backgroundColor: (theme) =>
-                            theme.palette.custom.bannerColor,
-                          maxWidth: "110px",
-                          marginRight: "30px",
-                          borderRadius: "10px",
-                        }}
-                      >
-                        <img src={sofa} alt="" height="100" width="105" />
+                {!products.length && productsLoading && (
+                  <SkeletonTable row={3} column={4} />
+                )}
+                {products?.map((product) => (
+                  <TableRow key={product._id}>
+                    <TableCell component="th" scope="row">
+                      <Box display="flex" alignItems="center">
+                        <Box
+                          sx={{
+                            backgroundColor: (theme) =>
+                              theme.palette.custom.bannerColor,
+                            maxWidth: "85px",
+                            marginRight: { xs: "8px", sm: "20px" },
+                            borderRadius: "10px",
+                          }}
+                        >
+                          {product.productID?.images?.length > 0 && (
+                            <img
+                              src={product.productID.images[0]}
+                              alt={product.productID.name}
+                              height="80"
+                              width="85"
+                            />
+                          )}
+                        </Box>
                       </Box>
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <Typography
-                      color="secondary"
-                      fontSize={{ sm: "18px", md: "16px" }}
-                    >
-                      Asgard Sofa
-                    </Typography>
-                    <Typography color="secondary">Rs. 250,000.00</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Box display="flex">
-                      <IconButton
-                        onClick={() => setQty(qty - 1)}
-                        disabled={qty < 2}
+                    </TableCell>
+                    <TableCell>
+                      <Typography
+                        color="secondary"
+                        fontSize={{ xs: "14px", sm: "18px" }}
                       >
-                        -
-                      </IconButton>
-                      <TextField
-                        sx={numberFieldStyling}
-                        type="number"
-                        value={qty}
-                      ></TextField>
-                      <IconButton
-                        onClick={() => setQty(qty + 1)}
-                        disabled={qty > 4}
+                        {product.productID.name}
+                      </Typography>
+                      <Typography
+                        color="secondary"
+                        fontSize={{ xs: "13px", sm: "16px" }}
                       >
-                        +
-                      </IconButton>
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <Box display="flex" justifyContent="center">
-                      <IconButton>
-                        <DeleteIcon color="primary" />
-                      </IconButton>
-                    </Box>
-                  </TableCell>
-                </TableRow>
+                        Rs. {Math.round(product.price)}.00
+                      </Typography>
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        columnGap={1}
+                        mt={1}
+                      >
+                        <Chip size="small" label={product.selectedSize} />
+                        <CircleIcon
+                          fontSize="small"
+                          sx={{ fill: product.selectedColor }}
+                        />
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Box display="flex">
+                        <IconButton
+                          onClick={() =>
+                            handleDecreaseQuantity(product.productID._id)
+                          }
+                          disabled={product.quantity < 2}
+                        >
+                          -
+                        </IconButton>
+                        <TextField
+                          sx={numberFieldStyling}
+                          type="number"
+                          value={product.quantity}
+                        ></TextField>
+                        <IconButton
+                          onClick={() =>
+                            handleIncreaseQuantity(product.productID._id)
+                          }
+                          disabled={product.quantity > 9}
+                        >
+                          +
+                        </IconButton>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Box display="flex" justifyContent="center">
+                        <IconButton
+                          onClick={() => handleOpenDialog(product._id)}
+                        >
+                          <DeleteIcon color="primary" />
+                        </IconButton>
+                      </Box>
+                      <Dialog
+                        open={deleteId === product._id}
+                        onClose={handleCloseDialog}
+                        aria-labelledby="delete-dialog-title"
+                        aria-describedby="delete-dialog-description"
+                      >
+                        <DialogTitle id="delete-dialog-title">
+                          <strong>Remove Product</strong>
+                        </DialogTitle>
+                        <DialogContent>
+                          <DialogContentText id="delete-dialog-description">
+                            Are you sure you want to remove this product?
+                          </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                          <Button
+                            onClick={handleCloseDialog}
+                            variant="outlined"
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            loading={deleteLoading}
+                            onClick={() => handleOnDelete()}
+                            variant="contained"
+                            autoFocus
+                          >
+                            Remove
+                          </Button>
+                        </DialogActions>
+                      </Dialog>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {!productsLoading && products.length === 0 && (
+                  <TableRow>
+                    <TableCell align="center" colSpan={4}>
+                      <Typography variant="h6">Cart is Empty...</Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </TableContainer>
