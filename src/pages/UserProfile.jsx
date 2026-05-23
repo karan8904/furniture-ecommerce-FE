@@ -38,7 +38,6 @@ import BusinessIcon from "@mui/icons-material/Business";
 import OtherHousesIcon from "@mui/icons-material/OtherHouses";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import SubscriptionCards from "../components/SubscriptionCard";
 
 const UserProfile = () => {
   const [showAddress, setShowAddress] = useState("Home");

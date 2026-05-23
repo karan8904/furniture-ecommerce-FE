@@ -32,7 +32,6 @@ import EditAddress from './pages/EditAddress.jsx'
 import AddAddress from './pages/AddAddress.jsx'
 import PaymentSuccess from './pages/PaymentSuccess.jsx'
 import Wishlist from './pages/Wishlist.jsx'
-import Subscriptions from './pages/Subscriptions.jsx'
 
 const theme = createTheme({
   palette: {
@@ -89,7 +88,6 @@ const router = createBrowserRouter([
       { path: "/profile", element: <ProtectedRoutes><UserProfile /></ProtectedRoutes> },
       { path: "/orders", element: <ProtectedRoutes><Orders /></ProtectedRoutes>},
       { path: "/wishlist", element: <ProtectedRoutes><Wishlist /></ProtectedRoutes>},
-      { path: "/subscriptions", element: <ProtectedRoutes><Subscriptions /></ProtectedRoutes>},
       { path: "/cart", element: <ProtectedRoutes><Cart /></ProtectedRoutes>},
       { path: "/settings", element: <ProtectedRoutes><Settings /></ProtectedRoutes>},
       { path: "/checkout",element: <ProtectedRoutes><Checkout /></ProtectedRoutes>},

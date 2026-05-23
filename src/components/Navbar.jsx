@@ -227,15 +227,6 @@ const Navbar = () => {
                       Orders
                     </MenuItem>,
                     <MenuItem
-                      key="subscriptions"
-                      onClick={() => {
-                        handleUserMenuClose();
-                        navigate("/subscriptions")
-                      }}
-                    >
-                      Subscriptions
-                    </MenuItem>,
-                    <MenuItem
                       key="settings"
                       onClick={() => {
                         handleUserMenuClose();
