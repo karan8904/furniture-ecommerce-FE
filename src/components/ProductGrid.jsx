@@ -23,7 +23,6 @@ import { showSnackbar } from "../slices/snackbarSlice";
 import { ProductCardSkeleton } from "./SkeletonLoading/OtherSkeletons";
 
 const ProductGrid = ({ products, productsLoading }) => {
-  const baseURL = import.meta.env.VITE_BASEURL;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const wishlistProducts = useSelector(
@@ -114,7 +113,7 @@ const ProductGrid = ({ products, productsLoading }) => {
                     display: "flex",
                     justifyContent: "end",
                   }}
-                  image={`${baseURL}/${product.images[0].replace(/\\/g, "/")}`}
+                  image={product.images[0]}
                 >
                   {product.discount_percent > 0 ? (
                     <Avatar

@@ -7,7 +7,6 @@ import { CategorySkeleton } from "./SkeletonLoading/OtherSkeletons";
 
 const CategoryComponent = ({limit, isCategoryPage}) => {
   const dispatch = useDispatch()
-  const baseURL = import.meta.env.VITE_BASEURL
   const { categories, loading } = useSelector((state) => state.category.getCategories)
   useEffect(() => {
     dispatch(getCategories())
@@ -47,7 +46,7 @@ const CategoryComponent = ({limit, isCategoryPage}) => {
                 <Link style={{ textDecoration: "none"}} to={`/category/${category._id}`}>
                   <Box display="flex" flexDirection="column">
                     <Box display="flex" justifyContent="center">
-                      <img src={`${baseURL}/${category.imageURL}`} alt="" height="350px" width="270px" style={{ borderRadius: "10px" }} />
+                      <img src={category.imageURL} alt="" height="350px" width="270px" style={{ borderRadius: "10px" }} />
                     </Box>
                     <Box display="flex" justifyContent="center">
                       <Typography

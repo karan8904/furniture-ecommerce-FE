@@ -39,7 +39,6 @@ import { SingleProductSkeleton } from "../components/SkeletonLoading/OtherSkelet
 
 const SingleProduct = () => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const baseURL = import.meta.env.VITE_BASEURL;
   const handlePopoverOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -165,10 +164,7 @@ const SingleProduct = () => {
                           alignItems="center"
                         >
                           <Avatar
-                            src={
-                              review?.userID?.profilePicture &&
-                              `${baseURL}/${review.userID.profilePicture}`
-                            }
+                            src={review?.userID?.profilePicture}
                             sx={{
                               bgcolor: (theme) => theme.palette.primary.main,
                             }}

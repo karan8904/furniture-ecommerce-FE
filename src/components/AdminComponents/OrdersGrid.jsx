@@ -58,7 +58,6 @@ const OrdersGrid = () => {
   const changeStatusLoading = useSelector(
     (state) => state.order.changeStatus.loadingIDs
   );
-  const baseURL = import.meta.env.VITE_BASEURL;
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(getOrders());
@@ -242,7 +241,7 @@ const OrdersGrid = () => {
                                     </TableCell>
                                     <TableCell>
                                       <img
-                                        src={`${baseURL}/${product?.productID?.images[0]}`}
+                                        src={product?.productID?.images[0]}
                                         height="50px"
                                         width="50px"
                                       />

@@ -1,5 +1,5 @@
 import React from "react";
-import bgimg from "../assets/bgimg.jpg";
+import { bgimg } from "../constants/assetUrls";
 import {
   Box,
   Typography,

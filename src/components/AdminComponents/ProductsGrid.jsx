@@ -46,7 +46,6 @@ const ProductsGrid = () => {
   const [query, setQuery] = useState("")
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const baseURL = import.meta.env.VITE_BASEURL;
   const products = useSelector((state) => state.product.getProducts.products);
   const productsLoading = useSelector(
     (state) => state.product.getProducts.loading
@@ -195,7 +194,7 @@ const ProductsGrid = () => {
                       </TableCell>
                       <TableCell>
                         <img
-                          src={`${baseURL}/${product?.images[0]}`}
+                          src={product?.images[0]}
                           alt=""
                           height="100px"
                           width="85px"

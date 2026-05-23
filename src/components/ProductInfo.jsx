@@ -48,7 +48,6 @@ const ProductInfo = ({ product, reviews }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [openShareDialog, setOpenShareDialog] = useState(false)
 
-  const baseURL = import.meta.env.VITE_BASEURL;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.getCurrentUser.user);
@@ -218,7 +217,7 @@ const ProductInfo = ({ product, reviews }) => {
                 >
                   <ImageListItem>
                     <img
-                      src={`${baseURL}/${img}`}
+                      src={img}
                       alt={img}
                       style={{ height: "76px", width: "73px" }}
                       loading="lazy"
@@ -241,7 +240,7 @@ const ProductInfo = ({ product, reviews }) => {
             justifyContent={{ sm: "center" }}
             overflow="hidden"
           >
-            <img src={`${baseURL}/${mainImage}`} width="100%" alt="" />
+            <img src={mainImage} width="100%" alt="" />
           </Box>
         </Grid>
 

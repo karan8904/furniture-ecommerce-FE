@@ -42,7 +42,6 @@ const CategoriesGrid = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [currentCategories, setCurrentCategories] = useState([]);
   const [query, setQuery] = useState("");
-  const baseURL = import.meta.env.VITE_BASEURL;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const categories = useSelector(
@@ -195,7 +194,7 @@ const CategoriesGrid = () => {
                       </TableCell>
                       <TableCell align="center">
                         <img
-                          src={`${baseURL}/${category.imageURL}`}
+                          src={category.imageURL}
                           height="120px"
                           width="100px"
                           alt=""

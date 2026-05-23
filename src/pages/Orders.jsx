@@ -42,7 +42,6 @@ import { useFormik } from "formik";
 const Orders = () => {
   const [orderID, setOrderID] = useState(null);
   const [reviewDialogId, setReviewDialogId] = useState(false);
-  const baseURL = import.meta.env.VITE_BASEURL;
   const user = useSelector((state) => state.user.getCurrentUser.user);
   const orders = useSelector((state) => state.order.getMyOrders.orders);
   const orderLoading = useSelector((state) => state.order.getMyOrders.loading);
@@ -199,7 +198,7 @@ const Orders = () => {
                                       <TableCell>{index + 1}</TableCell>
                                       <TableCell>
                                         <img
-                                          src={`${baseURL}/${product.productID.images[0]}`}
+                                          src={product.productID.images[0]}
                                           height="50px"
                                           width="50px"
                                         />

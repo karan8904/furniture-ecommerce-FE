@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import img_grid from "../assets/img_grid.png";
+import { imgGrid } from "../constants/assetUrls";
 import Products from "../components/Products";
 import CategoryComponent from "../components/Categories";
 import DiscountBanner from "../components/DiscountBanner";
@@ -107,7 +107,7 @@ const Home = () => {
         </Stack>
 
         <Box>
-          <img src={img_grid} alt="" width="100%" />
+          <img src={imgGrid} alt="" width="100%" />
         </Box>
       </Box>
 

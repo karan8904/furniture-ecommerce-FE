@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Card, CardContent, Typography, CardActions, Button } from "@mui/material";
-import homeBg from "../assets/home-bg.jpg";
+import { homeBg } from "../constants/assetUrls";
 import { useNavigate } from "react-router";
 
 const NewArrivalBanner = () => {

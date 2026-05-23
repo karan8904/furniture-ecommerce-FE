@@ -18,7 +18,7 @@ import {
   Badge,
   Avatar,
 } from "@mui/material";
-import logo from "../assets/logo.png";
+import { logo } from "../constants/assetUrls";
 import SearchIcon from "@mui/icons-material/Search";
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -33,13 +33,13 @@ import { showSnackbar } from "../slices/snackbarSlice";
 import { logoutUser } from "../slices/userSlice";
 import { getCartProducts, resetCart } from "../slices/cartSlice";
 import LogoutIcon from '@mui/icons-material/Logout';
+import { HeaderSkeleton } from "./SkeletonLoading/OtherSkeletons";
 
 const Navbar = () => {
   const [state, setState] = useState({ right: false });
   const [userMenu, setuserMenu] = React.useState(null);
 
   const dispatch = useDispatch();
-  const baseURL = import.meta.env.VITE_BASEURL
   const user = useSelector((state) => state.user.getCurrentUser.user);
   const userLoading = useSelector((state) => state.user.getCurrentUser.loading)
   const products = useSelector((state) => state.cart.getCartProducts.products);
@@ -154,7 +154,7 @@ const Navbar = () => {
             <IconButton>
               <SearchIcon />
             </IconButton>
-            {user && Object.keys(user).length !== 0 && (
+            {userLoading ? <HeaderSkeleton /> : user && Object.keys(user).length !== 0 && (
               <>
                 <IconButton onClick={() => navigate("/wishlist")}>
                   <FavoriteBorderIcon />
@@ -168,7 +168,7 @@ const Navbar = () => {
                   <Typography fontSize="15px">{user?.firstName}</Typography>
                   <IconButton onClick={(e) => handleUserMenuClick(e)}>
                     <Avatar
-                      src={user?.profilePicture && `${baseURL}/${user.profilePicture}`}
+                      src={user?.profilePicture && `${user.profilePicture}`}
                       sx={{
                         bgcolor: (theme) => theme.palette.primary.main,
                         height: "35px",
@@ -347,7 +347,7 @@ const Navbar = () => {
                 <Divider />
                 <ListItemIcon>
                   <Avatar
-                    src={user?.profilePicture && `${baseURL}/${user.profilePicture}`}
+                    src={user?.profilePicture}
                     sx={{
                       bgcolor: (theme) => theme.palette.primary.main,
                       height: "30px",

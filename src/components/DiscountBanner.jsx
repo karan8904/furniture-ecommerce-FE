@@ -1,7 +1,6 @@
 import React from "react";
 import { Box, Grid, Stack, Typography, Button, ImageList, ImageListItem } from "@mui/material";
-import listImg1 from "../assets/listImg1.png";
-import listImg2 from "../assets/listImg2.png";
+import { listImg1, listImg2 } from "../constants/assetUrls";
 import { useNavigate } from "react-router";
 
 const DiscountBanner = () => {

@@ -24,7 +24,7 @@ import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import MenuIcon from "@mui/icons-material/Menu";
 import PriceChangeOutlinedIcon from '@mui/icons-material/PriceChangeOutlined';
-import logo from "../../assets/logo.png";
+import { logo } from "../../constants/assetUrls";
 import LogoutIcon from '@mui/icons-material/Logout';
 import { logoutUser } from "../../slices/userSlice";
 import { useDispatch } from "react-redux";
@@ -33,7 +33,6 @@ import { showSnackbar } from "../../slices/snackbarSlice";
 
 const Sidebar = ({ open, setOpen, setCurrentSection, currentSection, user }) => {
   const [openDialog, setOpenDialog] = useState(false);
-  const baseURL = import.meta.env.VITE_BASEURL
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const drawerWidth = open ? 200 : 60;
@@ -219,7 +218,7 @@ const Sidebar = ({ open, setOpen, setCurrentSection, currentSection, user }) => 
           <ListItem sx={{ paddingLeft: "12px", py: "12px" }}>
               <ListItemIcon>
                 <Avatar
-                  src={user?.profilePicture && `${baseURL}/${user.profilePicture}`}
+                  src={user?.profilePicture}
                   sx={{
                     bgcolor: (theme) => theme.palette.primary.main,
                     height: "30px",
