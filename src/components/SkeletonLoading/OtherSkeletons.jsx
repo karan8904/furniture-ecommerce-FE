@@ -1,5 +1,15 @@
 import React from "react";
-import { Grid, Card, CardMedia, CardContent, Box, Typography, Avatar, IconButton, Skeleton } from "@mui/material";
+import {
+  Grid,
+  Card,
+  CardMedia,
+  CardContent,
+  Box,
+  Typography,
+  Avatar,
+  IconButton,
+  Skeleton,
+} from "@mui/material";
 
 export const ProductCardSkeleton = ({ count = 6 }) => {
   return (
@@ -20,19 +30,34 @@ export const ProductCardSkeleton = ({ count = 6 }) => {
                   height: 40,
                 }}
               >
-                <Skeleton variant="circular" width={40} height={40} sx={{ borderRadius: "50%"}} />
+                <Skeleton
+                  variant="circular"
+                  width={40}
+                  height={40}
+                  sx={{ borderRadius: "50%" }}
+                />
               </Avatar>
             </CardMedia>
 
             <CardContent sx={{ backgroundColor: "#F4F5F7" }}>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                mb={1}
+              >
                 <Skeleton variant="text" width="60%" height={30} />
                 <Skeleton variant="circular" width={24} height={24} />
               </Box>
 
               <Skeleton variant="text" width="40%" height={20} />
 
-              <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                mt={1}
+              >
                 <Skeleton variant="text" width="50%" height={30} />
                 <Skeleton variant="text" width="30%" height={25} />
               </Box>
@@ -47,16 +72,21 @@ export const ProductCardSkeleton = ({ count = 6 }) => {
 export const CategorySkeleton = ({ count = 3 }) => {
   return (
     <>
-    {Array.from({ length: count }).map((_, index) => (
-      <Grid size={{ md: 4, sm: 6, xs: 12 }} key={index} marginBottom={5}>
-        <Box display="flex" justifyContent="center">
-          <Skeleton variant="rounded" height="350px" width="270px" sx={{ borderRadius: "10px" }}/>
-        </Box>
-      </Grid>
-    ))}
-    </> 
-  )
-}
+      {Array.from({ length: count }).map((_, index) => (
+        <Grid size={{ md: 4, sm: 6, xs: 12 }} key={index} marginBottom={5}>
+          <Box display="flex" justifyContent="center">
+            <Skeleton
+              variant="rounded"
+              height="350px"
+              width="270px"
+              sx={{ borderRadius: "10px" }}
+            />
+          </Box>
+        </Grid>
+      ))}
+    </>
+  );
+};
 
 export const SingleProductSkeleton = () => {
   return (
@@ -155,12 +185,7 @@ export const SingleProductSkeleton = () => {
             </Typography>
             <Box display="flex" gap={2}>
               {[1, 2, 3].map((i) => (
-                <Skeleton
-                  key={i}
-                  variant="circular"
-                  width={40}
-                  height={40}
-                />
+                <Skeleton key={i} variant="circular" width={40} height={40} />
               ))}
             </Box>
           </Box>
@@ -192,4 +217,26 @@ export const SingleProductSkeleton = () => {
       </Grid>
     </Grid>
   );
-}
+};
+
+export const HeaderSkeleton = () => {
+  return (
+    <Box display="flex" gap={1.5} alignItems="center">
+      <IconButton disabled>
+        <Skeleton variant="circular" width={24} height={24} />
+      </IconButton>
+
+      <IconButton disabled>
+        <Skeleton variant="circular" width={24} height={24} />
+      </IconButton>
+
+      <Box display="flex" alignItems="center" gap={1}>
+        <Skeleton variant="text" width={50} height={20} />
+  
+        <IconButton disabled>
+          <Skeleton variant="circular" width={35} height={35} />
+        </IconButton>
+      </Box>
+    </Box>
+  );
+};

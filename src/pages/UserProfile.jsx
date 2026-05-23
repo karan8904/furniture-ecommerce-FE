@@ -45,11 +45,11 @@ const UserProfile = () => {
   const [deleteId, setDeleteId] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const baseURL = import.meta.env.VITE_BASEURL
   const deleteAddressLoading = useSelector(
     (state) => state.address.deleteAddress.loading
   );
   const user = useSelector((state) => state.user.getCurrentUser.user);
+  const { loading } = useSelector((state) => state.user.editUser)
 
   const { homeAddress, officeAddress, otherAddresses } = useSelector((state) => state.address.getAddresses.addresses)
 
@@ -164,7 +164,7 @@ const UserProfile = () => {
                   sx={{ width: 100, height: 100 }}
                   src={
                     typeof formik.values.profilePicture === "string"
-                      ? `${baseURL}/${formik.values.profilePicture}`
+                      ? `${formik.values.profilePicture}`
                       : URL.createObjectURL(formik.values.profilePicture)
                   }
                 />
@@ -270,7 +270,7 @@ const UserProfile = () => {
               />
             </Grid>
             <Grid size={8}>
-              <Button variant="contained" type="submit">
+              <Button variant="contained" loading={loading} type="submit">
                 Save Details
               </Button>
             </Grid>
