@@ -10,7 +10,6 @@ React frontend for a furniture e-commerce application. The app includes public s
 - Material UI
 - Formik and Yup
 - Axios
-- Stripe
 - Cloudinary-hosted UI assets
 
 ## Setup
@@ -25,7 +24,6 @@ Create a `.env` file in the project root:
 
 ```env
 VITE_BASEURL="http://localhost:5000"
-VITE_STRIPE_KEY="your_stripe_publishable_key"
 VITE_CLOUDINARY_IMAGE_BASEURL="https://res.cloudinary.com/dwojsioxr/image/upload"
 ```
 

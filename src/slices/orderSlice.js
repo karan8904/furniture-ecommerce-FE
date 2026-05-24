@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, current } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "../api/axios";
 
 const initialState = {
@@ -175,7 +175,7 @@ export const makePayment = createAsyncThunk(
             const response = await axios.post('/payment/checkout-session', data)
             return response.data
         } catch (error) {
-            const message = error.response.data.message
+            const message = error.response?.data?.message || error.response?.data?.error || "Payment failed."
             return thunkApi.rejectWithValue(message)
         }
     }
@@ -291,7 +291,7 @@ export const orderSlice = createSlice({
             state.orderStatusCount.data = action.payload.orders
             console.log(action.payload.orders)
         })
-        .addCase(orderStatusCount.rejected, (state) => {
+        .addCase(orderStatusCount.rejected, (state, action) => {
             state.orderStatusCount.loading = false
             state.orderStatusCount.error = action.payload
         })

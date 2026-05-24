@@ -14,21 +14,18 @@ import {
   MenuItem,
 } from "@mui/material";
 import { useFormik } from "formik";
-import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { makePayment, placeOrder } from "../slices/orderSlice";
 import { useNavigate } from "react-router";
 import { getAddresses } from "../slices/addressSlice";
 import { showSnackbar } from "../slices/snackbarSlice";
 import { resetCart } from "../slices/cartSlice";
-import { loadStripe } from "@stripe/stripe-js";
 import { getCharges } from "../slices/chargesSlice";
 import Cookies from 'js-cookie';
 
 const CheckoutForm = () => {
   const [addressType, setAddressType] = useState("Home");
   const [currentAddress, setCurrentAddress] = useState({});
-  const stripeLoading = loadStripe(import.meta.env.VITE_STRIPE_KEY);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -55,24 +52,14 @@ const CheckoutForm = () => {
     get();
   }, [user]);
 
-  const orderPlaceValidationSchema = Yup.object().shape({
-    userID: Yup.string().required("Please Login or Register."),
-    products: Yup.array().min(1).required("No Products Found."),
-    totalAmount: Yup.number().required("Required."),
-    address: Yup.object().required("Please select address."),
-    paymentMode: Yup.string().required("Please select payment mode."),
-  });
-
   const initiatePayment = async ({ orderID, products, platformCharges, totalAmount }) => {
     try {
-      const stripe = await stripeLoading;
       Cookies.set("type", "order")
       const result = await dispatch(makePayment({ orderID, platformCharges, products, totalAmount })).unwrap();
-      await stripe.redirectToCheckout({
-        sessionId: result.id,
-      });
+      if (!result?.url) throw new Error("Checkout URL not found.");
+      window.location.href = result.url;
     } catch (error) {
-      dispatch(showSnackbar({ severity: "error", message: "Payment Failed." }));
+      dispatch(showSnackbar({ severity: "error", message: error?.message || error || "Payment Failed." }));
       navigate("/");
     }
   };
@@ -153,7 +140,7 @@ const CheckoutForm = () => {
   const handleOnSelectAddress = (type, address) => {
     setAddressType(type);
     setCurrentAddress(address);
-    placeOrderForm.setValues("address", address);
+    placeOrderForm.setFieldValue("address", address);
   };
 
   return (
