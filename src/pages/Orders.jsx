@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 import { useDispatch, useSelector } from "react-redux";
 import { getMyOrders, mailInvoice } from "../slices/orderSlice";
 import {
@@ -100,7 +98,6 @@ const Orders = () => {
 
   return (
     <>
-      <Navbar />
       <Box
         padding="30px"
         sx={{ backgroundColor: (style) => style.palette.custom.bannerColor }}
@@ -375,7 +372,6 @@ const Orders = () => {
           </TableContainer>
         </Grid>
       </Grid>
-      <Footer />
     </>
   );
 };

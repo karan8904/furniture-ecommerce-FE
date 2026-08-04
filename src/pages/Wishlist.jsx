@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
-import PageTitleComponent from "../components/PageTitleComponent";;
-import Footer from "../components/Footer";
+import PageTitleComponent from "../components/PageTitleComponent";
 import InfoComponent from "../components/InfoComponent";
 import { useDispatch, useSelector } from "react-redux";
 import { getFromWishlist } from "../slices/wishlistSlice";
@@ -22,7 +20,6 @@ const Wishlist = () => {
 
   return (
     <>
-      <Navbar />
       <PageTitleComponent pageTitle="Wishlist" />
           <Container sx={{ marginY: "40px" }}>
             <ProductGrid
@@ -31,7 +28,6 @@ const Wishlist = () => {
             />
           </Container>
       <InfoComponent />
-      <Footer />
     </>
   );
 };

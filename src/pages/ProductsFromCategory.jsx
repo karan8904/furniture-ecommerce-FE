@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
 import PageTitleComponent from "../components/PageTitleComponent";
-import Footer from "../components/Footer";
 import {
   Box,
   Container,
@@ -39,7 +37,6 @@ const ProductsFromCategory = () => {
 
   return (
     <>
-      <Navbar />
       <PageTitleComponent pageTitle={category} />
       <Box margin="70px 0">
         <Container>
@@ -50,8 +47,6 @@ const ProductsFromCategory = () => {
       </Box>
 
       <InfoComponent />
-
-      <Footer />
     </>
   );
 };

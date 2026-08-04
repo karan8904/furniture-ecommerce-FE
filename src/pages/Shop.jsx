@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
 import PageTitleComponent from "../components/PageTitleComponent";
 import Products from "../components/Products";
-import Footer from "../components/Footer";
 import { Box, Pagination } from "@mui/material";
 
 import FilterComponent from "../components/FilterComponent";
@@ -29,7 +27,6 @@ const Shop = () => {
 
   return (
     <>
-      <Navbar />
       <PageTitleComponent pageTitle="Shop" />
 
       <FilterComponent
@@ -62,8 +59,6 @@ const Shop = () => {
       </Box>
 
       <InfoComponent />
-
-      <Footer />
     </>
   );
 };

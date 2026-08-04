@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 import {
   Box,
   Breadcrumbs,
@@ -73,8 +71,6 @@ const SingleProduct = () => {
 
   return (
     <>
-      <Navbar />
-
       <Box
         padding="30px"
         sx={{ backgroundColor: (style) => style.palette.custom.bannerColor }}
@@ -289,8 +285,6 @@ const SingleProduct = () => {
           </Button>
         </Box>
       </Box>
-
-      <Footer />
     </>
   );
 };

@@ -32,6 +32,8 @@ import EditAddress from './pages/EditAddress.jsx'
 import AddAddress from './pages/AddAddress.jsx'
 import PaymentSuccess from './pages/PaymentSuccess.jsx'
 import Wishlist from './pages/Wishlist.jsx'
+import MainLayout from './layouts/MainLayout.jsx'
+import Subscriptions from './pages/Subscriptions.jsx'
 
 const theme = createTheme({
   palette: {
@@ -69,14 +71,25 @@ const router = createBrowserRouter([
     path: "/",
     Component: App,
     children: [
-      
-      // PUBLIC ROUTES
-      { index: true, Component: Home },
-      { path: "/categories", Component: Categories },
-      { path: "/contact", Component: Contact },
-      { path: "/shop", Component: Shop },
-      { path: "/category/:id", Component: ProductsFromCategory},
-      { path: "/single-product/:id", Component: SingleProduct},
+      // ROUTES WITH NAVBAR AND FOOTER
+      {
+        Component: MainLayout,
+        children: [
+          { index: true, Component: Home },
+          { path: "/categories", Component: Categories },
+          { path: "/contact", Component: Contact },
+          { path: "/shop", Component: Shop },
+          { path: "/category/:id", Component: ProductsFromCategory },
+          { path: "/single-product/:id", Component: SingleProduct },
+          { path: "/profile", element: <ProtectedRoutes><UserProfile /></ProtectedRoutes> },
+          { path: "/orders", element: <ProtectedRoutes><Orders /></ProtectedRoutes> },
+          { path: "/wishlist", element: <ProtectedRoutes><Wishlist /></ProtectedRoutes> },
+          { path: "/cart", element: <ProtectedRoutes><Cart /></ProtectedRoutes> },
+          { path: "/settings", element: <ProtectedRoutes><Settings /></ProtectedRoutes> },
+          { path: "/checkout", element: <ProtectedRoutes><Checkout /></ProtectedRoutes> },
+          { path: "/subscriptions", element: <ProtectedRoutes><Subscriptions /></ProtectedRoutes> },
+        ],
+      },
 
       // AUTH ROUTES
       { path: "/register", element: <IfAlreadyLoggedIn><Register /></IfAlreadyLoggedIn> },
@@ -84,24 +97,17 @@ const router = createBrowserRouter([
       { path: "/forgot-password", element: <IfAlreadyLoggedIn><ForgotPassword /></IfAlreadyLoggedIn> },
       { path: "/password-reset/:userId/:token", element: <IfAlreadyLoggedIn><ResetPassword /></IfAlreadyLoggedIn> },
       
-      // PROTECTED ROUTES
-      { path: "/profile", element: <ProtectedRoutes><UserProfile /></ProtectedRoutes> },
-      { path: "/orders", element: <ProtectedRoutes><Orders /></ProtectedRoutes>},
-      { path: "/wishlist", element: <ProtectedRoutes><Wishlist /></ProtectedRoutes>},
-      { path: "/cart", element: <ProtectedRoutes><Cart /></ProtectedRoutes>},
-      { path: "/settings", element: <ProtectedRoutes><Settings /></ProtectedRoutes>},
-      { path: "/checkout",element: <ProtectedRoutes><Checkout /></ProtectedRoutes>},
-      { path: "/payment/success", element: <ProtectedRoutes><PaymentSuccess /></ProtectedRoutes>},
-      { path: "edit-address/:id", element: <ProtectedRoutes><EditAddress></EditAddress></ProtectedRoutes>},
-      { path: "add-address/:addressType", element: <ProtectedRoutes><AddAddress /></ProtectedRoutes>},
+      // OTHER PROTECTED ROUTES (without Navbar and Footer)
+      { path: "/payment/success", element: <ProtectedRoutes><PaymentSuccess /></ProtectedRoutes> },
+      { path: "edit-address/:id", element: <ProtectedRoutes><EditAddress></EditAddress></ProtectedRoutes> },
+      { path: "add-address/:addressType", element: <ProtectedRoutes><AddAddress /></ProtectedRoutes> },
       
       // ADMIN ROUTES 
-      { path: "/admin", element: <AdminRoutes><Admin /></AdminRoutes>},
-      { path: "/admin/add-category", element: <AdminRoutes><AddCategory /></AdminRoutes>},
-      { path: "/admin/add-product", element: <AdminRoutes><AddProduct /></AdminRoutes>},
+      { path: "/admin", element: <AdminRoutes><Admin /></AdminRoutes> },
+      { path: "/admin/add-category", element: <AdminRoutes><AddCategory /></AdminRoutes> },
+      { path: "/admin/add-product", element: <AdminRoutes><AddProduct /></AdminRoutes> },
       { path: "/admin/edit-category/:id", element: <AdminRoutes><EditCatgory /></AdminRoutes> },
       { path: "/admin/edit-product/:id", element: <AdminRoutes><EditProduct /></AdminRoutes> },
-    
     ],
   },
 ]);

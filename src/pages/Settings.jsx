@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react'
-import Navbar from "../components/Navbar";
 import PageTitleComponent from "../components/PageTitleComponent";
-import Footer from "../components/Footer";
 import InfoComponent from "../components/InfoComponent";
 import { Box, Breadcrumbs, Button, Checkbox, FormControlLabel, FormGroup, Grid, Typography } from '@mui/material';
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
@@ -46,7 +44,6 @@ const Settings = () => {
 
   return (
     <>
-      <Navbar />
       <Box
         padding="30px"
         sx={{ backgroundColor: (style) => style.palette.custom.bannerColor }}
@@ -103,7 +100,6 @@ const Settings = () => {
             </form>
           </Grid>
         </Grid>
-      <Footer />
     </>
   )
 }

@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
 import PageTitleComponent from "../components/PageTitleComponent";
-import Footer from "../components/Footer";
 import InfoComponent from "../components/InfoComponent";
 import {
   Avatar,
@@ -127,7 +125,6 @@ const UserProfile = () => {
 
   return (
     <>
-      <Navbar />
       <Box
         padding="30px"
         sx={{ backgroundColor: (style) => style.palette.custom.bannerColor }}
@@ -549,7 +546,6 @@ const UserProfile = () => {
           </Grid>
         </Grid>
       </Grid>
-      <Footer />
     </>
   );
 };

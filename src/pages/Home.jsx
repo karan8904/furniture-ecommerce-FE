@@ -1,6 +1,4 @@
 import React, { useEffect } from "react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 import { imgGrid } from "../constants/assetUrls";
 import Products from "../components/Products";
 import CategoryComponent from "../components/Categories";
@@ -20,8 +18,6 @@ const Home = () => {
   const navigate = useNavigate();
   return (
     <>
-      <Navbar />
-
       <NewArrivalBanner />
 
       <CategoryComponent limit={3} />
@@ -112,8 +108,6 @@ const Home = () => {
       </Box>
 
       <Divider sx={{ margin: "50px 0 15px 0", borderBottomWidth: "2px" }} />
-
-      <Footer />
     </>
   );
 };

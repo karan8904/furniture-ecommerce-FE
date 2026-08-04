@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 import {
   Box,
   Breadcrumbs,
@@ -45,7 +43,7 @@ const Subscriptions = () => {
       await dispatch(cancelSubscription(id)).unwrap()
       dispatch(showSnackbar({ message: "Subscription Cancelled Successfully." }))
       setOpenDialog(false)
-    } catch (error) {
+    } catch {
       dispatch(showSnackbar({ severity: "error",message: "Cannot cancel the subscription." }))
     }
   }
@@ -61,7 +59,6 @@ const Subscriptions = () => {
   };
   return (
     <>
-      <Navbar />
       <Box
         padding="30px"
         sx={{ backgroundColor: (style) => style.palette.custom.bannerColor }}
@@ -232,8 +229,6 @@ const Subscriptions = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
-      <Footer />
     </>
   );
 };
