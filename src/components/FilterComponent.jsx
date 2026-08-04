@@ -6,20 +6,27 @@ import {
   Typography,
   Select,
 } from "@mui/material";
-import { filterProducts } from "../slices/productSlice";
-import { useDispatch } from "react-redux";
 
-const FilterComponent = ({ totalProducts, firstProductNumber, lastProductNumber, setItemsPerPage, setCurrentPage }) => {
+
+const FilterComponent = ({
+  totalProducts,
+  firstProductNumber,
+  lastProductNumber,
+  setItemsPerPage,
+  setCurrentPage,
+  filter = "default",
+  setFilter
+}) => {
   const [itemCount, setItemCount] = useState(8);
-  const [sortOption, setSortOption] = useState("default");
 
-  const dispatch = useDispatch()
-
-  const handleOnChangeFilter = async(e) => {
-    setSortOption(e.target.value)
-    await dispatch(filterProducts(e.target.value)).unwrap()
-    setCurrentPage(1)
-  }
+  const handleOnChangeFilter = (e) => {
+    if (setFilter) {
+      setFilter(e.target.value);
+    }
+    if (setCurrentPage) {
+      setCurrentPage(1);
+    }
+  };
 
   return (
     <>
@@ -62,8 +69,9 @@ const FilterComponent = ({ totalProducts, firstProductNumber, lastProductNumber,
                   id="pageCountMenu"
                   value={itemCount}
                   onChange={(e) => {
-                    setItemCount(e.target.value)
-                    setItemsPerPage(e.target.value)
+                    setItemCount(e.target.value);
+                    setItemsPerPage(e.target.value);
+                    setCurrentPage(1);
                   }}
                   sx={{
                     height: "40px",
@@ -89,7 +97,7 @@ const FilterComponent = ({ totalProducts, firstProductNumber, lastProductNumber,
               <Box>
                 <Select
                   id="filterMenu"
-                  value={sortOption}
+                  value={filter}
                   onChange={handleOnChangeFilter}
                   sx={{
                     height: "40px",
