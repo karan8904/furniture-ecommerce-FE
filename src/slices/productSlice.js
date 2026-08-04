@@ -8,6 +8,14 @@ const initialState = {
   },
   getProducts: {
     products: [],
+    pagination: {
+      totalItems: 0,
+      totalPages: 1,
+      currentPage: 1,
+      itemsPerPage: 10,
+      hasNextPage: false,
+      hasPrevPage: false,
+    },
     error: null,
     loading: false
   },
@@ -51,16 +59,16 @@ export const addProduct = createAsyncThunk(
 
 export const getProducts = createAsyncThunk(
   "products/getProducts",
-  async (_, thunkApi) => {
+  async (params = {}, thunkApi) => {
     try {
-      const response = await axios.get("/products/")
-      return response.data
+      const response = await axios.get("/products/", { params });
+      return response.data;
     } catch (error) {
-      const message = error.response.data.message;
+      const message = error.response?.data?.message || error.message;
       return thunkApi.rejectWithValue(message);
     }
   }
-)
+);
 
 export const deleteProduct = createAsyncThunk(
   "products/deleteProduct",
@@ -129,18 +137,7 @@ export const searchProducts = createAsyncThunk(
   }
 )
 
-export const filterProducts = createAsyncThunk(
-  "products/filterProducts",
-  async(query, thunkApi) => {
-    try {
-      const response = await axios.get(`/products/filter/${query}`)
-      return response.data
-    } catch (error) {
-      const message = error.response.data.message;
-      return thunkApi.rejectWithValue(message)
-    }
-  }
-)
+
 
 const productSlice = createSlice({
   name: "products",
@@ -163,10 +160,19 @@ const productSlice = createSlice({
       //GET PRODUCTS
       .addCase(getProducts.pending, (state) => {
         state.getProducts.loading = true;
+        state.getProducts.products = [];
       })
       .addCase(getProducts.fulfilled, (state, action) => {
         state.getProducts.loading = false;
-        state.getProducts.products = action.payload.products
+        state.getProducts.products = action.payload.products || (Array.isArray(action.payload) ? action.payload : []);
+        state.getProducts.pagination = action.payload.pagination || {
+          totalItems: (action.payload.products || action.payload)?.length || 0,
+          totalPages: 1,
+          currentPage: 1,
+          itemsPerPage: (action.payload.products || action.payload)?.length || 10,
+          hasNextPage: false,
+          hasPrevPage: false,
+        };
       })
       .addCase(getProducts.rejected, (state, action) => {
         state.getProducts.loading = false;
@@ -194,13 +200,14 @@ const productSlice = createSlice({
         state.editProduct.loading = false;
       })
       .addCase(editProduct.rejected, (state, action) => {
-        state.editProduct.loading - false
+        state.editProduct.loading = false;
         state.editProduct.error = action.payload;
       })
 
       //GET SINGLE PRODUCT
       .addCase(getSingleProduct.pending, (state) => {
-        state.getSingleProduct.loading = true
+        state.getSingleProduct.loading = true;
+        state.getSingleProduct.product = {};
       })
       .addCase(getSingleProduct.fulfilled, (state, action) => {
         state.getSingleProduct.loading = false;
@@ -213,11 +220,12 @@ const productSlice = createSlice({
 
       //GET PRODUCTS FROM CATEGORY
       .addCase(getFromCategory.pending, (state) => {
-        state.getFromCategory.loading = true
+        state.getFromCategory.loading = true;
+        state.getFromCategory.products = [];
       })
       .addCase(getFromCategory.fulfilled, (state, action) => {
         state.getFromCategory.loading = false
-        state.getFromCategory.products = action.payload.products
+        state.getFromCategory.products = action.payload.products || (Array.isArray(action.payload) ? action.payload : [])
       })
       .addCase(getFromCategory.rejected, (state, action) => {
         state.getFromCategory.loading = false
@@ -226,33 +234,23 @@ const productSlice = createSlice({
 
       //SEARCH PRODUCT
       .addCase(searchProducts.pending, (state) => {
-        state.getProducts.loading = true
+        state.getProducts.loading = true;
+        state.getProducts.products = [];
       })
       .addCase(searchProducts.fulfilled, (state, action) => {
-        if(action.payload.length === 0)
-          state.getProducts.products = []
-        state.getProducts.products = action.payload
-        state.getProducts.loading = false
+        const prods = action.payload.products || action.payload;
+        state.getProducts.products = Array.isArray(prods) ? prods : [];
+        if (action.payload.pagination) {
+          state.getProducts.pagination = action.payload.pagination;
+        }
+        state.getProducts.loading = false;
       })
       .addCase(searchProducts.rejected, (state, action) => {
         state.getProducts.loading = false
         state.getProducts.error = action.payload
       })
 
-      //FILTER PRODUCT
-      .addCase(filterProducts.pending, (state) => {
-        state.getProducts.loading = true
-      })
-      .addCase(filterProducts.fulfilled, (state, action) => {
-        if(action.payload.length === 0)
-          state.getProducts.products = []
-        state.getProducts.products = action.payload
-        state.getProducts.loading = false
-      })
-      .addCase(filterProducts.rejected, (state, action) => {
-        state.getProducts.loading = false
-        state.getProducts.error = action.payload
-      })
+
   },
 });
 

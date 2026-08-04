@@ -27,8 +27,8 @@ const EditCatgory = () => {
 
   useEffect(() => {
     const get = async () => {
-      const result = await dispatch(getCategories()).unwrap();
-      result.categories.map((cat) => {
+      const result = await dispatch(getCategories({ itemsPerPage: 100 })).unwrap();
+      (result.categories || result).map((cat) => {
         if (cat._id === catId) {
         //   console.log(cat);
           setCategory(cat);

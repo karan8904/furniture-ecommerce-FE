@@ -23,7 +23,7 @@ const ProductsFromCategory = () => {
     (state) => state.product.getFromCategory.products
   );
   const productsLoading = useSelector(
-    (state) => state.product.getProducts.loading
+    (state) => state.product.getFromCategory.loading
   );
 
   useEffect(() => {

@@ -59,14 +59,15 @@ const SingleProduct = () => {
   const productLoading = useSelector(
     (state) => state.product.getSingleProduct.loading
   );
-  const products = useSelector((state) => state.product.getProducts.products)
+  const rawProducts = useSelector((state) => state.product.getProducts.products);
+  const products = (Array.isArray(rawProducts) ? rawProducts : [])
     .filter((p) => p._id !== id)
     .slice(0, 4);
 
   const { reviews, loading } = useSelector((state) => state.review.getReviews);
   useEffect(() => {
     dispatch(getSingleProduct(id));
-    dispatch(getProducts());
+    dispatch(getProducts({ page: 1, itemsPerPage: 8 }));
     dispatch(getReviews(id));
   }, [id]);
 

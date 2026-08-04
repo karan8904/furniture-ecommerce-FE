@@ -12,11 +12,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { getProducts } from "../slices/productSlice";
 
 const Home = () => {
-  const products = useSelector((state) => state.product.getProducts.products).slice(0,8)
-  const dispatch = useDispatch()
+  const products = useSelector((state) => state.product.getProducts.products) || [];
+  const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(getProducts())
-  }, [])
+    dispatch(getProducts({ page: 1, itemsPerPage: 8 }));
+  }, [dispatch]);
   const navigate = useNavigate();
   return (
     <>

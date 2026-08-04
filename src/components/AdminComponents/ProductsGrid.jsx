@@ -36,17 +36,13 @@ import SkeletonTable from "../SkeletonLoading/SkeletonTable";
 
 const ProductsGrid = () => {
   const [deleteId, setDeleteId] = useState(null);
-  const [paginationDetails, setPaginationDetails] = useState({
-    itemsPerPage: 5,
-    totalItems: 0,
-  });
-  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 5;
   const [currentPage, setCurrentPage] = useState(1);
-  const [currentProducts, setCurrentProducts] = useState([]);
-  const [query, setQuery] = useState("")
+  const [query, setQuery] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const products = useSelector((state) => state.product.getProducts.products);
+
+  const { products, pagination } = useSelector((state) => state.product.getProducts);
   const productsLoading = useSelector(
     (state) => state.product.getProducts.loading
   );
@@ -54,38 +50,26 @@ const ProductsGrid = () => {
     (state) => state.product.deleteProduct.loading
   );
 
-  useEffect(() => {
-    dispatch(getProducts());
-  }, []);
+  const totalPages = pagination?.totalPages || 1;
 
   useEffect(() => {
-    if (products?.length > 0) {
-      setPaginationDetails({
-        ...paginationDetails,
-        totalItems: products.length,
-      });
-      let count = Math.ceil(
-        products.length / paginationDetails.itemsPerPage
-      );
-      setTotalPages(count);
-      const indexOfLastItem = currentPage * paginationDetails.itemsPerPage;
-      const indexOfFirstItem = indexOfLastItem - paginationDetails.itemsPerPage;
-      setCurrentProducts(products.slice(indexOfFirstItem, indexOfLastItem));
+    if (!query) {
+      dispatch(getProducts({ page: currentPage, itemsPerPage }));
     }
-  }, [products, currentPage]);
+  }, [currentPage]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      if(query === "")
-        dispatch(getProducts())
-      if(query){
-        setCurrentPage(1)
-        dispatch(searchProducts(query))
+      if (query === "") {
+        dispatch(getProducts({ page: currentPage, itemsPerPage }));
+      } else {
+        setCurrentPage(1);
+        dispatch(searchProducts(query));
       }
-    }, 500)
+    }, 500);
 
-    return () => clearTimeout(timer) 
-  }, [query])
+    return () => clearTimeout(timer);
+  }, [query]);
 
   const handleOpenDialog = (id) => {
     setDeleteId(id);
@@ -100,7 +84,7 @@ const ProductsGrid = () => {
       await dispatch(deleteProduct(deleteId)).unwrap();
       dispatch(showSnackbar({ message: "Product Deleted Successfully." }));
       setDeleteId(null);
-      await dispatch(getProducts()).unwrap();
+      await dispatch(getProducts({ page: currentPage, itemsPerPage })).unwrap();
     } catch (error) {
       dispatch(showSnackbar({ severity: "error", message: error }));
       setDeleteId(null);
@@ -185,12 +169,11 @@ const ProductsGrid = () => {
                 {productsLoading && (
                   <SkeletonTable row={3} column={7} />
                 )}
-                {products?.length !== 0 && currentProducts?.length !== 0 &&
-                  currentProducts?.map((product, index) => (
-                    <TableRow key={index}>
+                {!productsLoading && products?.length > 0 &&
+                  products.map((product, index) => (
+                    <TableRow key={product._id || index}>
                       <TableCell>
-                        {(index + 1) +
-                          paginationDetails.itemsPerPage * (currentPage - 1)}
+                        {(index + 1) + itemsPerPage * (currentPage - 1)}
                       </TableCell>
                       <TableCell>
                         <img
@@ -201,10 +184,10 @@ const ProductsGrid = () => {
                         />
                       </TableCell>
                       <TableCell>{product.name}</TableCell>
-                      <TableCell>{product.category.name}</TableCell>
+                      <TableCell>{product.category?.name}</TableCell>
                       <TableCell>
                         <Box display="flex" gap="2px">
-                          {product.sizes.map((size) => (
+                          {product.sizes?.map((size) => (
                             <Chip key={size} label={size} />
                           ))}
                         </Box>
@@ -216,7 +199,7 @@ const ProductsGrid = () => {
                           maxWidth="110px"
                           overflow="auto"
                         >
-                          {product.colors.map((color) => (
+                          {product.colors?.map((color) => (
                             <CircleIcon key={color} sx={{ fill: color }} />
                           ))}
                         </Box>
@@ -280,7 +263,7 @@ const ProductsGrid = () => {
                       </TableCell>
                     </TableRow>
                   ))}
-                {products?.length > paginationDetails.itemsPerPage && (
+                {totalPages > 1 && (
                   <TableRow>
                     <TableCell align="center" colSpan={12}>
                       <Box display="flex" justifyContent="center">
@@ -290,7 +273,8 @@ const ProductsGrid = () => {
                           page={currentPage}
                           onChange={(e, page) => {
                             setCurrentPage(page);
-                            window.tableContainer.scrollTo(0, 0);
+                            const el = document.getElementById("tableContainer");
+                            if (el) el.scrollTo(0, 0);
                           }}
                           shape="rounded"
                           color="primary"
@@ -300,7 +284,7 @@ const ProductsGrid = () => {
                   </TableRow>
                 )}
 
-                {!productsLoading && products?.length === 0 && (
+                {!productsLoading && (!products || products.length === 0) && (
                   <TableRow>
                     <TableCell align="center" colSpan={12}>
                       <Typography variant="h6">No Products Found...</Typography>

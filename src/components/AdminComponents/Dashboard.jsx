@@ -28,8 +28,12 @@ const Dashboard = () => {
   const dispatch = useDispatch();
   const users = useSelector((state) => state.user.getAllUsers.users);
   const products = useSelector((state) => state.product.getProducts.products);
+  const productsPagination = useSelector((state) => state.product.getProducts.pagination);
   const categories = useSelector(
     (state) => state.category.getCategories.categories
+  );
+  const categoriesPagination = useSelector(
+    (state) => state.category.getCategories.pagination
   );
   const dailyOrderData = useSelector(
     (state) => state.order.dailyOrdersCount.data
@@ -171,10 +175,10 @@ const Dashboard = () => {
                 Products
               </Typography>
               <Typography fontSize="20px" fontWeight={550}>
-                Total Products: {products?.length}
+                Total Products: {productsPagination?.totalItems ?? products?.length ?? 0}
               </Typography>
               <Typography fontSize="17px" fontWeight={500}>
-                Categories: {categories?.length}
+                Categories: {categoriesPagination?.totalItems ?? categories?.length ?? 0}
               </Typography>
             </Box>
             <Box display="flex" alignItems="end">

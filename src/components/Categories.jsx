@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Container, Box, Typography, Grid, Stack } from "@mui/material";
+import { Container, Box, Typography, Grid, Stack, Pagination } from "@mui/material";
 import { getCategories } from "../slices/categorySlice";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router";
 import { CategorySkeleton } from "./SkeletonLoading/OtherSkeletons";
 
 const CategoryComponent = ({limit, isCategoryPage}) => {
-  const dispatch = useDispatch()
-  const { categories, loading } = useSelector((state) => state.category.getCategories)
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = limit || 6;
+  const dispatch = useDispatch();
+  const { categories, loading, pagination } = useSelector((state) => state.category.getCategories);
+
   useEffect(() => {
-    dispatch(getCategories())
-  }, [])
+    dispatch(getCategories({ page: limit ? 1 : currentPage, itemsPerPage }));
+  }, [dispatch, limit, isCategoryPage, currentPage]);
+
+  const totalPages = pagination?.totalPages || 1;
+
   return (
     <>
       <Container sx={{ marginTop: "60px" }}>
@@ -38,10 +44,10 @@ const CategoryComponent = ({limit, isCategoryPage}) => {
             columnSpacing={{ xs: 1, sm: 1, md: 3 }}
             wrap="wrap"
           >
-            {categories && loading && (
+            {loading && (
               <CategorySkeleton count={isCategoryPage ? 6 : 3} />
             )}
-            {categories && categories.slice(0, limit || categories.length).map((category) => (
+            {!loading && categories && categories.map((category) => (
               <Grid size={{ md: 4, sm: 6, xs: 12 }} key={category._id}>
                 <Link style={{ textDecoration: "none"}} to={`/category/${category._id}`}>
                   <Box display="flex" flexDirection="column">
@@ -65,6 +71,21 @@ const CategoryComponent = ({limit, isCategoryPage}) => {
             </Grid>
             ))}
           </Grid>
+          {isCategoryPage && totalPages > 1 && (
+            <Box margin="50px auto 20px" display="flex" justifyContent="center">
+              <Pagination
+                size="large"
+                count={totalPages}
+                page={currentPage}
+                onChange={(e, page) => {
+                  setCurrentPage(page);
+                  window.scrollTo(0, 0);
+                }}
+                shape="rounded"
+                color="primary"
+              />
+            </Box>
+          )}
         </Box>
       </Container>
     </>

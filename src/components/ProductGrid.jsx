@@ -84,19 +84,11 @@ const ProductGrid = ({ products, productsLoading }) => {
       columns={{ md: 12, sm: 8, xs: 12 }}
       columnSpacing={{ xs: 1, sm: 1, md: 3 }}
     >
-      {productsLoading && (
-        <ProductCardSkeleton count={8}/>
-      )}
-      {!productsLoading && products?.length === 0 && (
-        <Grid size={12}>
-          <Typography variant="h5" textAlign="center">
-            No Products Found...
-          </Typography>
-        </Grid>
-      )}
-      {products ? (
+      {productsLoading ? (
+        <ProductCardSkeleton count={8} />
+      ) : products && products.length > 0 ? (
         products.map((product) => {
-          if (!product.isVisible) return;
+          if (!product.isVisible) return null;
           return (
             <Grid key={product._id} size={{ md: 3, sm: 4, xs: 12 }}>
               <Card
@@ -173,7 +165,7 @@ const ProductGrid = ({ products, productsLoading }) => {
                     color="#898989"
                     fontWeight={500}
                   >
-                    {product.category.name}
+                    {product.category?.name}
                   </Typography>
                   {product.discount_percent > 0 ? (
                     <Box
@@ -219,7 +211,11 @@ const ProductGrid = ({ products, productsLoading }) => {
           );
         })
       ) : (
-        <Typography textAlign="center">No Products Found...</Typography>
+        <Grid size={12}>
+          <Typography variant="h5" textAlign="center">
+            No Products Found...
+          </Typography>
+        </Grid>
       )}
     </Grid>
   );

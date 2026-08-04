@@ -34,18 +34,14 @@ import SearchIcon from "@mui/icons-material/Search";
 
 const CategoriesGrid = () => {
   const [deleteId, setDeleteId] = useState(null);
-  const [paginationDetails, setPaginationDetails] = useState({
-    itemsPerPage: 5,
-    totalItems: 0,
-  });
-  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 5;
   const [currentPage, setCurrentPage] = useState(1);
-  const [currentCategories, setCurrentCategories] = useState([]);
   const [query, setQuery] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const categories = useSelector(
-    (state) => state.category.getCategories.categories
+
+  const { categories, pagination } = useSelector(
+    (state) => state.category.getCategories
   );
 
   const categoriesLoading = useSelector(
@@ -55,38 +51,26 @@ const CategoriesGrid = () => {
     (state) => state.category.deleteCategory.loading
   );
 
-  useEffect(() => {
-    dispatch(getCategories());
-  }, []);
+  const totalPages = pagination?.totalPages || 1;
 
   useEffect(() => {
-    if (categories?.length > 0) {
-      setPaginationDetails({
-        ...paginationDetails,
-        totalItems: categories.length,
-      });
-      let count = Math.ceil(
-        categories.length / paginationDetails.itemsPerPage
-      );
-      setTotalPages(count);
-      const indexOfLastItem = currentPage * paginationDetails.itemsPerPage;
-      const indexOfFirstItem = indexOfLastItem - paginationDetails.itemsPerPage;
-      setCurrentCategories(categories.slice(indexOfFirstItem, indexOfLastItem));
+    if (!query) {
+      dispatch(getCategories({ page: currentPage, itemsPerPage }));
     }
-  }, [categories, currentPage]);
+  }, [currentPage]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      if(query === "")
-        dispatch(getCategories())
-      if(query){
-        setCurrentPage(1)
-        dispatch(searchCategories(query))
+      if (query === "") {
+        dispatch(getCategories({ page: currentPage, itemsPerPage }));
+      } else {
+        setCurrentPage(1);
+        dispatch(searchCategories(query));
       }
-    }, 500)
+    }, 500);
 
-    return () => clearTimeout(timer) 
-  }, [query])
+    return () => clearTimeout(timer);
+  }, [query]);
 
   const handleOpenDialog = (id) => {
     setDeleteId(id);
@@ -101,7 +85,7 @@ const CategoriesGrid = () => {
       await dispatch(deleteCategory(deleteId)).unwrap();
       dispatch(showSnackbar({ message: "Category Deleted Successfully." }));
       setDeleteId(null);
-      await dispatch(getCategories()).unwrap();
+      await dispatch(getCategories({ page: currentPage, itemsPerPage })).unwrap();
     } catch (error) {
       dispatch(showSnackbar({ severity: "error", message: error }));
       setDeleteId(null);
@@ -184,13 +168,11 @@ const CategoriesGrid = () => {
                     </TableCell>
                   </TableRow>
                 )}
-                {categories?.length !== 0 && currentCategories?.length !== 0 &&
-                  currentCategories.map((category, index) => (
-                    <TableRow key={index}>
+                {!categoriesLoading && categories?.length > 0 &&
+                  categories.map((category, index) => (
+                    <TableRow key={category._id || index}>
                       <TableCell>
-                        {index +
-                          1 +
-                          paginationDetails.itemsPerPage * (currentPage - 1)}
+                        {index + 1 + itemsPerPage * (currentPage - 1)}
                       </TableCell>
                       <TableCell align="center">
                         <img
@@ -203,7 +185,7 @@ const CategoriesGrid = () => {
                       <TableCell align="right">{category.name}</TableCell>
                       <TableCell>{category.description}</TableCell>
                       <TableCell align="center">
-                        <IconButton aria-label="delete">
+                        <IconButton aria-label="edit">
                           <EditIcon
                             color="primary"
                             onClick={() =>
@@ -253,7 +235,7 @@ const CategoriesGrid = () => {
                       </TableCell>
                     </TableRow>
                   ))}
-                {categories?.length > paginationDetails.itemsPerPage && (
+                {totalPages > 1 && (
                   <TableRow>
                     <TableCell colSpan={6}>
                       <Box display="flex" justifyContent="center">
@@ -272,10 +254,10 @@ const CategoriesGrid = () => {
                   </TableRow>
                 )}
 
-                {!categoriesLoading && categories.length === 0 && (
+                {!categoriesLoading && (!categories || categories.length === 0) && (
                   <TableRow>
                     <TableCell align="center" colSpan={6}>
-                    <Typography variant="h6">No Categories Found...</Typography>
+                      <Typography variant="h6">No Categories Found...</Typography>
                     </TableCell>
                   </TableRow>
                 )}

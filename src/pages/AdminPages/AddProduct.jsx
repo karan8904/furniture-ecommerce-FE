@@ -35,7 +35,7 @@ const AddProduct = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getCategories());
+    dispatch(getCategories({ itemsPerPage: 100 }));
   }, []);
   const categories = useSelector(
     (state) => state.category.getCategories.categories

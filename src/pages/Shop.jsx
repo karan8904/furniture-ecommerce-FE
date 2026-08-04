@@ -12,52 +12,53 @@ import { getProducts } from "../slices/productSlice";
 
 const Shop = () => {
   const [itemsPerPage, setItemsPerPage] = useState(8);
-  const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
-  const [currentProducts, setCurrentProducts] = useState([]);
-  const [firstProductNumber, setFirstProductNumber] = useState(1)
-  const [lastProductNumber, setLastProductNumber] = useState(itemsPerPage)
-  const products = useSelector((state) => state.product.getProducts.products);
+  const [filter, setFilter] = useState("default");
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(getProducts());
-  }, []);
+  const { products, pagination } = useSelector((state) => state.product.getProducts);
 
   useEffect(() => {
-    if (products?.length > 0) {
-      let count = Math.ceil(products.length / itemsPerPage);
-      setTotalPages(count);
-      const indexOfLastItem = currentPage * itemsPerPage;
-      const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-      setFirstProductNumber(indexOfFirstItem + 1)
-      setLastProductNumber(indexOfLastItem > products.length ? products.length : indexOfLastItem)
-      setCurrentProducts(products.slice(indexOfFirstItem, indexOfLastItem));
-    }
-  }, [products, itemsPerPage, currentPage]);
+    dispatch(getProducts({ page: currentPage, itemsPerPage, filter }));
+  }, [dispatch, currentPage, itemsPerPage, filter]);
+
+  const totalItems = pagination?.totalItems ?? products?.length ?? 0;
+  const totalPages = pagination?.totalPages ?? 1;
+  const firstProductNumber = totalItems > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
+  const lastProductNumber = totalItems > 0 ? Math.min(currentPage * itemsPerPage, totalItems) : 0;
 
   return (
     <>
       <Navbar />
       <PageTitleComponent pageTitle="Shop" />
 
-      <FilterComponent totalProducts={products.length} firstProductNumber={firstProductNumber} lastProductNumber={lastProductNumber} setItemsPerPage={setItemsPerPage} setCurrentPage={setCurrentPage} />
+      <FilterComponent
+        totalProducts={totalItems}
+        firstProductNumber={firstProductNumber}
+        lastProductNumber={lastProductNumber}
+        setItemsPerPage={setItemsPerPage}
+        setCurrentPage={setCurrentPage}
+        filter={filter}
+        setFilter={setFilter}
+      />
 
       <Box margin="70px 0">
-        <Products products={currentProducts} />
-        <Box margin="70px auto" display="flex" justifyContent="center">
-          <Pagination
-            size="large"
-            count={totalPages}
-            page={currentPage}
-            onChange={(e, page) => {
-              setCurrentPage(page);
-              window.scrollTo(0, 0);
-            }}
-            shape="rounded"
-            color="primary"
-          />
-        </Box>
+        <Products products={products} />
+        {totalPages > 1 && (
+          <Box margin="70px auto" display="flex" justifyContent="center">
+            <Pagination
+              size="large"
+              count={totalPages}
+              page={currentPage}
+              onChange={(e, page) => {
+                setCurrentPage(page);
+                window.scrollTo(0, 0);
+              }}
+              shape="rounded"
+              color="primary"
+            />
+          </Box>
+        )}
       </Box>
 
       <InfoComponent />

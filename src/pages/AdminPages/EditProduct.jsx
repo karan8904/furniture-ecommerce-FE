@@ -46,7 +46,7 @@ const EditProduct = () => {
 
   useEffect(() => {
     dispatch(getSingleProduct(id)).unwrap();
-    dispatch(getCategories());
+    dispatch(getCategories({ itemsPerPage: 100 }));
   }, []);
   const categories = useSelector(
     (state) => state.category.getCategories.categories

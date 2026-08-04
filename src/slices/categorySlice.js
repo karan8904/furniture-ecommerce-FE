@@ -8,6 +8,14 @@ const initialState = {
   },
   getCategories: {
     categories: [],
+    pagination: {
+      totalItems: 0,
+      totalPages: 1,
+      currentPage: 1,
+      itemsPerPage: 10,
+      hasNextPage: false,
+      hasPrevPage: false,
+    },
     error: null,
     loading: false,
   },
@@ -40,13 +48,12 @@ export const addCategory = createAsyncThunk(
 
 export const getCategories = createAsyncThunk(
   "categories/getCategories",
-  async (_, thunkApi) => {
+  async (params = {}, thunkApi) => {
     try {
-      const response = await axios.get("/categories/");
-      //   console.log(response.data);
+      const response = await axios.get("/categories/", { params });
       return response.data;
     } catch (error) {
-      const message = error.response.data.message;
+      const message = error.response?.data?.message || error.message;
       return thunkApi.rejectWithValue(message);
     }
   }
@@ -115,10 +122,19 @@ export const categorySlice = createSlice({
       //GET CATEGORIES
       .addCase(getCategories.pending, (state) => {
         state.getCategories.loading = true;
+        state.getCategories.categories = [];
       })
       .addCase(getCategories.fulfilled, (state, action) => {
         state.getCategories.loading = false;
-        state.getCategories.categories = action.payload.categories;
+        state.getCategories.categories = action.payload.categories || (Array.isArray(action.payload) ? action.payload : []);
+        state.getCategories.pagination = action.payload.pagination || {
+          totalItems: (action.payload.categories || action.payload)?.length || 0,
+          totalPages: 1,
+          currentPage: 1,
+          itemsPerPage: (action.payload.categories || action.payload)?.length || 10,
+          hasNextPage: false,
+          hasPrevPage: false,
+        };
       })
       .addCase(getCategories.rejected, (state, action) => {
         state.getCategories.loading = false;
@@ -151,13 +167,16 @@ export const categorySlice = createSlice({
 
       //SEARCH CATEGORIES
       .addCase(searchCategories.pending, (state) => {
-        state.getCategories.loading = true
+        state.getCategories.loading = true;
+        state.getCategories.categories = [];
       })
       .addCase(searchCategories.fulfilled, (state, action) => {
-        if(action.payload.length === 0)
-          state.getCategories.categories = []
-        state.getCategories.categories = action.payload
-        state.getCategories.loading = false
+        const cats = action.payload.categories || action.payload;
+        state.getCategories.categories = Array.isArray(cats) ? cats : [];
+        if (action.payload.pagination) {
+          state.getCategories.pagination = action.payload.pagination;
+        }
+        state.getCategories.loading = false;
       })
       .addCase(searchCategories.rejected, (state, action) => {
         state.getCategories.loading = false
