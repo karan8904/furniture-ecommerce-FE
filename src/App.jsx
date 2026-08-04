@@ -3,6 +3,7 @@ import { Outlet } from "react-router";
 import { getCurrentUser } from "./slices/userSlice";
 import { useDispatch } from "react-redux";
 import Cookies from 'js-cookie';
+import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   const dispatch = useDispatch()
@@ -13,9 +14,9 @@ function App() {
     }
   },[])
   return (
-    <>
+    <ScrollToTop>
       <Outlet />
-    </>
+    </ScrollToTop>
   );
 }
 
